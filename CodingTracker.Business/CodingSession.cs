@@ -1,28 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CodingTracker.IInputvalidator;
-using Spectre.Console;
-using System.Diagnostics;
-
+﻿using System.Diagnostics;
+using CodingTracker.Common.IInputValidators;
 
 // method to record start & end time
 // logic to hold recorded times & view them
 // user should be able to input start & end times manually 
 
-namespace CodingTracker.CodingSessions
+namespace CodingTracker.Business.CodingSession
 {
     public class CodingSession
     {
+        private readonly IInputValidator _inputValidator;
+        public int SessionId { get; set; }
+        public int UserId { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public TimeSpan? Duration { get; set; }
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
         public bool IsStopWatchEnabled = false;
 
+
+
         public CodingSession(IInputValidator validator)
         {
-            _validator = validator;
+            _inputValidator = validator;
 
         }
         public void StartSession()
@@ -68,14 +71,14 @@ namespace CodingTracker.CodingSessions
 
         public void SetStartTimeManually()
         {
-            StartDate = _validator.GetValidDateFromUser();
-            StartTime = _validator.GetValidTimeFromUser();
+            StartDate = _inputValidator.GetValidDateFromUser();
+            StartTime = _inputValidator.GetValidTimeFromUser();
         }
 
         public void SetEndTimeManually()
         {
-            EndDate = _validator.GetValidDateFromUser();
-            EndTime = _validator.GetValidTimeFromUser();
+            EndDate = _inputValidator.GetValidDateFromUser();
+            EndTime = _inputValidator.GetValidTimeFromUser();
         }
     }
 }

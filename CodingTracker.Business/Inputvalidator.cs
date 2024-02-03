@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
-using CodingTracker.IInputvalidator;
-using Spectre.Console.Rendering;
-using IValidator = CodingTracker.Business.IInputValidators.IInputValidator;
+﻿using System.Globalization;
+using CodingTracker.Common.IInputValidators;
+using CodingTracker.Common.IDatabaseManagers;
+
+
 
 
 
 namespace CodingTracker.Business.InputValidators
 {
-    public class InputValidator : IValidator
+    public class InputValidator : IInputValidator
     {
-        private readonly IDbManager _databaseManager;
+        private readonly IDatabaseManager _databaseManager;
         private readonly HashSet<string> startValidCommands = new HashSet<string> { "O", "1", "2", "3" };
         private readonly HashSet<string> viewValidCommands = new HashSet<string> { "0", "1", "2", "3", };
 
 
-        public InputValidator(IDbManager databaseManager)
+        public InputValidator(IDatabaseManager databaseManager)
         {
             _databaseManager = databaseManager;
         }
@@ -49,25 +45,65 @@ namespace CodingTracker.Business.InputValidators
             }
             return false;
         }
-    }
-
-    public bool CheckStartInput(string startInput)
-    {
 
 
-        if (!startValidCommands.Contains(startInput))
+        public bool CheckStartInput(string startInput)
         {
-            Console.WriteLine("Please enter valid option");
-        }
-        return true;
-    }
 
-    public bool CheckViewInput(string viewInput)
-    {
-        if (!viewValidCommands.Contains(viewInput))
+
+            if (!startValidCommands.Contains(startInput))
+            {
+                Console.WriteLine("Please enter valid option");
+            }
+            return true;
+        }
+
+        public bool CheckViewInput(string viewInput)
         {
-            Console.WriteLine("Please enter valid option");
+            if (!viewValidCommands.Contains(viewInput))
+            {
+                Console.WriteLine("Please enter valid option");
+            }
+            return true;
         }
-        return true;
-    }
 
+
+        public DateTime GetValidDateFromUser()
+        {
+            while (true)
+            {
+                Console.WriteLine("Enter enter date start time (yy-MM-dd):");
+                string userInput = Console.ReadLine();
+
+                if (CheckDateInput(userInput, out DateTime result))
+                {
+                    return result;
+                }
+
+                Console.WriteLine("Invalid date format please enter in format yy-MM-dd";
+            }
+        }
+
+        public DateTime GetValidTimeFromUser() // refactor to remove writeline
+        {
+            while (true)
+            {
+                Console.WriteLine("Please enter the time (HH:mm):");
+                string userInput = Console.ReadLine();
+
+                if (CheckTimeInput(userInput, out DateTime result))
+                {
+                    return result;
+                }
+
+                Console.WriteLine("Invalid time format. Please try again.");
+            }
+        }
+
+
+
+
+
+
+    }
+}

@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodingTracker.Common\CodingTracker.Common.csproj" />
     <ProjectReference Include="..\CodingTracker.Data\CodingTracker.Data.csproj" />
-    <ProjectReference Include="..\CodingTracker.DTO\CodingTracker.DTO.csproj" />
   </ItemGroup>
 
 </Project>

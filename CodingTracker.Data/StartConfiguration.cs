@@ -1,20 +1,14 @@
-﻿using CodingTracker.IAppConfigs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Iconfig = CodingTracker.Data.IAppConfigs.IAppConfig;
+﻿using CodingTracker.Common.IStartConfiguration;
 
 namespace CodingTracker.Data.Configurations
 {
 
-    public class Configuartion : Iconfig
+    public class StartConfiguration : IStartConfiguration
     {
         public string DatabasePath { get; private set; }
         public string ConnectionString { get; private set; }
 
-        public Configuartion()
+        public StartConfiguration()
         {
             ValidateDatabasePath();
             ValidateConnectionString();

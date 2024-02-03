@@ -1,20 +1,20 @@
 ﻿using System.Data.SQLite;
-using DbManager = CodingTracker.Data.DatabaseManagers.DatabaseManager;
-using IDbManager = CodingTracker.Data.IDatabaseManagers.IDatabaseManager;
-using ICrud = CodingTracker.Data.ICRUDs.ICRUD;
-using CodingTracker.DTO.CodingSessionDTOs;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.ICRUDs;
+using CodingTracker.Common.CodingSessionDTOs;
+
 
 
 namespace CodingTracker.Data.CRUDs
 {
-    public class CRUD : ICrud
+    public class CRUD : ICRUD
     {
-        private readonly IDbManager _dbManager;
+        private readonly IDatabaseManager _dbManager;
         private readonly CodingSessionDTO _codingSessionDTO;
 
 
 
-        public CRUD(IDbManager databaseManager, CodingSessionDTO codingSessionDTO)
+        public CRUD(IDatabaseManager databaseManager, CodingSessionDTO codingSessionDTO)
         {
             _dbManager = databaseManager;
             _codingSessionDTO = codingSessionDTO;

@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Data.IDatabaseManagers
+namespace CodingTracker.Common.IDatabaseManagers
 {
     public interface IDatabaseManager
     {
+        
         void EnsureDatabaseForUser();
         void CreateTableIfNotExists();
         void OpenConnection();

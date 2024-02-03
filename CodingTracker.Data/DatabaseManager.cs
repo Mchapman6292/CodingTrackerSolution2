@@ -1,17 +1,15 @@
-﻿
+﻿using System;
 using System.Data.SQLite;
-using IDbManager = CodingTracker.Data.IDatabaseManagers.IDatabaseManager;
-using Config = CodingTracker.Data.Configurations.Configuartion;
-using Iconfig = CodingTracker.Data.IAppConfigs.IAppConfig;
-using Validator = CodingTracker.Business.InputValidators.InputValidator;
-using IValidator = CodingTracker.Business.IInputValidators.IInputValidator;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Data.Configurations;
+using CodingTracker.Common.IInputValidators;
 
 namespace CodingTracker.Data.DatabaseManagers
 {
-    public class DatabaseManager : IDbManager
+    public class DatabaseManager : IDatabaseManager
     {
-        private readonly IValidator? _validator; // gives the instance Inputvalidator interface
-        private readonly IConfig? _iconfig;
+        private readonly IInputValidator? _validator; // gives the instance Inputvalidator interface
+        private readonly StartConfiguration? _iconfig;
         private SQLiteConnection? _connection { get; } // The actual connection to database using the connection string. 
         private string DatabasePath => _iconfig.DatabasePath;
         private string ConnectionString => _iconfig.ConnectionString;
@@ -19,12 +17,14 @@ namespace CodingTracker.Data.DatabaseManagers
 
 
 
-        public DatabaseManager(IConfig iconfiguration, IValidator validator) // Provides the database path for the current user.
+        public DatabaseManager(StartConfiguration iconfiguration, IInputValidator validator) // Provides the database path for the current user.
         {
             _iconfig = iconfiguration;
             _validator = validator;
 
         }
+
+        public static string GetTodayDate() => DateTime.Today.ToString("yyyy-MM-dd");
 
         public void EnsureDatabaseForUser()
         {
@@ -37,7 +37,7 @@ namespace CodingTracker.Data.DatabaseManagers
                 CreateTableIfNotExists();
             }
         }
-        public static string GetTodayDate() => DateTime.Today.ToString("yyyy-MM-dd");
+      
 
         public void ExecuteCRUD(Action<SQLiteConnection> action)
         {
