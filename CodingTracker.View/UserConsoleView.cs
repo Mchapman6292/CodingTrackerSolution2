@@ -86,6 +86,11 @@ namespace CodingTracker.View.UserConsoleViews
             return sessionId;
 
         }
+
+        public int SetCodingGoals(int codingGoals)
+        {
+
+        }
+
     }
-}
 }

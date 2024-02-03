@@ -135,11 +135,14 @@ namespace CodingTracker.Data.CRUDs
             {
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-                 SELECT * FROM
-                    CodingSessions
-                    WHERE UserId = @userId
-                    ORDER BY Date DESC, StartTime DESC
-                    LIMIT @NumberOfSessions";
+                    SELECT * FROM
+                        CodingSessions
+                    WHERE 
+                        UserId = @userId
+                    ORDER BY
+                        Date DESC, StartTime DESC
+                    LIMIT
+                        @NumberOfSessions";
 
 
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
@@ -167,16 +170,22 @@ namespace CodingTracker.Data.CRUDs
                 if (!partialView)
                 {
                     command.CommandText = @"
-                        SELECT * FROM CodingSessions
-                        WHERE UserId = @userId
-                        ORDER BY Date DESC, StartTime DESC";
+                        SELECT * FROM
+                            CodingSessions
+                        WHERE
+                            UserId = @userId
+                        ORDER BY
+                            Date DESC, StartTime DESC";
                 }
                 else
                 {
                     command.CommandText = $@"
-                SELECT {partialColumns} FROM CodingSessions
-                WHERE UserId = @UserId
-                ORDER BY StartDate DESC, StartTime DESC";
+                        SELECT {partialColumns} FROM
+                            CodingSessions
+                        WHERE
+                            UserId = @UserId
+                        ORDER BY
+                            StartDate DESC, StartTime DESC";
                 }
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
                 try
@@ -197,11 +206,14 @@ namespace CodingTracker.Data.CRUDs
             _dbManager.ExecuteCRUD(connection =>
             {
                 using var command = connection.CreateCommand();
+
                 command.CommandText = @"
-                    SELECT SessionId, StartTime, EndTime 
-                    FROM CodingSessions 
-                    WHERE UserId = @UserId AND Date = @Date
-                    ORDER BY StartTime DESC";
+                    SELECT SessionId, StartTime, EndTime FROM 
+                        CodingSessions 
+                    WHERE
+                        UserId = @UserId AND Date = @Date
+                    ORDER BY
+                        StartTime DESC";
 
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
                 command.Parameters.AddWithValue("@Date", chosenDate.ToString("yyyy-MM-dd"));
@@ -218,15 +230,20 @@ namespace CodingTracker.Data.CRUDs
             });
         }
 
-        public void FilterSessionsByDay(string date)
+        public void FilterSessionsByDay(string date, bool isDescending)
         {
             _dbManager.ExecuteCRUD(connection =>
             {
                 using var command = connection.CreateCommand();
-                command.CommandText = @"
-            SELECT * FROM CodingSessions 
-            WHERE DATE(StartTime) = DATE(@Date)
-            ORDER BY StartTime ASC"; // Or DESC for descending
+
+                string order = isDescending ? "DESC" : "ASC";
+                command.CommandText = $@"
+                    SELECT * FROM
+                        CodingSessions 
+                    WHERE
+                        DATE(StartTime) = DATE(@Date)
+                    ORDER BY
+                        StartTime {order}";
 
                 command.Parameters.AddWithValue("@Date", date);
 
@@ -241,17 +258,19 @@ namespace CodingTracker.Data.CRUDs
             });
         }
 
-
-        public void FilterSessionsByWeek(string date)
+        public void FilterSessionsByWeek(string date, bool isDescending)
         {
             _dbManager.ExecuteCRUD(connection =>
             {
                 using var command = connection.CreateCommand();
-                command.CommandText = @"
-            SELECT * FROM CodingSessions 
-            WHERE strftime('%W', StartTime) = strftime('%W', @Date) AND 
-                  strftime('%Y', StartTime) = strftime('%Y', @Date) 
-            ORDER BY StartTime ASC"; // Or DESC for descending
+
+                string order = isDescending ? "DESC" : "ASC";
+                command.CommandText = $@"
+                    SELECT * FROM 
+                        CodingSessions 
+                    WHERE strftime('%W', StartTime) = strftime('%W', @Date) AND 
+                          strftime('%Y', StartTime) = strftime('%Y', @Date) 
+                    ORDER BY StartTime {order}";
 
                 command.Parameters.AddWithValue("@Date", date);
 
@@ -266,16 +285,20 @@ namespace CodingTracker.Data.CRUDs
             });
         }
 
-
-        public void FilterSessionsByYear(string year)
+        public void FilterSessionsByYear(string year, bool isDescending)
         {
             _dbManager.ExecuteCRUD(connection =>
             {
                 using var command = connection.CreateCommand();
-                command.CommandText = @"
-            SELECT * FROM CodingSessions 
-            WHERE strftime('%Y', StartTime) = @Year 
-            ORDER BY StartTime ASC"; // Or DESC for descending
+
+                string order = isDescending ? "DESC" : "ASC";
+                command.CommandText = $@"
+                    SELECT * FROM
+                        CodingSessions 
+                    WHERE
+                        strftime('%Y', StartTime) = @Year 
+                    ORDER BY
+                        StartTime {order}";
 
                 command.Parameters.AddWithValue("@Year", year);
 
@@ -290,6 +313,12 @@ namespace CodingTracker.Data.CRUDs
             });
         }
 
+        public void SetProgressGoal(int ProgressGoal)
+        {
+            _dbManager.ExecuteCRUD(connection =>
+            {
+                using var command = connection.CreateCommand();
+            }
 
 
     }
