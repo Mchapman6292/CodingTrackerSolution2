@@ -206,10 +206,91 @@ namespace CodingTracker.Data.CRUDs
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
                 command.Parameters.AddWithValue("@Date", chosenDate.ToString("yyyy-MM-dd"));
 
-                command.ExecuteNonQuery()
-    
-        });
+                try
+                {
+                    command.ExecuteNonQuery();
+
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            });
         }
+
+        public void FilterSessionsByDay(string date)
+        {
+            _dbManager.ExecuteCRUD(connection =>
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+            SELECT * FROM CodingSessions 
+            WHERE DATE(StartTime) = DATE(@Date)
+            ORDER BY StartTime ASC"; // Or DESC for descending
+
+                command.Parameters.AddWithValue("@Date", date);
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            });
+        }
+
+
+        public void FilterSessionsByWeek(string date)
+        {
+            _dbManager.ExecuteCRUD(connection =>
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+            SELECT * FROM CodingSessions 
+            WHERE strftime('%W', StartTime) = strftime('%W', @Date) AND 
+                  strftime('%Y', StartTime) = strftime('%Y', @Date) 
+            ORDER BY StartTime ASC"; // Or DESC for descending
+
+                command.Parameters.AddWithValue("@Date", date);
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            });
+        }
+
+
+        public void FilterSessionsByYear(string year)
+        {
+            _dbManager.ExecuteCRUD(connection =>
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+            SELECT * FROM CodingSessions 
+            WHERE strftime('%Y', StartTime) = @Year 
+            ORDER BY StartTime ASC"; // Or DESC for descending
+
+                command.Parameters.AddWithValue("@Year", year);
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            });
+        }
+
+
 
     }
 }

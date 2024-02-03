@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Common.IInputValidators;
+using System.Data;
 
 namespace CodingTracker.Data.DatabaseManagers
 {
@@ -10,7 +11,7 @@ namespace CodingTracker.Data.DatabaseManagers
     {
         private readonly IInputValidator? _validator; // gives the instance Inputvalidator interface
         private readonly StartConfiguration? _iconfig;
-        private SQLiteConnection? _connection { get; } // The actual connection to database using the connection string. 
+        private SQLiteConnection? _connection; // The actual connection to database using the connection string. 
         private string DatabasePath => _iconfig.DatabasePath;
         private string ConnectionString => _iconfig.ConnectionString;
 
@@ -26,6 +27,13 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public static string GetTodayDate() => DateTime.Today.ToString("yyyy-MM-dd");
 
+
+        public void ExecuteCRUD(Action<SQLiteConnection> action)
+        {
+            OpenConnection();
+            action(_connection);
+        }
+
         public void EnsureDatabaseForUser()
         {
             var databasePath = DatabasePath;
@@ -39,11 +47,7 @@ namespace CodingTracker.Data.DatabaseManagers
         }
       
 
-        public void ExecuteCRUD(Action<SQLiteConnection> action)
-        {
-            OpenConnection();
-            action(_connection);
-        }
+
 
         public void OpenConnection()
         {
