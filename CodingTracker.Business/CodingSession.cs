@@ -54,6 +54,7 @@ namespace CodingTracker.Business.CodingSession
             {
                 EndTime = DateTime.Now;
             }
+            CalculateDurationMinutes();
             CalculateGoalProgress();
         }
 
@@ -79,59 +80,73 @@ namespace CodingTracker.Business.CodingSession
             TimeToGoalMins = (CodingGoalHours * 60);
         }
 
-        private void CalculateGoalProgress()
+        public void CalculateGoalProgress()
         {
-            if (!CodingGoalHours.HasValue || CodingGoalHours.Value == 0)
+            if (!CodingGoalHours.HasValue || CodingGoalHours.Value <= 0)
             {
                 throw new InvalidOperationException("Coding goal must be set and greater than zero.");
             }
-
-            _ = TimeToGoalMins <= DurationMinutes;// fix
-        }
-    
-
-
-        public void SetStartTimeManually()
-        {
-            StartDate = _inputValidator.GetValidDateFromUser();
-            StartTime = _inputValidator.GetValidTimeFromUser();
-        }
-
-        public void SetEndTimeManually()
-        {
-            EndDate = _inputValidator.GetValidDateFromUser();
-            EndTime = _inputValidator.GetValidTimeFromUser();
-        }
-
-        private void CalculateDurationMinutes()
-        {
-            if (IsStopWatchEnabled)
+            CalculateDurationMinutes();
+            if (!DurationMinutes.HasValue)
             {
-                DurationMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
+                throw new InvalidOperationException("Session duration could not be determined.");
+            }
+
+            int goalMinutes = CodingGoalHours.Value * 60;
+
+
+            if (DurationMinutes.Value >= goalMinutes)
+            {
+                TimeToGoalMins = 0;
             }
             else
             {
-                if (!StartTime.HasValue || !EndTime.HasValue || EndTime < StartTime)
+
+                TimeToGoalMins = goalMinutes - DurationMinutes.Value;
+            }
+        }
+
+        public void SetStartTimeManually()
+            {
+                StartDate = _inputValidator.GetValidDateFromUser();
+                StartTime = _inputValidator.GetValidTimeFromUser();
+            }
+
+            public void SetEndTimeManually()
+            {
+                EndDate = _inputValidator.GetValidDateFromUser();
+                EndTime = _inputValidator.GetValidTimeFromUser();
+            }
+
+            private void CalculateDurationMinutes()
+            {
+                if (IsStopWatchEnabled)
                 {
-                    throw new InvalidOperationException("Invalid Start or End Time.");
+                    DurationMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
+                }
+                else
+                {
+                    if (!StartTime.HasValue || !EndTime.HasValue || EndTime < StartTime)
+                    {
+                        throw new InvalidOperationException("Invalid Start or End Time.");
+                    }
+
+                    DurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
+                }
+            }
+
+
+            public bool CheckBothDurationCalculations()
+            {
+                if (!IsStopWatchEnabled || !StartTime.HasValue || !EndTime.HasValue)
+                {
+                    throw new InvalidOperationException("Cannot check durations - either stopwatch is not enabled or manual times are not set.");
                 }
 
-                DurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
+                int stopwatchMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
+                int manualDurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
+
+                return stopwatchMinutes == manualDurationMinutes;
             }
-        }
-
-
-        public bool CheckBothDurationCalculations()
-        {
-            if (!IsStopWatchEnabled || !StartTime.HasValue || !EndTime.HasValue)
-            {
-                throw new InvalidOperationException("Cannot check durations - either stopwatch is not enabled or manual times are not set.");
-            }
-
-            int stopwatchMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
-            int manualDurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
-
-            return stopwatchMinutes == manualDurationMinutes;
         }
     }
-}
