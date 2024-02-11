@@ -16,7 +16,10 @@ namespace CodingTracker.Business.CodingSession
         public DateTime? EndTime { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public TimeSpan? Duration { get; set; }
+        public int? DurationMinutes { get; set; }
+        public int? CodingGoalHours { get; set; }
+        public int? TimeToGoalMins { get; set; }
+        public string? SessionNotes { get; set; }
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
         public bool IsStopWatchEnabled = false;
@@ -51,23 +54,42 @@ namespace CodingTracker.Business.CodingSession
             {
                 EndTime = DateTime.Now;
             }
+            CalculateGoalProgress();
         }
 
-        private void CalculateDuration()
+        public string FormatTimeToGoalToHHMM(int? timeToGoal)
         {
-            if (IsStopWatchEnabled)
+            if (!timeToGoal.HasValue)
             {
-                Duration = _stopwatch.Elapsed;
+                throw new ArgumentException("Minutes value is required.");
             }
-            else
-            {
-                if (EndTime < StartTime)
-                {
-                    throw new InvalidOperationException("EndTime cannot be earlier than StartTime.");
-                }
-                Duration = EndTime - StartTime;
-            }
+
+            int totalMinutes = timeToGoal.Value;
+            int hours = totalMinutes / 60;
+            int remainingMinutes = totalMinutes % 60;
+
+            return $"{hours:D2}:{remainingMinutes:D2}";
         }
+
+
+        public void SetCodingGoal(int goalHours)
+        {
+            CodingGoalHours = goalHours;
+
+            TimeToGoalMins = (CodingGoalHours * 60);
+        }
+
+        private void CalculateGoalProgress()
+        {
+            if (!CodingGoalHours.HasValue || CodingGoalHours.Value == 0)
+            {
+                throw new InvalidOperationException("Coding goal must be set and greater than zero.");
+            }
+
+            _ = TimeToGoalMins <= DurationMinutes;// fix
+        }
+    
+
 
         public void SetStartTimeManually()
         {
@@ -79,6 +101,37 @@ namespace CodingTracker.Business.CodingSession
         {
             EndDate = _inputValidator.GetValidDateFromUser();
             EndTime = _inputValidator.GetValidTimeFromUser();
+        }
+
+        private void CalculateDurationMinutes()
+        {
+            if (IsStopWatchEnabled)
+            {
+                DurationMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
+            }
+            else
+            {
+                if (!StartTime.HasValue || !EndTime.HasValue || EndTime < StartTime)
+                {
+                    throw new InvalidOperationException("Invalid Start or End Time.");
+                }
+
+                DurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
+            }
+        }
+
+
+        public bool CheckBothDurationCalculations()
+        {
+            if (!IsStopWatchEnabled || !StartTime.HasValue || !EndTime.HasValue)
+            {
+                throw new InvalidOperationException("Cannot check durations - either stopwatch is not enabled or manual times are not set.");
+            }
+
+            int stopwatchMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
+            int manualDurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
+
+            return stopwatchMinutes == manualDurationMinutes;
         }
     }
 }

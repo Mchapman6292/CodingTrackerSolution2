@@ -91,10 +91,9 @@ namespace CodingTracker.Data.DatabaseManagers
                 StartDate DATETIME NOT NULL,
                 EndDate DATETIME ,
                 DurationMinutes INTEGER ,
+                CoadingGoalHours INTEGER,
+                TimeToGoalMins INTEGER,
                 SessionNotes TEXT,
-                CoadingGoal INTEGER,
-                ProgressHours INTEGER,
-                ProgressMinutes INTEGER,
                 FOREIGN KEY(UserId) REFERENCES Users(UserId)
             );";
 

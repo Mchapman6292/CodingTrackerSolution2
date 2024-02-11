@@ -87,9 +87,20 @@ namespace CodingTracker.View.UserConsoleViews
 
         }
 
-        public int SetCodingGoals(int codingGoals)
+        public int SetCodingGoal()
         {
-
+            while (true)
+            {
+                Console.WriteLine("Enter coding goal in hours (positive integer):");
+                if (int.TryParse(Console.ReadLine(), out int codingGoal) && codingGoal > 0)
+                {
+                    return codingGoal;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid positive integer.");
+                }
+            }
         }
 
     }
