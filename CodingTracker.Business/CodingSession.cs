@@ -77,7 +77,7 @@ namespace CodingTracker.Business.CodingSession
         {
             CodingGoalHours = goalHours;
 
-            TimeToGoalMins = (CodingGoalHours * 60);
+            TimeToGoalMinutes = (CodingGoalHours * 60);
         }
 
         public void CalculateGoalProgress()
@@ -97,12 +97,12 @@ namespace CodingTracker.Business.CodingSession
 
             if (DurationMinutes.Value >= goalMinutes)
             {
-                TimeToGoalMins = 0;
+                TimeToGoalMinutes = 0;
             }
             else
             {
 
-                TimeToGoalMins = goalMinutes - DurationMinutes.Value;
+                TimeToGoalMinutes = goalMinutes - DurationMinutes.Value;
             }
         }
 

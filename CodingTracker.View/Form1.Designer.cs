@@ -1,39 +1,89 @@
-﻿namespace CodingTracker.View
+﻿using System;
+using System.Windows.Forms;
+using CodingTracker.Business.CodingSession;
+using CodingTracker.Common.ICRUDs;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.IInputValidators;
+using CodingTracker.Common.IUtilityServices;
+using CodingTracker.Common.UtilityServices;
+
+namespace CodingTracker.View
 {
-    partial class Form1
+    public partial class Form1 : Form
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private readonly ICRUD _crud;
+        private readonly IDatabaseManager _dbManager;
+        private readonly IInputValidator _inputValidator;
+        private readonly IUtilityService _utilityService;
+        private readonly CodingSession _codingSession;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+
+        public Form1(ICRUD crud, IDatabaseManager dbManager, IInputValidator inputValidator, IUtilityService utilityService, CodingSession codingSession)
         {
-            if (disposing && (components != null))
+            InitializeComponent();
+            _crud = crud;
+            _dbManager = dbManager;
+            _inputValidator = inputValidator;
+            _utilityService = utilityService;
+            _codingSession = codingSession;
+
+            // Initialize GUI components here
+            //add buttons, text boxes, labels, and data grid
+        }
+
+        private void StartSessionButton_Click(object sender, EventArgs e)
+        {
+            try
             {
-                components.Dispose();
+                _codingSession.StartSession();
+                MessageBox.Show("Session started.");
             }
-            base.Dispose(disposing);
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
+        private void EndSessionButton_Click(object sender, EventArgs e)
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            try
+            {
+                _codingSession.EndSession();
+                MessageBox.Show("Session ended.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
         }
 
-        #endregion
+        private void ViewSessionsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private void SetGoalButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                
+                int goalHours = _utilityService.TryParseInt(GoalHoursTextBox.Text);
+                _codingSession.SetCodingGoal(goalHours);
+                MessageBox.Show("Coding goal set.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
     }
 }
