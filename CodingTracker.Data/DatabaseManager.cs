@@ -4,24 +4,28 @@ using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Common.IInputValidators;
 using System.Data;
+using CodingTracker.Common.IStartConfiguration;
 
 namespace CodingTracker.Data.DatabaseManagers
 {
     public class DatabaseManager : IDatabaseManager
     {
+        private readonly string _connectionString;
+        private readonly string _databasePath;
         private readonly IInputValidator? _validator; // gives the instance Inputvalidator interface
-        private readonly StartConfiguration? _iconfig;
+        private readonly IStartConfiguration? _iStartConfiguration;
         private SQLiteConnection? _connection; // The actual connection to database using the connection string. 
-        private string DatabasePath => _iconfig.DatabasePath;
-        private string ConnectionString => _iconfig.ConnectionString;
 
 
 
 
-        public DatabaseManager(StartConfiguration iconfiguration, IInputValidator validator) // Provides the database path for the current user.
+        public DatabaseManager(IStartConfiguration startConfiguration, IInputValidator validator) // Provides the database path for the current user.
         {
-            _iconfig = iconfiguration;
+            _iStartConfiguration = startConfiguration;
             _validator = validator;
+            _databasePath = _iStartConfiguration.DatabasePath;
+            _connectionString = _iStartConfiguration.ConnectionString;
+
 
         }
 
@@ -36,16 +40,15 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public void EnsureDatabaseForUser()
         {
-            var databasePath = DatabasePath;
-            if (_connection == null || _connection.ConnectionString != $"Data Source={databasePath};Version=3;")
+            if (_connection == null || _connection.ConnectionString != $"Data Source={_databasePath};Version=3;")
             {
                 _connection?.Close();
-                _connection = new SQLiteConnection($"Data Source={databasePath};Version=3;");
+                _connection = new SQLiteConnection($"Data Source={_databasePath};Version=3;");
                 _connection.Open();
                 CreateTableIfNotExists();
             }
         }
-      
+
 
 
 
@@ -55,7 +58,7 @@ namespace CodingTracker.Data.DatabaseManagers
             {
                 try
                 {
-                    _connection = new SQLiteConnection(_iconfig.ConnectionString);
+                    _connection = new SQLiteConnection(_iStartConfiguration.ConnectionString);
                     _connection.Open();
                     CreateTableIfNotExists();
                 }
@@ -118,3 +121,4 @@ namespace CodingTracker.Data.DatabaseManagers
             }
         }
     }
+}

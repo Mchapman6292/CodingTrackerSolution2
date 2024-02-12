@@ -7,6 +7,7 @@ namespace CodingTracker.Data.Configurations
     public class StartConfiguration : IStartConfiguration
     {
         public string ConnectionString { get; private set; }
+        public string DatabasePath { get; private set; }
 
         public StartConfiguration(IConfiguration configuration)
         {

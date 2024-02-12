@@ -11,6 +11,8 @@ using CodingTracker.Data.CRUDs;
 using CodingTracker.Common.ICRUDs;
 using CodingTracker.Common.IStartConfiguration;
 using CodingTracker.Data.Configurations;
+using CodingTracker.Common.IUtilityServices;
+using CodingTracker.Common.UtilityServices;
 
 
 namespace CodingTracker.View.Program
@@ -37,6 +39,7 @@ namespace CodingTracker.View.Program
                 .AddSingleton<IDatabaseManager, DatabaseManager>()
                 .AddSingleton<IUserConsoleView, UserConsoleView>() 
                 .AddSingleton<ICRUD, CRUD>()
+                .AddSingleton<UtilityService, IUtilityService>()
                 .BuildServiceProvider();
 
 
