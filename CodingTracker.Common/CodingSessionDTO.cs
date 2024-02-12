@@ -14,11 +14,11 @@ namespace CodingTracker.Common.CodingSessionDTOs
         public DateTime? EndTime { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public TimeSpan? Duration { get; set; }
+        public int? DurationMinutes { get; set; }
 
         public int? CodingGoalHours { get; set; }
         
-        public int ProgressMinutes {  get; set; }
+        public int TimeToGoalMinutes {  get; set; }
 
         public string? SessionNotes { get; set; }
     }
