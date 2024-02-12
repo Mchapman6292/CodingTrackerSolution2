@@ -8,11 +8,6 @@ namespace CodingTracker.Common.IStartConfiguration
 {
     public interface IStartConfiguration
     {
-        public string DatabasePath { get; }
         public string ConnectionString { get; }
-
-
-        public void ValidateDatabasePath();
-        public void ValidateConnectionString();
     }
 }

@@ -9,6 +9,8 @@ using CodingTracker.View.UserConsoleViews;
 using CodingTracker.Common.IUserConsoleView;
 using CodingTracker.Data.CRUDs;
 using CodingTracker.Common.ICRUDs;
+using CodingTracker.Common.IStartConfiguration;
+using CodingTracker.Data.Configurations;
 
 
 namespace CodingTracker.View.Program
@@ -23,13 +25,14 @@ namespace CodingTracker.View.Program
         {
 
             var configurationBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false) // reloadOnChange set to true for dynamic construction, when reading from json file(static) set to false.
                 .AddEnvironmentVariables();
 
             IConfiguration JSONconfiguration = configurationBuilder.Build();
 
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IConfiguration>(JSONconfiguration)
+                .AddSingleton<IStartConfiguration, StartConfiguration>()
                 .AddSingleton<IInputValidator, InputValidator>()
                 .AddSingleton<IDatabaseManager, DatabaseManager>()
                 .AddSingleton<IUserConsoleView, UserConsoleView>() 
