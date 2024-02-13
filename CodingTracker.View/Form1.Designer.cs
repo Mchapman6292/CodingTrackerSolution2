@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Windows.Forms;
 using CodingTracker.Business.CodingSession;
 using CodingTracker.Common.ICRUDs;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IUtilityServices;
-using CodingTracker.Common.UtilityServices;
+
 
 namespace CodingTracker.View
 {
@@ -22,6 +23,7 @@ namespace CodingTracker.View
         private Button setGoalButton;
         private TextBox goalHoursTextBox;
         private DataGridView sessionsDataGridView;
+        private bool _isSessionActive = false;
 
 
 
@@ -76,42 +78,56 @@ namespace CodingTracker.View
 
         private void StartSessionButton_Click(object sender, EventArgs e)
         {
-            try
+            if (!_isSessionActive)
             {
-                _codingSession.StartSession();
-                MessageBox.Show("Session started.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
+                try
+                {
+                    _codingSession.StartSession();
+                    _isSessionActive = true;
+                    startSessionButton.Enabled = false;
+                    MessageBox.Show("Session started.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
             }
         }
 
         private void EndSessionButton_Click(object sender, EventArgs e)
         {
-            try
+            if (_isSessionActive)
             {
-                _codingSession.EndSession();
-                MessageBox.Show("Session ended.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
+                try
+                {
+                    _codingSession.EndSession();
+                    _isSessionActive = false;
+                    endSessionButton.Enabled = true;
+                    MessageBox.Show("Session ended.");
+                }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
             }
         }
+    
+
+
 
         private void ViewSessionsButton_Click(object sender, EventArgs e)
-        {
-            try
             {
+                try
+                {
 
 
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
 
         private void SetGoalButton_Click(object sender, EventArgs e)
         {
