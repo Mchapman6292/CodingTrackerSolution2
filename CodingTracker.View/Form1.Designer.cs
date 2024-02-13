@@ -16,6 +16,13 @@ namespace CodingTracker.View
         private readonly IInputValidator _inputValidator;
         private readonly IUtilityService _utilityService;
         private readonly CodingSession _codingSession;
+        private Button startSessionButton;
+        private Button endSessionButton;
+        private Button viewSessionsButton;
+        private Button setGoalButton;
+        private TextBox goalHoursTextBox;
+        private DataGridView sessionsDataGridView;
+
 
 
         public Form1(ICRUD crud, IDatabaseManager dbManager, IInputValidator inputValidator, IUtilityService utilityService, CodingSession codingSession)
@@ -29,6 +36,42 @@ namespace CodingTracker.View
 
             // Initialize GUI components here
             //add buttons, text boxes, labels, and data grid
+        }
+
+
+
+
+        private void InitializeFormComponents()
+        {
+            
+            startSessionButton = new Button { Text = "Start Session" };
+            endSessionButton = new Button { Text = "End Session" };
+            viewSessionsButton = new Button { Text = "View Sessions" };
+            setGoalButton = new Button { Text = "Set Goal" };
+            goalHoursTextBox = new TextBox();
+            sessionsDataGridView = new DataGridView();
+
+
+            startSessionButton.Location = new Point(10, 10);
+            endSessionButton.Location = new Point(110, 10);
+            viewSessionsButton.Location = new Point(210, 10);
+            setGoalButton.Location = new Point(310, 10);
+            goalHoursTextBox.Location = new Point(410, 10);
+            sessionsDataGridView.Location = new Point(10, 50);
+
+
+            startSessionButton.Click += StartSessionButton_Click;
+            endSessionButton.Click += EndSessionButton_Click;
+            viewSessionsButton.Click += ViewSessionsButton_Click;
+            setGoalButton.Click += SetGoalButton_Click;
+
+
+            Controls.Add(startSessionButton);
+            Controls.Add(endSessionButton);
+            Controls.Add(viewSessionsButton);
+            Controls.Add(setGoalButton);
+            Controls.Add(goalHoursTextBox);
+            Controls.Add(sessionsDataGridView);
         }
 
         private void StartSessionButton_Click(object sender, EventArgs e)
@@ -75,7 +118,7 @@ namespace CodingTracker.View
             try
             {
                 
-                int goalHours = _utilityService.TryParseInt(GoalHoursTextBox.Text);
+                int goalHours = _utilityService.TryParseInt(goalHoursTextBox.Text);
                 _codingSession.SetCodingGoal(goalHours);
                 MessageBox.Show("Coding goal set.");
             }
