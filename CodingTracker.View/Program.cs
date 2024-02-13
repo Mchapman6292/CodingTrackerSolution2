@@ -39,7 +39,7 @@ namespace CodingTracker.View.Program
                 .AddSingleton<IDatabaseManager, DatabaseManager>()
                 .AddSingleton<IUserConsoleView, UserConsoleView>() 
                 .AddSingleton<ICRUD, CRUD>()
-                .AddSingleton<UtilityService, IUtilityService>()
+                .AddSingleton< IUtilityService, UtilityService>()
                 .BuildServiceProvider();
 
 

@@ -37,3 +37,4 @@ namespace CodingTracker.Common.UtilityServices
             return (part / total) * 100;
         }
     }
+}
