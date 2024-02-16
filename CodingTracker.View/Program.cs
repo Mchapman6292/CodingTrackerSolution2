@@ -50,7 +50,7 @@ namespace CodingTracker.View.Program
 
             ApplicationConfiguration.Initialize();
 
-            Application.Run(new Form1()); 
+            Application.Run(new LoginPage()); 
         }
     }
 }

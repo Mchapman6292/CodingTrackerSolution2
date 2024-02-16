@@ -10,7 +10,7 @@ using CodingTracker.Common.IUtilityServices;
 
 namespace CodingTracker.View
 {
-    public partial class Form1 : Form
+    public partial class LoginPage : Form
     {
         private readonly ICRUD _crud;
         private readonly IDatabaseManager _dbManager;
@@ -27,7 +27,7 @@ namespace CodingTracker.View
 
 
 
-        public Form1(ICRUD crud, IDatabaseManager dbManager, IInputValidator inputValidator, IUtilityService utilityService, CodingSession codingSession)
+        public LoginPage(ICRUD crud, IDatabaseManager dbManager, IInputValidator inputValidator, IUtilityService utilityService, CodingSession codingSession)
         {
             InitializeComponent();
             _crud = crud;
