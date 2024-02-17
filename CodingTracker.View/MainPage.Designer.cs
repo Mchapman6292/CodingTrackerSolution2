@@ -28,29 +28,29 @@
         /// </summary>
         private void InitializeComponent()
         {
-            StartSessionButton = new Button();
-            ViewSessionButton = new Button();
+            codingSessionMainButton = new Button();
+            viewSessionButton = new Button();
             MainPageExitButton = new Button();
             SuspendLayout();
             // 
-            // StartSessionButton
+            // codingSessionMainButton
             // 
-            StartSessionButton.Location = new Point(801, 242);
-            StartSessionButton.Name = "StartSessionButton";
-            StartSessionButton.Size = new Size(386, 49);
-            StartSessionButton.TabIndex = 0;
-            StartSessionButton.Text = "Start Coding Session";
-            StartSessionButton.UseVisualStyleBackColor = true;
-            StartSessionButton.Click += button1_Click;
+            codingSessionMainButton.Location = new Point(801, 242);
+            codingSessionMainButton.Name = "codingSessionMainButton";
+            codingSessionMainButton.Size = new Size(386, 49);
+            codingSessionMainButton.TabIndex = 0;
+            codingSessionMainButton.Text = "Coding session";
+            codingSessionMainButton.UseVisualStyleBackColor = true;
+            codingSessionMainButton.Click += button1_Click;
             // 
-            // ViewSessionButton
+            // viewSessionButton
             // 
-            ViewSessionButton.Location = new Point(801, 343);
-            ViewSessionButton.Name = "ViewSessionButton";
-            ViewSessionButton.Size = new Size(386, 54);
-            ViewSessionButton.TabIndex = 1;
-            ViewSessionButton.Text = "View Coding Sessions";
-            ViewSessionButton.UseVisualStyleBackColor = true;
+            viewSessionButton.Location = new Point(801, 343);
+            viewSessionButton.Name = "viewSessionButton";
+            viewSessionButton.Size = new Size(386, 54);
+            viewSessionButton.TabIndex = 1;
+            viewSessionButton.Text = "View coding sessions";
+            viewSessionButton.UseVisualStyleBackColor = true;
             // 
             // MainPageExitButton
             // 
@@ -67,8 +67,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(2147, 750);
             Controls.Add(MainPageExitButton);
-            Controls.Add(ViewSessionButton);
-            Controls.Add(StartSessionButton);
+            Controls.Add(viewSessionButton);
+            Controls.Add(codingSessionMainButton);
             Name = "MainPage";
             Text = "MainPage";
             ResumeLayout(false);
@@ -76,8 +76,8 @@
 
         #endregion
 
-        private Button StartSessionButton;
-        private Button ViewSessionButton;
+        private Button codingSessionMainButton;
+        private Button viewSessionButton;
         private Button MainPageExitButton;
     }
 }

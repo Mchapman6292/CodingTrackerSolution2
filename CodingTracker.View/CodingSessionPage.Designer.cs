@@ -28,24 +28,66 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
+            components = new System.ComponentModel.Container();
+            startCodingSessionButton = new Button();
+            enterStartTimeButton = new Button();
+            enterEndTimeButton = new Button();
+            timer1 = new System.Windows.Forms.Timer(components);
+            checkBox1 = new CheckBox();
             SuspendLayout();
             // 
-            // button1
+            // startCodingSessionButton
             // 
-            button1.Location = new Point(851, 251);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 0;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
+            startCodingSessionButton.Location = new Point(849, 232);
+            startCodingSessionButton.Name = "startCodingSessionButton";
+            startCodingSessionButton.Size = new Size(493, 80);
+            startCodingSessionButton.TabIndex = 0;
+            startCodingSessionButton.Text = "Start coding session";
+            startCodingSessionButton.UseVisualStyleBackColor = true;
+            startCodingSessionButton.Click += StartCodingSessionButton_Click;
+            // 
+            // enterStartTimeButton
+            // 
+            enterStartTimeButton.Location = new Point(131, 483);
+            enterStartTimeButton.Name = "enterStartTimeButton";
+            enterStartTimeButton.Size = new Size(496, 77);
+            enterStartTimeButton.TabIndex = 1;
+            enterStartTimeButton.Text = "Enter start time";
+            enterStartTimeButton.UseVisualStyleBackColor = true;
+            enterStartTimeButton.Click += EnterStartTimeButton_Click;
+            // 
+            // enterEndTimeButton
+            // 
+            enterEndTimeButton.Location = new Point(1740, 483);
+            enterEndTimeButton.Name = "enterEndTimeButton";
+            enterEndTimeButton.Size = new Size(496, 88);
+            enterEndTimeButton.TabIndex = 2;
+            enterEndTimeButton.Text = "Enter end time";
+            enterEndTimeButton.UseVisualStyleBackColor = true;
+            enterEndTimeButton.Click += EnterEndTimeButton_Click;
+            // 
+            // timer1
+            // 
+            timer1.Tick += timer1_Tick;
+            // 
+            // checkBox1
+            // 
+            checkBox1.Location = new Point(1402, 233);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(197, 80);
+            checkBox1.TabIndex = 3;
+            checkBox1.Text = "Show Stopwatch";
+            checkBox1.UseVisualStyleBackColor = true;
             // 
             // CodingSessionPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(2469, 715);
-            Controls.Add(button1);
+            Controls.Add(checkBox1);
+            Controls.Add(enterEndTimeButton);
+            Controls.Add(enterStartTimeButton);
+            Controls.Add(startCodingSessionButton);
             Name = "CodingSessionPage";
             Text = "CodingSessionPage";
             ResumeLayout(false);
@@ -53,6 +95,10 @@
 
         #endregion
 
-        private Button button1;
+        private Button startCodingSessionButton;
+        private Button enterStartTimeButton;
+        private Button enterEndTimeButton;
+        private System.Windows.Forms.Timer timer1;
+        private CheckBox checkBox1;
     }
 }

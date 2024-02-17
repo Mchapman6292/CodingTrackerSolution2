@@ -16,5 +16,25 @@ namespace CodingTracker.View
         {
             InitializeComponent();
         }
+
+        private void StartCodingSessionButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void EnterStartTimeButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void EnterEndTimeButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+
+        }
     }
 }
