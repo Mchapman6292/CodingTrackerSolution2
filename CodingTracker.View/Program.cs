@@ -15,6 +15,12 @@ using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Business.ApplicationControls;
 using CodingTracker.Common.IApplicationControls;
+using CodingTracker.Data.LoginManagers;
+using CodingTracker.Common.ILoginManagers;
+using CodingTracker.Data.CredentialServices;
+using CodingTracker.Common.ICredentialStorageServices;
+using CodingTracker.Data.UserCredentialDTOs;
+using CodingTracker.Common.IUserCredentialDTOs;
 
 //testing pull 
 
@@ -45,6 +51,9 @@ namespace CodingTracker.View.Program
                 .AddSingleton<ICRUD, CRUD>()
                 .AddSingleton<IUtilityService,UtilityService>()
                 .AddSingleton<IApplicationControl, ApplicationControl>()
+                .AddSingleton<ILoginManager, LoginManager>()
+                .AddSingleton<ICredentialService, CredentialService>()
+                .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
                 .BuildServiceProvider();
 
 

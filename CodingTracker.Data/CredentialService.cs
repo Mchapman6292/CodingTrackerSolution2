@@ -1,27 +1,19 @@
-﻿using CodingTracker.UserCredentials;
+﻿using CodingTracker.Common.ICredentialStorageServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using UCredentials = CodingTracker.UserCredentials.UserCredential;
-using System.Security.Cryptography;
-
-//
 
 namespace CodingTracker.Data.CredentialServices
 {
-    public class CredentialStorage
+    public class CredentialService : ICredentialService
     {
-        private Dictionary<int, UserCredential> _credentialsDict;
-        private readonly UCredentials _UCredentials;
-
-        public CredentialStorage(UCredentials uCredentials)
+        public CredentialService() 
         {
-            _credentialsDict = new Dictionary<int, UserCredential>();
-            _UCredentials = uCredentials;
+            
         }
+
 
 
         public void AddCredentials(UserCredential credential)
@@ -44,23 +36,6 @@ namespace CodingTracker.Data.CredentialServices
                 _credentialsDict.Add(userId, credential);
             }
         }
-
-
-        public bool CheckUserName(string username)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Username == username);
-        }
-
-        public bool CheckUserId(int userId)
-        {
-            return _credentialsDict.ContainsKey(userId);
-        }
-
-        public bool CheckUserPassword(string password)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Password == password);
-        }
-
         public void UpdateUserName(int userId, string newUserName)
         {
             if (!_credentialsDict.ContainsKey(userId))
@@ -71,6 +46,8 @@ namespace CodingTracker.Data.CredentialServices
             _credentialsDict[userId].Username = newUserName;
         }
 
+
+
         public void UpdatePassword(int userId, string newPassword)
         {
             if (!_credentialsDict.ContainsKey(userId))
@@ -79,6 +56,7 @@ namespace CodingTracker.Data.CredentialServices
             }
 
             _credentialsDict[userId].Password = HashPassword(newPassword);
+        }
         }
         public void UpdateCredentials(int userId, string newUsername, string newPassword)
         {
@@ -112,8 +90,4 @@ namespace CodingTracker.Data.CredentialServices
                 return builder.ToString();
             }
         }
-    }
 }
-
-
-    

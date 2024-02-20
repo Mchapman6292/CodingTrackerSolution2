@@ -128,11 +128,11 @@ namespace CodingTracker.View
             }
         }
 
-        private Label label1;
-        private Label label2;
-        private TextBox textBox1;
-        private TextBox textBox2;
-        private Button button1;
-        private Button button2;
+        private Label loginUsernameLabel;
+        private Label loginPasswordLabel;
+        private TextBox loginUsernameTextbox;
+        private TextBox loginPasswordTextbox;
+        private Button mainPageLoginButton;
+        private Button mainPageExitButton;
     }
 }

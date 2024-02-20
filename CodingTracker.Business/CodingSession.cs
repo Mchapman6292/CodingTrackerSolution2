@@ -3,7 +3,7 @@ using CodingTracker.Common.IInputValidators;
 
 // method to record start & end time
 // logic to hold recorded times & view them
-// user should be able to input start & end times manually 
+// user should be able to input start & end times manually j     
 
 namespace CodingTracker.Business.CodingSession
 {
