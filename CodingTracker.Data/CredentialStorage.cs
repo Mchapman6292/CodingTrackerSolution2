@@ -1,85 +1,43 @@
-﻿using CodingTracker.UserCredentials;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿
 using System.Text;
-using System.Threading.Tasks;
-using UCredentials = CodingTracker.UserCredentials.UserCredential;
 using System.Security.Cryptography;
+using CodingTracker.Data.UserCredentialDTOs;
+using CodingTracker.Common.ICredentialStorage;
+using CodingTracker.Data.CredentialServices;
+using CodingTracker.Common.ICredentialServices;
+
 
 //
 
-namespace CodingTracker.Data.CredentialServices
+namespace CodingTracker.Data.CredentialStorage
 {
-    public class CredentialStorage
+    public class CredentialStorage : ICredentialStorage
     {
-        private Dictionary<int, UserCredential> _credentialsDict;
-        private readonly UCredentials _UCredentials;
+        private readonly UserCredentialDTO _uCredentials;
+        private Dictionary<int, UserCredentialDTO> _credentialsById;
+        private readonly ICredentialService _credentialService;
 
-        public CredentialStorage(UCredentials uCredentials)
+        public CredentialStorage( ICredentialService credentialService)
         {
-            _credentialsDict = new Dictionary<int, UserCredential>();
-            _UCredentials = uCredentials;
+            _credentialsById = new Dictionary<int, UserCredentialDTO>();
+            _credentialService = credentialService;
         }
 
 
-        public void AddCredentials(UserCredential credential)
+        public void AddCredentials(UserCredentialDTO credential)
         {
             int userId = credential.UserId;
             string userName = credential.Username;
             string uPassword = credential.Password;
 
-            if (_credentialsDict.ContainsKey(userId))
+            if (_credentialsById.ContainsKey(userId))
             {
                 throw new InvalidOperationException("User Id Already exists");
             }
-            else if (CheckUserName(userName))
-            {
-                throw new InvalidOperationException("Username already exists");
-            }
-            else
-            {
-                UpdatePassword(HashPassword(uPassword));
-                _credentialsDict.Add(userId, credential);
-            }
+            credential.Password = HashPassword(credential.Password);
+            _credentialsById.Add(credential.UserId, credential);
         }
 
-
-        public bool CheckUserName(string username)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Username == username);
-        }
-
-        public bool CheckUserId(int userId)
-        {
-            return _credentialsDict.ContainsKey(userId);
-        }
-
-        public bool CheckUserPassword(string password)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Password == password);
-        }
-
-        public void UpdateUserName(int userId, string newUserName)
-        {
-            if (!_credentialsDict.ContainsKey(userId))
-            {
-                throw new("User ID does not exist");
-            }
-
-            _credentialsDict[userId].Username = newUserName;
-        }
-
-        public void UpdatePassword(int userId, string newPassword)
-        {
-            if (!_credentialsDict.ContainsKey(userId))
-            {
-                throw new InvalidOperationException("User ID does not exist");
-            }
-
-            _credentialsDict[userId].Password = HashPassword(newPassword);
-        }
         public void UpdateCredentials(int userId, string newUsername, string newPassword)
         {
             if (!CheckUserId(userId))
@@ -97,6 +55,49 @@ namespace CodingTracker.Data.CredentialServices
             }
         }
 
+
+        public void UpdateUserName(int userId, string newUserName)
+        {
+            if (!_credentialsById.ContainsKey(userId))
+            {
+                throw new("User ID does not exist");
+            }
+
+            _credentialsById[userId].Username = newUserName;
+        }
+
+
+
+        public void UpdatePassword(int userId, string newPassword)
+        {
+            if (!_credentialsById.ContainsKey(userId))
+            {
+                throw new InvalidOperationException("User ID does not exist");
+            }
+
+            _credentialsById[userId].Password = HashPassword(newPassword);
+        }
+
+        public void DeleteCredentials(int userId)
+        {
+            if (!_credentialsById.ContainsKey(userId))
+            {
+                throw new InvalidOperationException("User ID does not exist");
+            }
+            _credentialsById.Remove(userId);
+        }
+
+        public UserCredentialDTO GetCredentialById(int userId)
+        {
+            if (_credentialsById.TryGetValue(userId, out UserCredentialDTO credential))
+            {
+                return credential;
+            }
+            throw new KeyNotFoundException($"No credentials found for userId {userId}");
+        }
+
+
+
         public static string HashPassword(string password)
         {
             using (SHA256 sha256Hash = SHA256.Create())
@@ -112,8 +113,29 @@ namespace CodingTracker.Data.CredentialServices
                 return builder.ToString();
             }
         }
+
+
+        public bool CheckUserName(string username)
+        {
+            return _credentialsById.Values.Any(credential => credential.Username == username);
+        }
+
+
+        public bool CheckUserId(int userId)
+        {
+            return _credentialsById.ContainsKey(userId);
+        }
+
+        public bool CheckUserPassword(string password)
+        {
+            return _credentialsById.Values.Any(credential => credential.Password == password);
+        }
     }
+
 }
+
+}
+
 
 
     
