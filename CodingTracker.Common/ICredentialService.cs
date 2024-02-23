@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.ICredentialStorageServices
+namespace CodingTracker.Common.ICredentialServices
 {
     public interface ICredentialService
     {

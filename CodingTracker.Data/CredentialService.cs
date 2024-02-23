@@ -1,93 +1,65 @@
-﻿using CodingTracker.Common.ICredentialStorageServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using CodingTracker.Common.ICredentialServices;
+using CodingTracker.Common.ICredentialStorage;
+using CodingTracker.Data.UserCredentialDTOs;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace CodingTracker.Data.CredentialServices
 {
     public class CredentialService : ICredentialService
     {
-        public CredentialService() 
+        private readonly ICredentialStorage _credentialStorage;
+
+
+        public CredentialService(ICredentialStorage credentialStorage)
         {
-            
+            _credentialStorage = credentialStorage;
+        }
+
+
+        public bool ValidateLogin(string username, string password)
+        {
+            if (_credentialStorage.)
         }
 
 
 
-        public void AddCredentials(UserCredential credential)
-        {
-            int userId = credential.UserId;
-            string userName = credential.Username;
-            string uPassword = credential.Password;
 
-            if (_credentialsDict.ContainsKey(userId))
+
+
+
+
+        public bool ValidateLogin(string username, string password)
+        {
+            if (_credentialsDict.TryGetValue(username, out UserCredentialDTO storedCredentials))
             {
-                throw new InvalidOperationException("User Id Already exists");
-            }
-            else if (CheckUserName(userName))
-            {
-                throw new InvalidOperationException("Username already exists");
+                string hashedInputPassword = HashPassword(password);
+                return hashedInputPassword == storedCredentials.Password;
             }
             else
             {
-                UpdatePassword(HashPassword(uPassword));
-                _credentialsDict.Add(userId, credential);
+                // Username not found
+                return false;
             }
         }
-        public void UpdateUserName(int userId, string newUserName)
+
+
+
+
+        public bool CheckUserName(string username)
         {
-            if (!_credentialsDict.ContainsKey(userId))
-            {
-                throw new("User ID does not exist");
-            }
-
-            _credentialsDict[userId].Username = newUserName;
+            return _credentialsDict.Values.Any(credential => credential.Username == username);
         }
 
-
-
-        public void UpdatePassword(int userId, string newPassword)
+        public bool CheckUserId(int userId)
         {
-            if (!_credentialsDict.ContainsKey(userId))
-            {
-                throw new InvalidOperationException("User ID does not exist");
-            }
+            return _credentialsDict.ContainsKey(userId);
+        }
 
-            _credentialsDict[userId].Password = HashPassword(newPassword);
-        }
-        }
-        public void UpdateCredentials(int userId, string newUsername, string newPassword)
+        public bool CheckUserPassword(string password)
         {
-            if (!CheckUserId(userId))
-            {
-                throw new InvalidOperationException("User ID does not exist");
-            }
-
-            if (!string.IsNullOrEmpty(newUsername) && !CheckUserName(newUsername))
-            {
-                UpdateUserName(userId, newUsername);
-            }
-            if (!string.IsNullOrEmpty(newPassword))
-            {
-                UpdatePassword(userId, newPassword);
-            }
+            return _credentialsDict.Values.Any(credential => credential.Password == password);
         }
-
-        public static string HashPassword(string password)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
+    }
 }
