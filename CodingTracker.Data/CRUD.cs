@@ -20,25 +20,27 @@ namespace CodingTracker.Data.CRUDs
             _codingSessionDTO = codingSessionDTO;
         }
 
+
+
         public void UpdateSession()
         {
             _dbManager.ExecuteCRUD(connection =>
             {
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-            UPDATE CodingSessions  
-            SET 
-                StartTime = @StartTime,
-                EndTime = @EndTime,
-                StartDate = @StartDate,
-                EndDate = @EndDate,
-                DurationMinutes = @DurationMinutes,
-                CodingGoalHours = @CodingGoalHours,
-                TimeToGoalMins = @TimeToGoalMins,
-                SessionNotes = @SessionNotes
-            WHERE 
-                SessionId = @SessionId AND 
-                UserId = @UserId";
+                    UPDATE CodingSessions  
+                    SET 
+                        StartTime = @StartTime,
+                        EndTime = @EndTime,
+                        StartDate = @StartDate,
+                        EndDate = @EndDate,
+                        DurationMinutes = @DurationMinutes,
+                        CodingGoalHours = @CodingGoalHours,
+                        TimeToGoalMins = @TimeToGoalMins,
+                        SessionNotes = @SessionNotes
+                    WHERE 
+                        SessionId = @SessionId AND 
+                        UserId = @UserId";
 
                 command.Parameters.AddWithValue("@SessionId", _codingSessionDTO.SessionId);
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
@@ -53,7 +55,7 @@ namespace CodingTracker.Data.CRUDs
 
                 try
                 {
-                    command.ExecuteNonQuery();
+                    command.ExecuteNonQuery(); // Used as default for all queries that do not return a result
                 }
                 catch (SQLiteException ex)
                 {
@@ -70,11 +72,11 @@ namespace CodingTracker.Data.CRUDs
             {
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-            UPDATE CodingSessions 
-            SET
-                TimeToGoalMins = @TimeToGoalMins
-            WHERE
-                UserId = @UserId";
+                    UPDATE CodingSessions 
+                    SET
+                        TimeToGoalMins = @TimeToGoalMins
+                    WHERE
+                        UserId = @UserId";
 
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
                 command.Parameters.AddWithValue("@TimeToGoalMins", _codingSessionDTO.TimeToGoalMinutes);
@@ -100,10 +102,10 @@ namespace CodingTracker.Data.CRUDs
             {
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-            DELETE FROM CodingSessions 
-            WHERE 
-                SessionId = @SessionId AND 
-                UserId = @UserId";
+                    DELETE FROM CodingSessions 
+                    WHERE 
+                        SessionId = @SessionId AND 
+                        UserId = @UserId";
 
                 command.Parameters.AddWithValue("@SessionId", _codingSessionDTO.SessionId);
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
@@ -127,29 +129,29 @@ namespace CodingTracker.Data.CRUDs
             {
                 using var command = connection.CreateCommand();
                 command.CommandText = @"
-            INSERT INTO CodingSessions 
-            (
-                UserId, 
-                StartTime, 
-                EndTime, 
-                StartDate,
-                EndDate,
-                DurationMinutes, 
-                CodingGoalHours,
-                TimeToGoalMins,
-                SessionNotes
-            ) 
-            VALUES 
-            (
-                @UserId, 
-                @StartTime, 
-                @EndTime, 
-                @StartDate,
-                @EndDate,
-                @DurationMinutes, 
-                @CodingGoalHours,
-                @TimeToGoalMins,
-                @SessionNotes
+                    INSERT INTO CodingSessions 
+                    (
+                        UserId, 
+                        StartTime, 
+                        EndTime, 
+                        StartDate,
+                        EndDate,
+                        DurationMinutes, 
+                        CodingGoalHours,
+                        TimeToGoalMins,
+                        SessionNotes
+                    ) 
+                    VALUES 
+                    (
+                        @UserId, 
+                        @StartTime, 
+                        @EndTime, 
+                        @StartDate,
+                        @EndDate,
+                        @DurationMinutes, 
+                        @CodingGoalHours,
+                        @TimeToGoalMins,
+                        @SessionNotes
             )";
 
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);

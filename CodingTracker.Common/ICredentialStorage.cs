@@ -1,4 +1,4 @@
-﻿using CodingTracker.Common.IUserCredentialDTOs;
+﻿using CodingTracker.Common.UserCredentialDTOs;
 
 namespace CodingTracker.Common.ICredentialStorage
 {
@@ -10,8 +10,10 @@ namespace CodingTracker.Common.ICredentialStorage
         void UpdatePassword(int userId, string newPassword);
         void DeleteCredentials(int userId);
         UserCredentialDTO GetCredentialById(int userId);
-        bool CheckUserName(string username);
-        bool CheckUserId(int userId);
-        bool CheckUserPassword(string password);
+        bool CheckUserNameCredential(string username, out UserCredentialDTO userCredential);
+        bool CheckUserIdCredentialCredential(int userId);
+        bool CheckUserPasswordCredential(string password);
+        string HashPassword(string password);
+
     }
 }
