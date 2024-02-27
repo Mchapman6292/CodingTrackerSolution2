@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Data.UserCredentialDTOs
+namespace CodingTracker.Common.UserCredentialDTOs
 {
     public class UserCredentialDTO : IUserCredentialDTO
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using CodingTracker.Common.ICredentialServices;
 using CodingTracker.Common.ICredentialStorage;
-using CodingTracker.Data.UserCredentialDTOs;
-using System.Text;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.UserCredentialDTOs;
 
 
 namespace CodingTracker.Data.CredentialServices
@@ -10,36 +10,36 @@ namespace CodingTracker.Data.CredentialServices
     public class CredentialService : ICredentialService
     {
         private readonly ICredentialStorage _credentialStorage;
+        private readonly IDatabaseManager _databaseManager;
+        
 
 
-        public CredentialService(ICredentialStorage credentialStorage)
+        public CredentialService(ICredentialStorage credentialStorage, IDatabaseManager databaseManager)
         {
             _credentialStorage = credentialStorage;
+            _databaseManager = databaseManager;
         }
+
+        public UserCredentialDTO CreateUser(string username, string password)
+        {
+            string hashedPassword = _credentialStorage.HashPassword(password);
+
+            
+
+
+        }
+
 
 
         public bool ValidateLogin(string username, string password)
         {
-            if (_credentialStorage.)
-        }
-
-
-
-
-
-
-
-
-        public bool ValidateLogin(string username, string password)
-        {
-            if (_credentialsDict.TryGetValue(username, out UserCredentialDTO storedCredentials))
+            if (_credentialStorage.CheckUserNameCredential(username, out UserCredentialDTO storedCredentials))
             {
-                string hashedInputPassword = HashPassword(password);
+                string hashedInputPassword = _credentialStorage.HashPassword(password);
                 return hashedInputPassword == storedCredentials.Password;
             }
             else
             {
-                // Username not found
                 return false;
             }
         }
@@ -47,19 +47,12 @@ namespace CodingTracker.Data.CredentialServices
 
 
 
-        public bool CheckUserName(string username)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Username == username);
-        }
 
-        public bool CheckUserId(int userId)
-        {
-            return _credentialsDict.ContainsKey(userId);
-        }
+    
 
-        public bool CheckUserPassword(string password)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Password == password);
-        }
+
+
+
+
     }
 }

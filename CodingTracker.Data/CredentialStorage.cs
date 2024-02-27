@@ -1,10 +1,12 @@
 ﻿
 using System.Text;
 using System.Security.Cryptography;
-using CodingTracker.Data.UserCredentialDTOs;
+using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.ICredentialStorage;
 using CodingTracker.Data.CredentialServices;
 using CodingTracker.Common.ICredentialServices;
+using CodingTracker.Common.IDatabaseManagers;
+using System.Data.SQLite;
 
 
 //
@@ -14,82 +16,144 @@ namespace CodingTracker.Data.CredentialStorage
     public class CredentialStorage : ICredentialStorage
     {
         private readonly UserCredentialDTO _uCredentials;
-        private Dictionary<int, UserCredentialDTO> _credentialsById;
+        private readonly IDatabaseManager _databaseManager;
+        private Dictionary<string, UserCredentialDTO> _credentialsDict = new Dictionary<string, UserCredentialDTO>();
         private readonly ICredentialService _credentialService;
 
-        public CredentialStorage( ICredentialService credentialService)
+        public CredentialStorage( ICredentialService credentialService, IDatabaseManager databaseManager)
         {
-            _credentialsById = new Dictionary<int, UserCredentialDTO>();
+            _credentialsDict = new Dictionary<string, UserCredentialDTO>();
             _credentialService = credentialService;
+            _databaseManager = databaseManager;
         }
 
 
         public void AddCredentials(UserCredentialDTO credential)
         {
-            int userId = credential.UserId;
-            string userName = credential.Username;
-            string uPassword = credential.Password;
-
-            if (_credentialsById.ContainsKey(userId))
+            string hashedPassword = HashPassword(credential.Password);
+            _databaseManager.ExecuteCRUD(connection =>
             {
-                throw new InvalidOperationException("User Id Already exists");
-            }
-            credential.Password = HashPassword(credential.Password);
-            _credentialsById.Add(credential.UserId, credential);
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                INSERT INTO 
+                        UserCredentials
+                (
+                        UserId,
+                        Username,
+                        PasswordHash
+                )
+                VALUES
+                (
+                        @UserId,
+                        @Username,
+                        @PasswordHash
+                )";
+                command.Parameters.AddWithValue("@UserId", credential.UserId);
+                command.Parameters.AddWithValue("@Username", credential.Username);
+                command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            });
         }
 
         public void UpdateCredentials(int userId, string newUsername, string newPassword)
         {
-            if (!CheckUserId(userId))
-            {
-                throw new InvalidOperationException("User ID does not exist");
-            }
-
-            if (!string.IsNullOrEmpty(newUsername) && !CheckUserName(newUsername))
-            {
-                UpdateUserName(userId, newUsername);
-            }
-            if (!string.IsNullOrEmpty(newPassword))
-            {
-                UpdatePassword(userId, newPassword);
-            }
+            UpdateUserName(userId, newUsername);
+            UpdatePassword(userId, newPassword);
         }
+
 
 
         public void UpdateUserName(int userId, string newUserName)
         {
-            if (!_credentialsById.ContainsKey(userId))
+            _databaseManager.ExecuteCRUD(connection =>
             {
-                throw new("User ID does not exist");
-            }
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                UPDATE 
+                        UserCredentials
+                SET 
+                        Username = @Username
+                WHERE 
+                        UserId = @UserId";
+                command.Parameters.AddWithValue("@UserId", userId);
+                command.Parameters.AddWithValue("@Username", newUserName);
 
-            _credentialsById[userId].Username = newUserName;
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            });
         }
-
 
 
         public void UpdatePassword(int userId, string newPassword)
         {
-            if (!_credentialsById.ContainsKey(userId))
+            string hashedPassword = HashPassword(newPassword);
+            _databaseManager.ExecuteCRUD(connection =>
             {
-                throw new InvalidOperationException("User ID does not exist");
-            }
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                UPDATE 
+                        UserCredentials
+                SET 
+                        PasswordHash = @PasswordHash
+                WHERE 
+                        UserId = @UserId";
+                command.Parameters.AddWithValue("@UserId", userId);
+                command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
-            _credentialsById[userId].Password = HashPassword(newPassword);
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+
+                }
+            });
         }
 
         public void DeleteCredentials(int userId)
         {
-            if (!_credentialsById.ContainsKey(userId))
+            _databaseManager.ExecuteCRUD(connection =>
             {
-                throw new InvalidOperationException("User ID does not exist");
-            }
-            _credentialsById.Remove(userId);
-        }
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                DELETE FROM 
+                        UserCredentials
+                WHERE 
+                        UserId = @UserId";
+                command.Parameters.AddWithValue("@UserId", userId);
 
-        public UserCredentialDTO GetCredentialById(int userId)
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+ 
+                }
+            });
+        }
+    
+
+        public UserCredentialDTO GetCredentialById(int userId) // Needed?
         {
-            if (_credentialsById.TryGetValue(userId, out UserCredentialDTO credential))
+            if (_credentialsDict.TryGetValue(userId, out UserCredentialDTO credential))
             {
                 return credential;
             }
@@ -98,7 +162,7 @@ namespace CodingTracker.Data.CredentialStorage
 
 
 
-        public static string HashPassword(string password)
+        public  string HashPassword(string password)
         {
             using (SHA256 sha256Hash = SHA256.Create())
             {
@@ -115,26 +179,25 @@ namespace CodingTracker.Data.CredentialStorage
         }
 
 
-        public bool CheckUserName(string username)
+        public bool CheckUserNameCredential(string username, out UserCredentialDTO userCredential) // Probably not needed
         {
-            return _credentialsById.Values.Any(credential => credential.Username == username);
+            return _credentialsDict.TryGetValue(username, out userCredential);
         }
 
 
-        public bool CheckUserId(int userId)
+        public bool CheckUserIdCredentialCredential(int userId)
         {
-            return _credentialsById.ContainsKey(userId);
+            return _credentialsDict.ContainsKey(userId);
         }
 
-        public bool CheckUserPassword(string password)
+        public bool CheckUserPasswordCredential(string password)
         {
-            return _credentialsById.Values.Any(credential => credential.Password == password);
+            return _credentialsDict.Values.Any(credential => credential.Password == password);
         }
     }
 
 }
 
-}
 
 
 
