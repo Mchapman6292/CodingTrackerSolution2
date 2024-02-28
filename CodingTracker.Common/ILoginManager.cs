@@ -9,3 +9,4 @@ namespace CodingTracker.Common.ILoginManagers
     public interface ILoginManager
     {
     }
+}

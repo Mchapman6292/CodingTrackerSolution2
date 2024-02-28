@@ -10,9 +10,7 @@ namespace CodingTracker.Common.ICredentialStorage
         void UpdatePassword(int userId, string newPassword);
         void DeleteCredentials(int userId);
         UserCredentialDTO GetCredentialById(int userId);
-        bool CheckUserNameCredential(string username, out UserCredentialDTO userCredential);
-        bool CheckUserIdCredentialCredential(int userId);
-        bool CheckUserPasswordCredential(string password);
+
         string HashPassword(string password);
 
     }

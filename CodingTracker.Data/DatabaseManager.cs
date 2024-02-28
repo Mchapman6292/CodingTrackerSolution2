@@ -12,7 +12,7 @@ namespace CodingTracker.Data.DatabaseManagers
     {
         private readonly string _connectionString;
         private readonly string _databasePath;
-        private readonly IInputValidator? _validator; // gives the instance Inputvalidator interface
+        private readonly IInputValidator? _validator; 
         private readonly IStartConfiguration? _iStartConfiguration;
         private SQLiteConnection? _connection; // The actual connection to database using the connection string. 
 
