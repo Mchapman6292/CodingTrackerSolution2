@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using System.Text;
 using System.Security.Cryptography;
 using CodingTracker.Common.UserCredentialDTOs;
@@ -7,47 +7,46 @@ using CodingTracker.Data.CredentialServices;
 using CodingTracker.Common.ICredentialServices;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
-
-
-//
+using CodingTracker.Common.Loggers; 
+using System.Collections.Generic;
+using CodingTracker.Common.IApplicationLoggers;
 
 namespace CodingTracker.Data.CredentialStorage
 {
     public class CredentialStorage : ICredentialStorage
     {
-        private readonly UserCredentialDTO _uCredentials;
-        private readonly IDatabaseManager _databaseManager;
-        private Dictionary<string, UserCredentialDTO> _credentialsDict = new Dictionary<string, UserCredentialDTO>();
+        private readonly IApplicationLogger _appLogger; // Injected logger
         private readonly ICredentialService _credentialService;
+        private readonly IDatabaseManager _databaseManager;
 
-        public CredentialStorage( ICredentialService credentialService, IDatabaseManager databaseManager)
+        public CredentialStorage(IApplicationLogger logger, ICredentialService credentialService, IDatabaseManager databaseManager)
         {
-            _credentialsDict = new Dictionary<string, UserCredentialDTO>();
+            _appLogger = logger;
             _credentialService = credentialService;
             _databaseManager = databaseManager;
         }
-
 
         public void AddCredentials(UserCredentialDTO credential)
         {
             string hashedPassword = HashPassword(credential.Password);
             _databaseManager.ExecuteCRUD(connection =>
             {
-                using var command = connection.CreateCommand();
-                command.CommandText = @"
-                INSERT INTO 
+                using var command = new SQLiteCommand(@"
+                    INSERT INTO
                         UserCredentials
-                (
+                    (
                         UserId,
                         Username,
                         PasswordHash
-                )
-                VALUES
-                (
+                    )
+                    VALUES
+                    (
                         @UserId,
                         @Username,
                         @PasswordHash
-                )";
+                    )"
+                            , connection);
+
                 command.Parameters.AddWithValue("@UserId", credential.UserId);
                 command.Parameters.AddWithValue("@Username", credential.Username);
                 command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
@@ -55,10 +54,11 @@ namespace CodingTracker.Data.CredentialStorage
                 try
                 {
                     command.ExecuteNonQuery();
+                    _appLogger.Info("Credentials added successfully for {Username}", credential.Username);
                 }
                 catch (SQLiteException ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    _appLogger.Error("Failed to add credentials for {Username}. Error: {ErrorMessage}", credential.Username, ex.Message);
                 }
             });
         }
@@ -69,59 +69,51 @@ namespace CodingTracker.Data.CredentialStorage
             UpdatePassword(userId, newPassword);
         }
 
-
-
         public void UpdateUserName(int userId, string newUserName)
         {
             _databaseManager.ExecuteCRUD(connection =>
             {
-                using var command = connection.CreateCommand();
-                command.CommandText = @"
-                UPDATE 
-                        UserCredentials
-                SET 
-                        Username = @Username
-                WHERE 
-                        UserId = @UserId";
+                using var command = new SQLiteCommand(@"
+                    UPDATE UserCredentials
+                    SET Username = @Username
+                    WHERE UserId = @UserId", connection);
+
                 command.Parameters.AddWithValue("@UserId", userId);
                 command.Parameters.AddWithValue("@Username", newUserName);
 
                 try
                 {
                     command.ExecuteNonQuery();
+                    _appLogger.Info("Username updated successfully for UserId {UserId}", userId);
                 }
                 catch (SQLiteException ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    _appLogger.Error("Failed to update username for UserId {UserId}. Error: {ErrorMessage}", userId, ex.Message);
                 }
             });
         }
-
 
         public void UpdatePassword(int userId, string newPassword)
         {
             string hashedPassword = HashPassword(newPassword);
             _databaseManager.ExecuteCRUD(connection =>
             {
-                using var command = connection.CreateCommand();
-                command.CommandText = @"
-                UPDATE 
-                        UserCredentials
-                SET 
-                        PasswordHash = @PasswordHash
-                WHERE 
-                        UserId = @UserId";
+                using var command = new SQLiteCommand(@"
+                    UPDATE UserCredentials
+                    SET PasswordHash = @PasswordHash
+                    WHERE UserId = @UserId", connection);
+
                 command.Parameters.AddWithValue("@UserId", userId);
                 command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
                 try
                 {
                     command.ExecuteNonQuery();
+                    _appLogger.Info("Password updated successfully for UserId {UserId}", userId);
                 }
                 catch (SQLiteException ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
-
+                    _appLogger.Error("Failed to update password for UserId {UserId}. Error: {ErrorMessage}", userId, ex.Message);
                 }
             });
         }
@@ -130,75 +122,62 @@ namespace CodingTracker.Data.CredentialStorage
         {
             _databaseManager.ExecuteCRUD(connection =>
             {
-                using var command = connection.CreateCommand();
-                command.CommandText = @"
-                DELETE FROM 
-                        UserCredentials
-                WHERE 
-                        UserId = @UserId";
+                using var command = new SQLiteCommand(@"
+                    DELETE FROM UserCredentials
+                    WHERE UserId = @UserId", connection);
+
                 command.Parameters.AddWithValue("@UserId", userId);
 
                 try
                 {
                     command.ExecuteNonQuery();
+                    _appLogger.Info("Credentials deleted successfully for UserId {UserId}", userId);
                 }
                 catch (SQLiteException ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
- 
+                    _appLogger.Error("Failed to delete credentials for UserId {UserId}. Error: {ErrorMessage}", userId, ex.Message);
                 }
             });
         }
-    
 
-        public UserCredentialDTO GetCredentialById(int userId) // Needed?
+
+
+        public string HashPassword(string password)
         {
-            if (_credentialsDict.TryGetValue(userId, out UserCredentialDTO credential))
+            try
             {
-                return credential;
-            }
-            throw new KeyNotFoundException($"No credentials found for userId {userId}");
-        }
-
-
-
-        public  string HashPassword(string password)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
+                using (SHA256 sha256Hash = SHA256.Create())
                 {
-                    builder.Append(bytes[i].ToString("x2"));
+
+                    byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < bytes.Length; i++)
+                    {
+                        builder.Append(bytes[i].ToString("x2"));
+                    }
+                    return builder.ToString();
                 }
-                return builder.ToString();
+            }
+            catch (ArgumentNullException ex)
+            {
+                _appLogger.Error("Password cannot be null.", ex);
+                throw;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _appLogger.Error("An unexpected error occurred while hashing the password.", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error("An error occurred while processing your request.", ex);
+                throw;
             }
         }
 
 
-        public bool CheckUserNameCredential(string username, out UserCredentialDTO userCredential) // Probably not needed
-        {
-            return _credentialsDict.TryGetValue(username, out userCredential);
-        }
-
-
-        public bool CheckUserIdCredentialCredential(int userId)
-        {
-            return _credentialsDict.ContainsKey(userId);
-        }
-
-        public bool CheckUserPasswordCredential(string password)
-        {
-            return _credentialsDict.Values.Any(credential => credential.Password == password);
-        }
     }
-
 }
 
 
-
-
-    

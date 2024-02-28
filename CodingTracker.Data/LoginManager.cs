@@ -66,7 +66,7 @@ namespace CodingTracker.Data.LoginManagers
                 return null; // Indicate failure by returning null
             }
         }
-    }
+    
 
 
 
