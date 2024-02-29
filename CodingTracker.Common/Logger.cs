@@ -1,4 +1,7 @@
 ﻿using Serilog;
+using Serilog.Context;
+using System;
+using System.Diagnostics;
 using CodingTracker.Common.IApplicationLoggers;
 
 namespace CodingTracker.Common.Loggers
@@ -11,6 +14,7 @@ namespace CodingTracker.Common.Loggers
         {
             _logger = new LoggerConfiguration()
                 .MinimumLevel.Information() // Set minimum level to Information
+                .Enrich.FromLogContext() // Enrich logs from the log context
                 .WriteTo.Console() // Log to console
                 .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day) // Log to file, with daily roll-over
                 .CreateLogger();
