@@ -1,7 +1,7 @@
 ﻿using System.Data.SQLite;
-using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.ICRUDs;
-using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Logging.IDatabaseManagers;
+using CodingTracker.Logging.ICRUDs;
+using CodingTracker.Logging.CodingSessionDTOs;
 
 
 

@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodingTracker.Common\CodingTracker.Common.csproj" />
+    <ProjectReference Include="..\CodingTracker.Logging\CodingTracker.Logging.csproj" />
   </ItemGroup>
 
 </Project>
