@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CodingTracker.Common
 {
-    internal static class ActivityExtensions
+    public static class ActivityExtensions
     {
         public static string GetSpanId(this Activity activity) => activity?.SpanId.ToHexString() ?? string.Empty;
         public static string GetTraceId(this Activity activity) => activity?.TraceId.ToHexString() ?? string.Empty;

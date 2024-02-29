@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodingTracker.Business", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodingTracker.Data", "CodingTracker.Data\CodingTracker.Data.csproj", "{07D92AB0-9678-4690-AB68-F859AFE4F0EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingTracker.View", "CodingTracker.View\CodingTracker.View.csproj", "{913A3449-89AC-4D81-B3C3-13D9B9FF3D1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodingTracker.View", "CodingTracker.View\CodingTracker.View.csproj", "{913A3449-89AC-4D81-B3C3-13D9B9FF3D1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingTracker.Common", "CodingTracker.Common\CodingTracker.Common.csproj", "{29BFB055-9485-4862-BA80-3CB64AF43E70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodingTracker.Common", "CodingTracker.Common\CodingTracker.Common.csproj", "{29BFB055-9485-4862-BA80-3CB64AF43E70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingTracker.Logging", "CodingTracker.Logging\CodingTracker.Logging.csproj", "{53D1FB13-6286-4320-8C9B-C0E3B1449CAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{29BFB055-9485-4862-BA80-3CB64AF43E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29BFB055-9485-4862-BA80-3CB64AF43E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29BFB055-9485-4862-BA80-3CB64AF43E70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D1FB13-6286-4320-8C9B-C0E3B1449CAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D1FB13-6286-4320-8C9B-C0E3B1449CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D1FB13-6286-4320-8C9B-C0E3B1449CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D1FB13-6286-4320-8C9B-C0E3B1449CAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
