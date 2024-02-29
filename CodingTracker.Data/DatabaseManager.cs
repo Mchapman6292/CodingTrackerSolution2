@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data.SQLite;
-using CodingTracker.Logging.IDatabaseManagers;
+using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Data.Configurations;
-using CodingTracker.Logging.IInputValidators;
+using CodingTracker.Common.IInputValidators;
 using System.Data;
-using CodingTracker.Logging.IStartConfiguration;
+using CodingTracker.Common.IStartConfigurations;
 
 namespace CodingTracker.Data.DatabaseManagers
 {

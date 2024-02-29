@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Enrichers.Span;
-using CodingTracker
+using CodingTracker.Common.ILoggerEnrichers;
 
 namespace CodingTracker.Logging.LoggerEnrichers
 {

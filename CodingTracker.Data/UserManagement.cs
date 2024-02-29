@@ -1,6 +1,6 @@
-﻿using CodingTracker.Logging.ICredentialStorage;
-using CodingTracker.Logging.IDatabaseManagers;
-using CodingTracker.Logging.UserCredentialDTOs;
+﻿using CodingTracker.Common.ICredentialStorage;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.UserCredentialDTOs;
 using System.Data.SQLite;
 
 // Logic that includes CRUD methods to update database
