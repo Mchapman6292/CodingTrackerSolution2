@@ -1,9 +1,9 @@
-﻿using CodingTracker.Common.ILoginManagers;
-using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.ICredentialStorage;
+﻿using CodingTracker.Logging.ILoginManagers;
+using CodingTracker.Logging.IDatabaseManagers;
+using CodingTracker.Logging.ICredentialStorage;
 using System.Data.SQLite;
 using System.Data.SqlClient;
-using CodingTracker.Common.UserCredentialDTOs;
+using CodingTracker.Logging.UserCredentialDTOs;
 
 
 // resetPassword, updatePassword, rememberUser 

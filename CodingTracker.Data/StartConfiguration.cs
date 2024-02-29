@@ -1,4 +1,4 @@
-﻿using CodingTracker.Common.IStartConfiguration;
+﻿using CodingTracker.Common.IStartConfigurations;
 using Microsoft.Extensions.Configuration;
 using System;
 

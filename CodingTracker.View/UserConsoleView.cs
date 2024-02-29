@@ -1,11 +1,11 @@
 ﻿
 using System;
-using CodingTracker.Common.IUserConsoleView;
-using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Logging.IUserConsoleView;
+using CodingTracker.Logging.IDatabaseManagers;
+using CodingTracker.Logging.CodingSessionDTOs;
 using CodingTracker.Business.CodingSession;
-using CodingTracker.Common.IInputValidator;
-using CodingTracker.Common.ICRUDs;
+using CodingTracker.Logging.IInputValidator;
+using CodingTracker.Logging.ICRUDs;
 
 
 //To do

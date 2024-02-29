@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 using CodingTracker.Business.CodingSession;
-using CodingTracker.Common.ICRUDs;
-using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.IInputValidators;
-using CodingTracker.Common.IUtilityServices;
-using CodingTracker.Common.UtilityServices;
+using CodingTracker.Logging.ICRUDs;
+using CodingTracker.Logging.IDatabaseManagers;
+using CodingTracker.Logging.IInputValidators;
+using CodingTracker.Logging.IUtilityServices;
+using CodingTracker.Logging.UtilityServices;
 
 namespace CodingTracker.View
 {

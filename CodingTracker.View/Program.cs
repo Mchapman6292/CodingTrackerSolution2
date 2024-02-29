@@ -9,7 +9,7 @@ using CodingTracker.View.UserConsoleViews;
 using CodingTracker.Common.IUserConsoleView;
 using CodingTracker.Data.CRUDs;
 using CodingTracker.Common.ICRUDs;
-using CodingTracker.Common.IStartConfiguration;
+using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UtilityServices;
@@ -23,7 +23,7 @@ using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.IUserCredentialDTOs;
 using CodingTracker.Data.CredentialStorage;
 using CodingTracker.Common.ICredentialStorage;
-using CodingTracker.Common.Loggers;
+using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.Common.IApplicationLoggers;
 
 //testing pull 
@@ -59,7 +59,7 @@ namespace CodingTracker.View.Program
                 .AddSingleton<ICredentialService, CredentialService>()
                 .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
                 .AddSingleton<ICredentialStorage, CredentialStorage>()
-                .AddSingleton<IApplicationLogger, Logger>()
+                .AddSingleton<IApplicationLogger, ApplicationLogger>()
                 .BuildServiceProvider();
 
 

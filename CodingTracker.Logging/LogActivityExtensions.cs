@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common
+namespace CodingTracker.Logging.AcitivtyExtensions
 {
-    public static class ActivityExtensions
+    public static class ActivityExtension
     {
         public static string GetSpanId(this Activity activity) => activity?.SpanId.ToHexString() ?? string.Empty;
         public static string GetTraceId(this Activity activity) => activity?.TraceId.ToHexString() ?? string.Empty;

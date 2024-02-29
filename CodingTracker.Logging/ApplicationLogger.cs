@@ -4,13 +4,13 @@ using System;
 using System.Diagnostics;
 using CodingTracker.Common.IApplicationLoggers;
 
-namespace CodingTracker.Common.Loggers
+namespace CodingTracker.Logging.ApplicationLoggers
 {
-    public class Logger : IApplicationLogger
+    public class ApplicationLogger : IApplicationLoggers
     {
         private readonly Serilog.ILogger _logger;
 
-        public Logger()
+        public ApplicationLogger()
         {
             _logger = new LoggerConfiguration()
                 .MinimumLevel.Information() // Set minimum level to Information

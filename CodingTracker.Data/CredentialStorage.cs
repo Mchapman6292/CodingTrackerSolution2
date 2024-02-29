@@ -7,7 +7,6 @@ using CodingTracker.Data.CredentialServices;
 using CodingTracker.Common.ICredentialServices;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
-using CodingTracker.Common.Loggers; 
 using System.Collections.Generic;
 using CodingTracker.Common.IApplicationLoggers;
 
@@ -141,7 +140,6 @@ namespace CodingTracker.Data.CredentialStorage
         }
 
 
-
         public string HashPassword(string password)
         {
             try
@@ -176,7 +174,10 @@ namespace CodingTracker.Data.CredentialStorage
             }
         }
 
-
+        UserCredentialDTO GetCredentialById(int userId)//needed?
+        {
+            throw new NotImplementedException("GetCredentialById is not implemented in the current storage provider.");
+        }
     }
 }
 

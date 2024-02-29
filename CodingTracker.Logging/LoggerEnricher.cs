@@ -3,8 +3,9 @@ using System.Diagnostics;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Enrichers.Span;
+using CodingTracker
 
-namespace CodingTracker.Common.LoggerEnrichers
+namespace CodingTracker.Logging.LoggerEnrichers
 {
     public class LoggerEnricher : ILoggerEnricher
     {

@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CodingTracker.Common\CodingTracker.Common.csproj" />
     <ProjectReference Include="..\CodingTracker.Data\CodingTracker.Data.csproj" />
+    <ProjectReference Include="..\CodingTracker.Logging\CodingTracker.Logging.csproj" />
   </ItemGroup>
 
 </Project>
