@@ -6,7 +6,7 @@ using CodingTracker.Common.IApplicationLoggers;
 
 namespace CodingTracker.Logging.ApplicationLoggers
 {
-    public class ApplicationLogger : IApplicationLoggers
+    public class ApplicationLogger : IApplicationLogger
     {
         private readonly Serilog.ILogger _logger;
 
