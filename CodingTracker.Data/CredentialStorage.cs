@@ -7,14 +7,17 @@ using CodingTracker.Data.CredentialServices;
 using CodingTracker.Common.ICredentialServices;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
-using System.Collections.Generic;
 using CodingTracker.Common.IApplicationLoggers;
+using System.Diagnostics;
+using System.Net;
 
+
+// Pass DTO as parameter to methods that act on multiple properties
 namespace CodingTracker.Data.CredentialStorage
 {
     public class CredentialStorage : ICredentialStorage
     {
-        private readonly IApplicationLogger _appLogger; // Injected logger
+        private readonly IApplicationLogger _appLogger;
         private readonly ICredentialService _credentialService;
         private readonly IDatabaseManager _databaseManager;
 
@@ -27,10 +30,14 @@ namespace CodingTracker.Data.CredentialStorage
 
         public void AddCredentials(UserCredentialDTO credential)
         {
-            string hashedPassword = HashPassword(credential.Password);
-            _databaseManager.ExecuteCRUD(connection =>
+            using (var activity = new Activity(nameof(AddCredentials)).Start()) // Start a new activity
             {
-                using var command = new SQLiteCommand(@"
+                _appLogger.Debug($"Starting {nameof(AddCredentials)}. TraceID: {activity.TraceId}, UserId: {credential.UserId}, Username: {credential.Username}");
+
+                string hashedPassword = HashPassword(credential.Password);
+                _databaseManager.ExecuteCRUD(connection =>
+                {
+                    using var command = new SQLiteCommand(@"
                     INSERT INTO
                         UserCredentials
                     (
@@ -44,22 +51,25 @@ namespace CodingTracker.Data.CredentialStorage
                         @Username,
                         @PasswordHash
                     )"
-                            , connection);
+                                , connection);
 
-                command.Parameters.AddWithValue("@UserId", credential.UserId);
-                command.Parameters.AddWithValue("@Username", credential.Username);
-                command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
+                    command.Parameters.AddWithValue("@UserId", credential.UserId);
+                    command.Parameters.AddWithValue("@Username", credential.Username);
+                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
-                try
-                {
-                    command.ExecuteNonQuery();
-                    _appLogger.Info("Credentials added successfully for {Username}", credential.Username);
-                }
-                catch (SQLiteException ex)
-                {
-                    _appLogger.Error("Failed to add credentials for {Username}. Error: {ErrorMessage}", credential.Username, ex.Message);
-                }
-            });
+                    try
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        int affectedRows = command.ExecuteNonQuery();
+                        stopwatch.Stop();
+                        _appLogger.Info($"Credentials added successfully for {credential.Username}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
+                    catch (SQLiteException ex)
+                    {
+                        _appLogger.Error($"Failed to add credentials for {credential.Username}. Error: {ex.Message}. TraceID: {Activity.Current?.TraceId}");
+                    }
+                });
+            }
         }
 
         public void UpdateCredentials(int userId, string newUsername, string newPassword)
@@ -70,77 +80,114 @@ namespace CodingTracker.Data.CredentialStorage
 
         public void UpdateUserName(int userId, string newUserName)
         {
-            _databaseManager.ExecuteCRUD(connection =>
+            using (var activity = new Activity(nameof(UpdateUserName)).Start())
             {
-                using var command = new SQLiteCommand(@"
-                    UPDATE UserCredentials
-                    SET Username = @Username
-                    WHERE UserId = @UserId", connection);
-
-                command.Parameters.AddWithValue("@UserId", userId);
-                command.Parameters.AddWithValue("@Username", newUserName);
-
-                try
+                _appLogger.Debug($"Starting {nameof(UpdateUserName)}. TraceID: {activity.TraceId}, UserId: {userId}, NewUserName: {newUserName}");
+                _databaseManager.ExecuteCRUD(connection =>
                 {
-                    command.ExecuteNonQuery();
-                    _appLogger.Info("Username updated successfully for UserId {UserId}", userId);
-                }
-                catch (SQLiteException ex)
-                {
-                    _appLogger.Error("Failed to update username for UserId {UserId}. Error: {ErrorMessage}", userId, ex.Message);
-                }
-            });
+                    using var command = new SQLiteCommand(@"
+                    UPDATE
+                        UserCredentials
+                    SET
+                        Username = @Username
+                    WHERE
+                        UserId = @UserId",
+
+                            connection);
+
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@Username", newUserName);
+
+                    try
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        int affectedRows = command.ExecuteNonQuery();
+                        stopwatch.Stop();
+                        _appLogger.Info($"Username updated successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
+                    catch (SQLiteException ex)
+                    {
+                        _appLogger.Error($"Failed to update username for UserId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}");
+                    }
+                });
+            }
         }
+
 
         public void UpdatePassword(int userId, string newPassword)
         {
-            string hashedPassword = HashPassword(newPassword);
-            _databaseManager.ExecuteCRUD(connection =>
+            using (var activity = new Activity(nameof(UpdatePassword)).Start())
             {
-                using var command = new SQLiteCommand(@"
-                    UPDATE UserCredentials
-                    SET PasswordHash = @PasswordHash
-                    WHERE UserId = @UserId", connection);
-
-                command.Parameters.AddWithValue("@UserId", userId);
-                command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
-
-                try
+                _appLogger.Debug($"Starting {nameof(UpdatePassword)}. TraceID: {activity.TraceId}, UserId: {userId}");
+                string hashedPassword = HashPassword(newPassword);
+                _databaseManager.ExecuteCRUD(connection =>
                 {
-                    command.ExecuteNonQuery();
-                    _appLogger.Info("Password updated successfully for UserId {UserId}", userId);
-                }
-                catch (SQLiteException ex)
-                {
-                    _appLogger.Error("Failed to update password for UserId {UserId}. Error: {ErrorMessage}", userId, ex.Message);
-                }
-            });
+                    using var command = new SQLiteCommand(@"
+                UPDATE
+                    UserCredentials
+                SET 
+                    PasswordHash = @PasswordHash
+                WHERE
+                    UserId = @UserId",
+                        connection);
+
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
+
+                    try
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        int affectedRows = command.ExecuteNonQuery();
+                        stopwatch.Stop();
+                        _appLogger.Info($"Password updated successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
+                    catch (SQLiteException ex)
+                    {
+                        _appLogger.Error($"Failed to update password for UserId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    }
+                });
+            }
         }
 
         public void DeleteCredentials(int userId)
         {
-            _databaseManager.ExecuteCRUD(connection =>
+            using (var activity = new Activity(nameof(DeleteCredentials)).Start())
             {
-                using var command = new SQLiteCommand(@"
-                    DELETE FROM UserCredentials
-                    WHERE UserId = @UserId", connection);
-
-                command.Parameters.AddWithValue("@UserId", userId);
-
-                try
+                _appLogger.Debug($"Starting {nameof(DeleteCredentials)}. TraceID: {activity.TraceId}, UserId: {userId}");
+                _databaseManager.ExecuteCRUD(connection =>
                 {
-                    command.ExecuteNonQuery();
-                    _appLogger.Info("Credentials deleted successfully for UserId {UserId}", userId);
-                }
-                catch (SQLiteException ex)
-                {
-                    _appLogger.Error("Failed to delete credentials for UserId {UserId}. Error: {ErrorMessage}", userId, ex.Message);
-                }
-            });
+                    using var command = new SQLiteCommand(@"
+                DELETE FROM 
+                    UserCredentials
+                WHERE
+                    UserId = @UserId",
+                        connection);
+
+                    command.Parameters.AddWithValue("@UserId", userId);
+
+                    try
+                    {
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        int affectedRows = command.ExecuteNonQuery();
+                        stopwatch.Stop();
+                        _appLogger.Info($"Credentials deleted successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
+                    catch (SQLiteException ex)
+                    {
+                        _appLogger.Error($"Failed to delete credentials for UserId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    }
+                });
+            }
         }
 
 
-        public string HashPassword(string password)
+            /// <summary>
+            /// Does not create a new activity as exceptions thrown here are re-thrown and handled by the caller, where they are logged within the appropriate operational context.
+            /// </summary>
+            /// </summary>
+            /// <param name="password"></param>
+            /// <returns></returns>
+            public string HashPassword(string password)
         {
             try
             {
@@ -176,7 +223,7 @@ namespace CodingTracker.Data.CredentialStorage
 
         UserCredentialDTO GetCredentialById(int userId)//needed?
         {
-            throw new NotImplementedException("GetCredentialById is not implemented in the current storage provider.");
+            throw new NotImplementedException(" not implemented.");
         }
     }
 }
