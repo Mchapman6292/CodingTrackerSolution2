@@ -12,7 +12,7 @@ namespace CodingTracker.Business.ApplicationControls
         public bool ApplicationIsRunning { get; private set; }
 
 
-        public ApplicationController()
+        public ApplicationControl()
         {
             ApplicationIsRunning = false; // Set to false instead of true to ensure that processes don't run or exit prematurely or unintentionally.
         }

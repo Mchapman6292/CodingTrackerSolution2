@@ -3,8 +3,6 @@ using System.Text;
 using System.Security.Cryptography;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.ICredentialStorage;
-using CodingTracker.Data.CredentialServices;
-using CodingTracker.Common.ICredentialServices;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
 using CodingTracker.Common.IApplicationLoggers;
@@ -18,13 +16,11 @@ namespace CodingTracker.Data.CredentialStorage
     public class CredentialStorage : ICredentialStorage
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICredentialService _credentialService;
         private readonly IDatabaseManager _databaseManager;
 
-        public CredentialStorage(IApplicationLogger logger, ICredentialService credentialService, IDatabaseManager databaseManager)
+        public CredentialStorage(IApplicationLogger applogger,  IDatabaseManager databaseManager)
         {
-            _appLogger = logger;
-            _credentialService = credentialService;
+            _appLogger = applogger;
             _databaseManager = databaseManager;
         }
 
@@ -221,7 +217,7 @@ namespace CodingTracker.Data.CredentialStorage
             }
         }
 
-        UserCredentialDTO GetCredentialById(int userId)//needed?
+        public UserCredentialDTO GetCredentialById(int userId)//needed?
         {
             throw new NotImplementedException(" not implemented.");
         }

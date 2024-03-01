@@ -49,12 +49,12 @@ namespace CodingTracker.Data.LoginManagers
                         command.Parameters.AddWithValue("@Username", username);
 
                         using var reader = command.ExecuteReader();
-                        if (reader.Read())
+                        if (reader.Read()) // Used to check if there are any rows(users) returned by the query. 
                         {
                             var storedHash = reader["PasswordHash"].ToString();
                             if (hashedPassword == storedHash)
                             {
-                                // Construct the DTO with data from the database
+                                // Construct the DTO with data from the database, query against existing users. 
                                 userCredential = new UserCredentialDTO
                                 {
                                     UserId = Convert.ToInt32(reader["UserId"]),
