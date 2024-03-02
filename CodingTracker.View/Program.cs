@@ -17,8 +17,6 @@ using CodingTracker.Business.ApplicationControls;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Data.LoginManagers;
 using CodingTracker.Common.ILoginManagers;
-using CodingTracker.Data.CredentialServices;
-using CodingTracker.Common.ICredentialServices;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.IUserCredentialDTOs;
 using CodingTracker.Data.CredentialStorage;
@@ -56,7 +54,6 @@ namespace CodingTracker.View.Program
                 .AddSingleton<IUtilityService,UtilityService>()
                 .AddSingleton<IApplicationControl, ApplicationControl>()
                 .AddSingleton<ILoginManager, LoginManager>()
-                .AddSingleton<ICredentialService, CredentialService>()
                 .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
                 .AddSingleton<ICredentialStorage, CredentialStorage>()
                 .AddSingleton<IApplicationLogger, ApplicationLogger>()
