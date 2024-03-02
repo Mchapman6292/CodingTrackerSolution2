@@ -1,27 +1,47 @@
-﻿using CodingTracker.Common.IStartConfigurations;
+﻿using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.IStartConfigurations;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Diagnostics;
 
 namespace CodingTracker.Data.Configurations
 {
     public class StartConfiguration : IStartConfiguration
     {
+        private readonly IApplicationLogger _appLogger;
+        private readonly IConfiguration _configuration; 
         public string ConnectionString { get; private set; }
         public string DatabasePath { get; private set; }
 
-        public StartConfiguration(IConfiguration configuration)
+        public StartConfiguration(IApplicationLogger appLogger, IConfiguration configuration)
         {
-            try
+            _appLogger = appLogger;
+            _configuration = configuration; 
+        }
+
+        public void LoadConfiguration()
+        {
+            using (var activity = new Activity(nameof(LoadConfiguration)).Start()) 
             {
-                ConnectionString = configuration.GetSection("DatabaseConfig:ConnectionString").Value;
-                if (string.IsNullOrEmpty(ConnectionString))
+                _appLogger.Debug($"Starting {nameof(LoadConfiguration)}. TraceID: {activity.TraceId}");
+
+                try
                 {
-                    throw new InvalidOperationException("Connection string configuration is missing.");
+                    ConnectionString = _configuration.GetSection("DatabaseConfig:ConnectionString").Value;
+
+                    if (string.IsNullOrEmpty(ConnectionString))
+                    {
+                        _appLogger.Error($"Connection string configuration is missing. TraceID: {activity.TraceId}");
+                        throw new InvalidOperationException("Connection string configuration is missing.");
+                    }
+
+                    _appLogger.Info($"Configuration loaded successfully. TraceID: {activity.TraceId}");
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Error loading configuration: " + ex.Message, ex);
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Error loading configuration: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    throw new InvalidOperationException("Error loading configuration: " + ex.Message, ex);
+                }
             }
         }
     }

@@ -5,11 +5,15 @@ using CodingTracker.Data.Configurations;
 using CodingTracker.Common.IInputValidators;
 using System.Data;
 using CodingTracker.Common.IStartConfigurations;
+using CodingTracker.Common.IApplicationLoggers;
+using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace CodingTracker.Data.DatabaseManagers
 {
     public class DatabaseManager : IDatabaseManager
     {
+        private readonly IApplicationLogger _appLogger;
         private readonly string _connectionString;
         private readonly string _databasePath;
         private readonly IInputValidator? _validator; 
@@ -19,8 +23,9 @@ namespace CodingTracker.Data.DatabaseManagers
 
 
 
-        public DatabaseManager(IStartConfiguration startConfiguration, IInputValidator validator) // Provides the database path for the current user.
+        public DatabaseManager(IApplicationLogger appLogger, IStartConfiguration startConfiguration, IInputValidator validator) // Provides the database path for the current user.
         {
+            _appLogger = appLogger;
             _iStartConfiguration = startConfiguration;
             _validator = validator;
             _databasePath = _iStartConfiguration.DatabasePath;
@@ -54,20 +59,46 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public void OpenConnection()
         {
-            if (_connection == null || _connection.State != ConnectionState.Open)
+            using (var activity = new Activity(nameof(OpenConnection)).Start())
             {
+                _appLogger.Debug($"Starting {nameof(OpenConnection)}. TraceID: {activity.TraceId}");
+
                 try
                 {
-                    _connection = new SQLiteConnection(_iStartConfiguration.ConnectionString);
+                    if (_connection != null && _connection.State == ConnectionState.Open)
+                    {
+                        _appLogger.Debug($"Connection already open. TraceID: {activity.TraceId}");
+                        return;
+                    }
+
+                    _connection = new SQLiteConnection(_connectionString);
                     _connection.Open();
-                    CreateTableIfNotExists();
+                    _appLogger.Info($"Connection opened successfully. TraceID: {activity.TraceId}");
                 }
-                catch (SQLiteException ex)
+                catch (SqlException ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    _appLogger.Error($"SQL error occurred while opening connection: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    _appLogger.Error($"Invalid operation while opening connection: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+                catch (TimeoutException ex)
+                {
+                    _appLogger.Error($"Timeout occurred while opening connection: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+                // Include additional catch blocks for other specific exceptions as needed
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Unexpected error while opening connection: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    throw;
                 }
             }
         }
+
 
         public void CreateTableIfNotExists()
         {
