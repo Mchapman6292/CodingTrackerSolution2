@@ -40,12 +40,12 @@ namespace CodingTracker.Data.LoginManagers
                     {
                         using var command = connection.CreateCommand();
                         command.CommandText = @"
-                SELECT 
-                        UserId, Username, PasswordHash 
-                FROM 
-                        UserCredentials 
-                WHERE 
-                        Username = @Username";
+                        SELECT 
+                                UserId, Username, PasswordHash 
+                        FROM 
+                                UserCredentials 
+                        WHERE 
+                                Username = @Username";
                         command.Parameters.AddWithValue("@Username", username);
 
                         using var reader = command.ExecuteReader();

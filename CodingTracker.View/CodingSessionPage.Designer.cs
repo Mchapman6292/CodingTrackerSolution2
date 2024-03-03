@@ -1,4 +1,6 @@
-﻿namespace CodingTracker.View
+﻿using CodingTracker.Business.CodingSession;
+
+namespace CodingTracker.View
 {
     partial class CodingSessionPage
     {
@@ -20,6 +22,60 @@
             base.Dispose(disposing);
         }
 
+
+        private void StartSessionButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _codingSession.StartSession();
+                MessageBox.Show("Session started.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private void EndSessionButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _codingSession.EndSession();
+                MessageBox.Show("Session ended.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private void ViewSessionsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private void SetGoalButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                int goalHours = _utilityService.TryParseInt(goalHoursTextBox.Text);
+                _codingSession.SetCodingGoal(goalHours);
+                MessageBox.Show("Coding goal set.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -38,7 +94,7 @@
             // 
             // startCodingSessionButton
             // 
-            startCodingSessionButton.Location = new Point(849, 232);
+            startCodingSessionButton.Location = new Point(671, 233);
             startCodingSessionButton.Name = "startCodingSessionButton";
             startCodingSessionButton.Size = new Size(493, 80);
             startCodingSessionButton.TabIndex = 0;
@@ -58,7 +114,7 @@
             // 
             // enterEndTimeButton
             // 
-            enterEndTimeButton.Location = new Point(1740, 483);
+            enterEndTimeButton.Location = new Point(1184, 483);
             enterEndTimeButton.Name = "enterEndTimeButton";
             enterEndTimeButton.Size = new Size(496, 88);
             enterEndTimeButton.TabIndex = 2;
