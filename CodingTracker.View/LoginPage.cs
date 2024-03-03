@@ -1,11 +1,14 @@
+using CodingTracker.Common.ILoginManagers;
+
 namespace CodingTracker.View
 {
     public partial class LoginPage : Form
     {
-        public LoginPage()
+        private readonly ILoginManager _loginManager;
+        public LoginPage(ILoginManager loginManager)
         {
             InitializeComponent();
-            throw new NotImplementedException();
+            _loginManager = loginManager;
         }
 
         private void InitializeComponent()
@@ -14,8 +17,10 @@ namespace CodingTracker.View
             loginPasswordLabel = new Label();
             loginUsernameTextbox = new TextBox();
             loginPasswordTextbox = new TextBox();
-            mainPageLoginButton = new Button();
-            mainPageExitButton = new Button();
+            LoginPageLoginButton = new Button();
+            loginPageExitButton = new Button();
+            label1 = new Label();
+            LoginPageErrorLabel = new Label();
             SuspendLayout();
             // 
             // loginUsernameLabel
@@ -50,50 +55,89 @@ namespace CodingTracker.View
             loginPasswordTextbox.Size = new Size(267, 23);
             loginPasswordTextbox.TabIndex = 4;
             // 
-            // mainPageLoginButton
+            // LoginPageLoginButton
             // 
-            mainPageLoginButton.Location = new Point(582, 505);
-            mainPageLoginButton.Name = "mainPageLoginButton";
-            mainPageLoginButton.Size = new Size(141, 35);
-            mainPageLoginButton.TabIndex = 5;
-            mainPageLoginButton.Text = "Login";
-            mainPageLoginButton.UseVisualStyleBackColor = true;
-            mainPageLoginButton.Click += MainPageLoginButton;
+            LoginPageLoginButton.Location = new Point(582, 505);
+            LoginPageLoginButton.Name = "LoginPageLoginButton";
+            LoginPageLoginButton.Size = new Size(141, 35);
+            LoginPageLoginButton.TabIndex = 5;
+            LoginPageLoginButton.Text = "Login";
+            LoginPageLoginButton.UseVisualStyleBackColor = true;
+            LoginPageLoginButton.Click += LoginPageLoginButton_Click;
             // 
-            // mainPageExitButton
+            // loginPageExitButton
             // 
-            mainPageExitButton.Location = new Point(822, 505);
-            mainPageExitButton.Name = "mainPageExitButton";
-            mainPageExitButton.Size = new Size(141, 35);
-            mainPageExitButton.TabIndex = 6;
-            mainPageExitButton.Text = "Exit";
-            mainPageExitButton.UseVisualStyleBackColor = true;
-            mainPageExitButton.Click += MainPageExitButton;
+            loginPageExitButton.Location = new Point(822, 505);
+            loginPageExitButton.Name = "loginPageExitButton";
+            loginPageExitButton.Size = new Size(141, 35);
+            loginPageExitButton.TabIndex = 6;
+            loginPageExitButton.Text = "Exit";
+            loginPageExitButton.UseVisualStyleBackColor = true;
+            loginPageExitButton.Click += LoginPageExitButton_Click;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.ForeColor = Color.Red;
+            label1.Location = new Point(696, 437);
+            label1.Name = "label1";
+            label1.Size = new Size(0, 15);
+            label1.TabIndex = 7;
+            // 
+            // LoginPageErrorLabel
+            // 
+            LoginPageErrorLabel.AutoSize = true;
+            LoginPageErrorLabel.Location = new Point(696, 452);
+            LoginPageErrorLabel.Name = "LoginPageErrorLabel";
+            LoginPageErrorLabel.Size = new Size(0, 15);
+            LoginPageErrorLabel.TabIndex = 8;
+            LoginPageErrorLabel.Visible = false;
             // 
             // LoginPage
             // 
             ClientSize = new Size(2055, 877);
-            Controls.Add(mainPageExitButton);
-            Controls.Add(mainPageLoginButton);
+            Controls.Add(LoginPageErrorLabel);
+            Controls.Add(label1);
+            Controls.Add(loginPageExitButton);
+            Controls.Add(LoginPageLoginButton);
             Controls.Add(loginPasswordTextbox);
             Controls.Add(loginUsernameTextbox);
             Controls.Add(loginPasswordLabel);
             Controls.Add(loginUsernameLabel);
             Name = "LoginPage";
+            Load += LoginPage_Load;
             ResumeLayout(false);
             PerformLayout();
         }
 
+        private void LoginPageLoginButton_Click(object sender, EventArgs e)
+        {
+            string username = loginUsernameTextbox.Text;
+            string password = loginPasswordTextbox.Text;
+
+            var userCredential = _loginManager.ValidateLogin(username, password);
+
+            if (userCredential != null)
+            {
+                MessageBox.Show("Login successful.");
+            }
+            else
+            {
+                LoginPageErrorLabel.Visible = true;
+                LoginPageErrorLabel.Text = "Login failed. Please check your username and password.";
+            }
+        }
 
 
-        private void MainPageLoginButton(object sender, EventArgs e)
+
+        private void LoginPageExitButton_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void MainPageExitButton(object sender, EventArgs e)
+        private void LoginPage_Load(object sender, EventArgs e)
         {
 
         }
-    }
-}
+
+

@@ -45,11 +45,7 @@ namespace CodingTracker.View
         {
             
             startSessionButton = new Button { Text = "Start Session" };
-            endSessionButton = new Button { Text = "End Session" };
-            viewSessionsButton = new Button { Text = "View Sessions" };
-            setGoalButton = new Button { Text = "Set Goal" };
-            goalHoursTextBox = new TextBox();
-            sessionsDataGridView = new DataGridView();
+            
 
 
             startSessionButton.Location = new Point(10, 10);
@@ -60,10 +56,6 @@ namespace CodingTracker.View
             sessionsDataGridView.Location = new Point(10, 50);
 
 
-            startSessionButton.Click += StartSessionButton_Click;
-            endSessionButton.Click += EndSessionButton_Click;
-            viewSessionsButton.Click += ViewSessionsButton_Click;
-            setGoalButton.Click += SetGoalButton_Click;
 
 
             Controls.Add(startSessionButton);
@@ -74,65 +66,14 @@ namespace CodingTracker.View
             Controls.Add(sessionsDataGridView);
         }
 
-        private void StartSessionButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _codingSession.StartSession();
-                MessageBox.Show("Session started.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
-
-        private void EndSessionButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _codingSession.EndSession();
-                MessageBox.Show("Session ended.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
-
-        private void ViewSessionsButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
-
-        private void SetGoalButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                
-                int goalHours = _utilityService.TryParseInt(goalHoursTextBox.Text);
-                _codingSession.SetCodingGoal(goalHours);
-                MessageBox.Show("Coding goal set.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
 
         private Label loginUsernameLabel;
         private Label loginPasswordLabel;
         private TextBox loginUsernameTextbox;
         private TextBox loginPasswordTextbox;
-        private Button mainPageLoginButton;
-        private Button mainPageExitButton;
+        private Button LoginPageLoginButton;
+        private Button loginPageExitButton;
+        private Label label1;
+        private Label LoginPageErrorLabel;
     }
 }

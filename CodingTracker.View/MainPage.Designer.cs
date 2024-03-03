@@ -52,10 +52,10 @@
             viewSessionButton.Text = "View coding sessions";
             viewSessionButton.UseVisualStyleBackColor = true;
             // 
-            // MainPageExitButton
+            // LoginPageExitButton
             // 
             MainPageExitButton.Location = new Point(1997, 678);
-            MainPageExitButton.Name = "MainPageExitButton";
+            MainPageExitButton.Name = "LoginPageExitButton";
             MainPageExitButton.Size = new Size(156, 60);
             MainPageExitButton.TabIndex = 2;
             MainPageExitButton.Text = "Exit";
