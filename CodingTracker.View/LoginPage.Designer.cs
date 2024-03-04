@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using System.Windows.Forms;
 using CodingTracker.Business.CodingSession;
@@ -10,7 +10,7 @@ using CodingTracker.Logging.UtilityServices;
 
 namespace CodingTracker.View
 {
-    public partial class LoginPage : Form
+    partial class loginPageForm
     {
         private readonly ICRUD _crud;
         private readonly IDatabaseManager _dbManager;
@@ -24,48 +24,116 @@ namespace CodingTracker.View
         private TextBox goalHoursTextBox;
         private DataGridView sessionsDataGridView;
         private bool _isSessionActive = false;
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-
-
-        public LoginPage(ICRUD crud, IDatabaseManager dbManager, IInputValidator inputValidator, IUtilityService utilityService, CodingSession codingSession)
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
         {
-            InitializeComponent();
-            _crud = crud;
-            _dbManager = dbManager;
-            _inputValidator = inputValidator;
-            _utilityService = utilityService;
-            _codingSession = codingSession;
-
-            // Initialize GUI components here
-            //add buttons, text boxes, labels, and data grid
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
         }
 
+        #region Windows Form Designer generated code
 
-
-
-        private void InitializeFormComponents()
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
         {
-            
-            startSessionButton = new Button { Text = "Start Session" };
-            
-
-
-            startSessionButton.Location = new Point(10, 10);
-            endSessionButton.Location = new Point(110, 10);
-            viewSessionsButton.Location = new Point(210, 10);
-            setGoalButton.Location = new Point(310, 10);
-            goalHoursTextBox.Location = new Point(410, 10);
-            sessionsDataGridView.Location = new Point(10, 50);
-
-
-
-
-            Controls.Add(startSessionButton);
-            Controls.Add(endSessionButton);
-            Controls.Add(viewSessionsButton);
-            Controls.Add(setGoalButton);
-            Controls.Add(goalHoursTextBox);
-            Controls.Add(sessionsDataGridView);
+            loginPageUsernameLabel = new Label();
+            Password = new Label();
+            loginPagePasswordTextbox = new TextBox();
+            loginPageUsernameTextbox = new TextBox();
+            loginPageErrorTextbox = new Label();
+            loginPageLoginButton = new Button();
+            loginPageExitButton = new Button();
+            SuspendLayout();
+            // 
+            // loginPageUsernameLabel
+            // 
+            loginPageUsernameLabel.Location = new Point(631, 207);
+            loginPageUsernameLabel.Name = "loginPageUsernameLabel";
+            loginPageUsernameLabel.Size = new Size(100, 23);
+            loginPageUsernameLabel.TabIndex = 0;
+            loginPageUsernameLabel.Text = "Username";
+            // 
+            // Password
+            // 
+            Password.Location = new Point(629, 270);
+            Password.Name = "Password";
+            Password.Size = new Size(100, 23);
+            Password.TabIndex = 1;
+            Password.Text = "Password";
+            // 
+            // loginPagePasswordTextbox
+            // 
+            loginPagePasswordTextbox.AcceptsReturn = true;
+            loginPagePasswordTextbox.CausesValidation = false;
+            loginPagePasswordTextbox.Location = new Point(812, 270);
+            loginPagePasswordTextbox.Name = "loginPagePasswordTextbox";
+            loginPagePasswordTextbox.Size = new Size(223, 23);
+            loginPagePasswordTextbox.TabIndex = 2;
+            // 
+            // loginPageUsernameTextbox
+            // 
+            loginPageUsernameTextbox.Location = new Point(812, 207);
+            loginPageUsernameTextbox.Name = "loginPageUsernameTextbox";
+            loginPageUsernameTextbox.Size = new Size(223, 23);
+            loginPageUsernameTextbox.TabIndex = 3;
+            // 
+            // loginPageErrorTextbox
+            // 
+            loginPageErrorTextbox.Location = new Point(809, 425);
+            loginPageErrorTextbox.Name = "loginPageErrorTextbox";
+            loginPageErrorTextbox.Size = new Size(226, 23);
+            loginPageErrorTextbox.TabIndex = 5;
+            loginPageErrorTextbox.Visible = false;
+            // 
+            // loginPageLoginButton
+            // 
+            loginPageLoginButton.Location = new Point(812, 349);
+            loginPageLoginButton.Name = "loginPageLoginButton";
+            loginPageLoginButton.Size = new Size(223, 33);
+            loginPageLoginButton.TabIndex = 6;
+            loginPageLoginButton.Text = "Login";
+            loginPageLoginButton.UseVisualStyleBackColor = true;
+            loginPageLoginButton.Click += loginPageLoginButton_Click;
+            // 
+            // loginPageExitButton
+            // 
+            loginPageExitButton.Location = new Point(1215, 425);
+            loginPageExitButton.Name = "loginPageExitButton";
+            loginPageExitButton.Size = new Size(90, 41);
+            loginPageExitButton.TabIndex = 8;
+            loginPageExitButton.Text = "Exit";
+            loginPageExitButton.UseVisualStyleBackColor = true;
+            loginPageExitButton.Click += loginPageExitButton_Click;
+            // 
+            // loginPageForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(2481, 584);
+            Controls.Add(loginPageExitButton);
+            Controls.Add(loginPageLoginButton);
+            Controls.Add(loginPageErrorTextbox);
+            Controls.Add(loginPageUsernameTextbox);
+            Controls.Add(loginPagePasswordTextbox);
+            Controls.Add(Password);
+            Controls.Add(loginPageUsernameLabel);
+            Name = "loginPageForm";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         private void StartSessionButton_Click(object sender, EventArgs e)
@@ -135,14 +203,15 @@ namespace CodingTracker.View
                 MessageBox.Show($"Error: {ex.Message}");
             }
         }
+        #endregion
 
-        private Label loginUsernameLabel;
-        private Label loginPasswordLabel;
-        private TextBox loginUsernameTextbox;
-        private TextBox loginPasswordTextbox;
-        private Button LoginPageLoginButton;
+        private Label loginPageUsernameLabel;
+        private Label Password;
+        private TextBox loginPagePasswordTextbox;
+        private TextBox loginPageUsernameTextbox;
+        private Label loginPageErrorTextbox;
+        private Button loginPageLoginButton;
+        private Button button1;
         private Button loginPageExitButton;
-        private Label label1;
-        private Label LoginPageErrorLabel;
     }
 }
