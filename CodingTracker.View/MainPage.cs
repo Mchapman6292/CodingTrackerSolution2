@@ -51,5 +51,95 @@ namespace CodingTrackerSolution
         {
 
         }
+
+        private void guna2HtmlLabel15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel26_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel23_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel22_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2GradientPanel6_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void guna2GradientPanel8_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel11_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel13_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel16_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel25_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel28_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
