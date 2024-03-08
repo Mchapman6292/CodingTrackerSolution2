@@ -2,6 +2,8 @@
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.ICRUDs;
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Data.DatabaseManagers;
+using System.Diagnostics;
 
 
 
@@ -359,6 +361,45 @@ namespace CodingTracker.Data.CRUDs
                     Console.WriteLine($"Error: {ex.Message}");
                 }
             });
+        }
+
+
+        public async Task ViewAllSession(bool partialView = false)
+        {
+            var methodName = nameof(ViewAllSession);
+            using (var activity = new Activity(methodName).Start())
+            {
+                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, PartialView: {partialView}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                try
+                {
+                    await _databaseManager.ExecuteCRUDAsync(async connection =>
+                    {
+                        using var command = connection.CreateCommand();
+                        var partialColumns = partialView ? "SessionId, StartDate, EndDate" : "*";
+                        command.CommandText = $@"
+                    SELECT {partialColumns} FROM
+                        CodingSessions
+                    WHERE
+                        UserId = @UserId
+                    ORDER BY
+                        StartDate DESC, StartTime DESC";
+
+                        command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
+
+                        await command.ExecuteReaderAsync();
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"{methodName} executed successfully. PartialView: {partialView}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to execute {methodName}. PartialView: {partialView}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+            }
         }
     }
 }
