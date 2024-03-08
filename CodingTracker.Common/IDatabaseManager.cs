@@ -15,5 +15,6 @@ namespace CodingTracker.Common.IDatabaseManagers
         void OpenConnection();
         void ExecuteCRUD(Action<SQLiteConnection> action);
         bool CheckSessionIdExist(int sessionId);
+        Task ExecuteCRUDAsync(Func<SQLiteConnection, Task> asyncAction);
     }
 }

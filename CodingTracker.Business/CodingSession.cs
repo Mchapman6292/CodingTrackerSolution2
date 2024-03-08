@@ -55,7 +55,7 @@ namespace CodingTracker.Business.CodingSession
                 EndTime = DateTime.Now;
             }
             CalculateDurationMinutes();
-            CalculateGoalProgress();
+            CalculateTimeToGoal();
         }
 
         public string FormatTimeToGoalToHHMM(int? timeToGoal)
@@ -80,7 +80,7 @@ namespace CodingTracker.Business.CodingSession
             TimeToGoalMinutes = (CodingGoalHours * 60);
         }
 
-        public void CalculateGoalProgress()
+        public void CalculateTimeToGoal()
         {
             if (!CodingGoalHours.HasValue || CodingGoalHours.Value <= 0)
             {
