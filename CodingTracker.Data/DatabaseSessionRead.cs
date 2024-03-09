@@ -61,7 +61,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 {
                     stopwatch.Stop();
                     _appLogger.Error($"Failed to read DurationMinutes values. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    throw; 
+                    throw;
                 }
 
                 return durationMinutesList;
@@ -70,14 +70,16 @@ namespace CodingTracker.Data.DatabaseSessionReads
         public async Task<List<CodingSessionDTO>> ViewRecentSession(int numberOfSessions)
         {
             var methodName = nameof(ViewRecentSession);
+            List<CodingSessionDTO> CodingSessionList = new List<CodingSessionDTO>();
+
             using (var activity = new Activity(nameof(ViewRecentSession)).Start())
             {
                 _appLogger.Debug($"Starting {nameof(ViewRecentSession)}. TraceID: {activity.TraceId}, UserId: {_codingSessionDTO.UserId}, NumberOfSessions: {numberOfSessions}");
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 List<CodingSessionDTO> sessions = new List<CodingSessionDTO>();
-                try 
-                { 
+                try
+                {
                     await _databaseManager.ExecuteCRUDAsync(async connection =>
                     {
                         using var command = connection.CreateCommand();
@@ -99,21 +101,23 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
                     stopwatch.Stop();
                     _appLogger.Info($"Viewed recent {numberOfSessions} sessions successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    }
-                catch (SQLiteException ex)
-                    {
-                        stopwatch.Stop();
-                        _appLogger.Error($"Failed to view recent sessions. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-
-                    }
-                    }
-                  
                 }
+                catch (SQLiteException ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to view recent sessions. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+
+                }
+                return CodingSessionList;
+            }
+        }
+    
             
 
-        public async Task ViewAllSession(bool partialView = false)
+        public async Task<List<CodingSessionDTO>> ViewAllSession(bool partialView = false)
         {
             var methodName = nameof(ViewAllSession);
+            List<CodingSessionDTO> CodingSessionList = new List<CodingSessionDTO>();
             using (var activity = new Activity(methodName).Start())
             {
                 _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, PartialView: {partialView}");
@@ -146,12 +150,15 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     stopwatch.Stop();
                     _appLogger.Error($"Failed to execute {methodName}. PartialView: {partialView}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
+                return CodingSessionList;
             }
         }
 
-        public async Task ViewSpecific(string chosenDate)
+        public async Task<List<CodingSessionDTO>> ViewSpecific(string chosenDate)
         {
             var methodName = nameof(ViewSpecific);
+            List<CodingSessionDTO> CodingSessionList = new List<CodingSessionDTO>();
+
             using (var activity = new Activity(methodName).Start())
             {
                 _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, ChosenDate: {chosenDate}");
@@ -183,12 +190,14 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     stopwatch.Stop();
                     _appLogger.Error($"Failed to execute {methodName}. ChosenDate: {chosenDate}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
+                return CodingSessionList;
             }
         }
 
-        public async Task FilterSessionsByDay(string date, bool isDescending)
+        public async Task<List<CodingSessionDTO>> FilterSessionsByDay(string date, bool isDescending)
         {
             var methodName = nameof(FilterSessionsByDay);
+            List<CodingSessionDTO> CodingSessionList = new List<CodingSessionDTO>();
             using (var activity = new Activity(methodName).Start())
             {
                 _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, Date: {date}, IsDescending: {isDescending}");
@@ -221,12 +230,15 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     stopwatch.Stop();
                     _appLogger.Error($"Failed to execute {methodName}. Date: {date}, IsDescending: {isDescending}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
+                return CodingSessionList;
             }
         }
 
-        public async Task FilterSessionsByWeek(string date, bool isDescending)
+        public async Task<List<CodingSessionDTO>> FilterSessionsByWeek(string date, bool isDescending)
         {
             var methodName = nameof(FilterSessionsByWeek);
+            List<CodingSessionDTO> CodingSessionList = new List<CodingSessionDTO>();
+
             using (var activity = new Activity(methodName).Start())
             {
                 _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, Date: {date}, IsDescending: {isDescending}");
@@ -258,12 +270,15 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     stopwatch.Stop();
                     _appLogger.Error($"Failed to execute {methodName}. Date: {date}, IsDescending: {isDescending}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
+                return CodingSessionList;
             }
         }
 
-        public async Task FilterSessionsByYear(string year, bool isDescending)
+        public async Task<List<CodingSessionDTO>> FilterSessionsByYear(string year, bool isDescending)
         {
             var methodName = nameof(FilterSessionsByYear);
+            List<CodingSessionDTO> CodingSessionList = new List<CodingSessionDTO>();
+
             using (var activity = new Activity(methodName).Start())
             {
                 _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, Year: {year}, IsDescending: {isDescending}");
@@ -296,6 +311,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     stopwatch.Stop();
                     _appLogger.Error($"Failed to execute {methodName}. Year: {year}, IsDescending: {isDescending}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
+                return CodingSessionList;
             }
         }
     }
