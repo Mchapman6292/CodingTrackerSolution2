@@ -10,7 +10,7 @@ using CodingTracker.Logging.UtilityServices;
 
 namespace CodingTracker.View
 {
-    partial class loginPageForm
+    partial class LoginPage
     {
         private readonly ICRUD _crud;
         private readonly IDatabaseManager _dbManager;
@@ -119,7 +119,7 @@ namespace CodingTracker.View
             loginPageExitButton.UseVisualStyleBackColor = true;
             loginPageExitButton.Click += loginPageExitButton_Click;
             // 
-            // loginPageForm
+            // LoginPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -131,7 +131,7 @@ namespace CodingTracker.View
             Controls.Add(loginPagePasswordTextbox);
             Controls.Add(Password);
             Controls.Add(loginPageUsernameLabel);
-            Name = "loginPageForm";
+            Name = "LoginPage";
             ResumeLayout(false);
             PerformLayout();
         }

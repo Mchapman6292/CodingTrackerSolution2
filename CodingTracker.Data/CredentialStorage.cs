@@ -68,11 +68,7 @@ namespace CodingTracker.Data.CredentialStorage
             }
         }
 
-        public void UpdateCredentials(int userId, string newUsername, string newPassword)
-        {
-            UpdateUserName(userId, newUsername);
-            UpdatePassword(userId, newPassword);
-        }
+
 
         public void UpdateUserName(int userId, string newUserName)
         {

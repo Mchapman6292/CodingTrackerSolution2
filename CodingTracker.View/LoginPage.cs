@@ -12,10 +12,10 @@ using System.Windows.Forms;
 
 namespace CodingTracker.View
 {
-    public partial class loginPageForm : Form
+    public partial class LoginPage : Form
     {
         private readonly ILoginManager _loginManager;
-        public loginPageForm(ILoginManager loginManager)
+        public LoginPage(ILoginManager loginManager)
         {
             _loginManager = loginManager;
             InitializeComponent();
