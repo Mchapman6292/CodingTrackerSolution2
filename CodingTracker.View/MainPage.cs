@@ -1,23 +1,36 @@
+using CodingTracker.View.IFormControllers;
+
 namespace CodingTrackerSolution
 {
     public partial class MainPage : Form
     {
-        public MainPage()
+        private readonly IFormController _formController;
+        public MainPage(IFormController formController)
         {
+            _formController = formController;
             InitializeComponent();
         }
 
-        private void guna2Button1_Click(object sender, EventArgs e)
+        private void StartCodingSessionPage_Click(object sender, EventArgs e)
         {
+            _formController.ShowCodingSessionPage();
+        }
+        private void EditSession_Click(object sender, EventArgs e)
+        {
+            _formController.ShowEditSessionPage();
+        }
 
+        private void ViewSession_Click(object sender, EventArgs e)
+        {
+            _formController.ShowViewSessionPage();
+        }
+
+        private void MainPageSettingsButton_Click(object sender, EventArgs e)
+        {
+            _formController.ShowSettingsPage();
         }
 
         private void panel2_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void guna2Button2_Click(object sender, EventArgs e)
         {
 
         }
@@ -27,10 +40,6 @@ namespace CodingTrackerSolution
 
         }
 
-        private void MainPageViewButton_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -138,6 +147,16 @@ namespace CodingTrackerSolution
         }
 
         private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void guna2Button1_Click(object sender, EventArgs e)
         {
 
         }

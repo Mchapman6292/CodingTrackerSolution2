@@ -10,24 +10,14 @@ using System.Windows.Forms;
 
 namespace CodingTracker.View
 {
-    public partial class CodingSessionPage : Form
+    public partial class SettingsPage : Form
     {
-        public CodingSessionPage()
+        public SettingsPage()
         {
             InitializeComponent();
         }
 
-        private void CodingSessionPageStartSessionButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void CodingSessionPageManualStartButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void CodingSessionPageMinimiseButton_Click(object sender, EventArgs e)
+        private void SettingsPage_Load(object sender, EventArgs e)
         {
 
         }

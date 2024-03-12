@@ -1,6 +1,6 @@
 ﻿namespace CodingTracker.View
 {
-    partial class loginPageForm
+    partial class LoginPage
     {
         /// <summary>
         /// Required designer variable.
@@ -97,7 +97,7 @@
             loginPageExitButton.UseVisualStyleBackColor = true;
             loginPageExitButton.Click += loginPageExitButton_Click;
             // 
-            // loginPageForm
+            // LoginPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -109,7 +109,7 @@
             Controls.Add(loginPagePasswordTextbox);
             Controls.Add(Password);
             Controls.Add(loginPageUsernameLabel);
-            Name = "loginPageForm";
+            Name = "LoginPage";
             ResumeLayout(false);
             PerformLayout();
         }

@@ -34,7 +34,7 @@ namespace CodingTracker.Data.LoginManagers
                     Stopwatch stopwatch = Stopwatch.StartNew();
                     var hashedPassword = _credentialStorage.HashPassword(password);
 
-                    UserCredentialDTO userCredential = null; // Initialize as null to indicate no user found by default
+                    UserCredentialDTO userCredential = null; 
 
                     _databaseManager.ExecuteCRUD(connection =>
                     {
@@ -49,12 +49,12 @@ namespace CodingTracker.Data.LoginManagers
                         command.Parameters.AddWithValue("@Username", username);
 
                         using var reader = command.ExecuteReader();
-                        if (reader.Read()) // Used to check if there are any rows(users) returned by the query. 
+                        if (reader.Read())  
                         {
                             var storedHash = reader["PasswordHash"].ToString();
                             if (hashedPassword == storedHash)
                             {
-                                // Construct the DTO with data from the database, query against existing users. 
+                              
                                 userCredential = new UserCredentialDTO
                                 {
                                     UserId = Convert.ToInt32(reader["UserId"]),
