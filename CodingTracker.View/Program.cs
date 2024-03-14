@@ -5,10 +5,6 @@ using CodingTracker.Business.InputValidators;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Data.DatabaseManagers;
 using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.View.UserConsoleViews;
-using CodingTracker.Common.IUserConsoleView;
-using CodingTracker.Data.CRUDs;
-using CodingTracker.Common.ICRUDs;
 using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Common.IUtilityServices;
@@ -24,7 +20,9 @@ using CodingTracker.Common.ICredentialStorage;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.Common.IApplicationLoggers;
 
-//testing pull 
+//To do
+// refactor classes to use CodingSessionDTO as parameter
+//
 
 
 namespace CodingTracker.View.Program
@@ -49,8 +47,6 @@ namespace CodingTracker.View.Program
                 .AddSingleton<IStartConfiguration, StartConfiguration>()
                 .AddSingleton<IInputValidator, InputValidator>()
                 .AddSingleton<IDatabaseManager, DatabaseManager>()
-                .AddSingleton<IUserConsoleView, UserConsoleView>() 
-                .AddSingleton<ICRUD, CRUD>()
                 .AddSingleton<IUtilityService,UtilityService>()
                 .AddSingleton<IApplicationControl, ApplicationControl>()
                 .AddSingleton<ILoginManager, LoginManager>()

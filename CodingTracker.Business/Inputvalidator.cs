@@ -80,7 +80,7 @@ namespace CodingTracker.Business.InputValidators
                     return result;
                 }
 
-                Console.WriteLine("Invalid date format please enter in format yy-MM-dd";
+                Console.WriteLine("Invalid date format please enter in format yy-MM-dd");
             }
         }
 
@@ -99,11 +99,5 @@ namespace CodingTracker.Business.InputValidators
                 Console.WriteLine("Invalid time format. Please try again.");
             }
         }
-
-
-
-
-
-
     }
 }
