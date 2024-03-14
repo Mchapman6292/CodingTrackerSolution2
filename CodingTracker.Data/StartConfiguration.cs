@@ -28,11 +28,18 @@ namespace CodingTracker.Data.Configurations
                 try
                 {
                     ConnectionString = _configuration.GetSection("DatabaseConfig:ConnectionString").Value;
+                    DatabasePath = _configuration.GetSection("DatabaseConfig:DatabasePath").Value;
 
                     if (string.IsNullOrEmpty(ConnectionString))
                     {
                         _appLogger.Error($"Connection string configuration is missing. TraceID: {activity.TraceId}");
                         throw new InvalidOperationException("Connection string configuration is missing.");
+                    }
+
+                    if (string.IsNullOrEmpty(DatabasePath))
+                    {
+                        _appLogger.Error($"Database path configuration is missing. TraceID: {activity.TraceId}");
+                        throw new InvalidOperationException("Database path configuration is missing.");
                     }
 
                     _appLogger.Info($"Configuration loaded successfully. TraceID: {activity.TraceId}");

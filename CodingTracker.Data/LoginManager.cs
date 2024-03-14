@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
+using CodingTracker.Common.CodingSessionDTOs;
 
 
 // resetPassword, updatePassword, rememberUser 
@@ -16,6 +17,7 @@ namespace CodingTracker.Data.LoginManagers
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
         private readonly ICredentialStorage _credentialStorage;
+        private readonly CodingSessionDTO _codingSessionDTO;
         public LoginManager(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialStorage credentialStorage)
         {
             _databaseManager = databaseManager;
@@ -131,5 +133,60 @@ namespace CodingTracker.Data.LoginManagers
         }
 
 
+        public List<CodingSessionDTO> ViewSpecific(string chosenDate)
+        {
+            var methodName = nameof(ViewSpecific);
+            List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
+
+            using (var activity = new Activity(methodName).Start())
+            {
+                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, ChosenDate: {chosenDate}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                try
+                {
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = @"
+                        SELECT SessionId, StartTime, EndTime FROM 
+                            CodingSessions 
+                        WHERE
+                            UserId = @UserId AND Date = @Date
+                        ORDER BY
+                            StartTime DESC"
+                            ;
+
+                            command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
+                            command.Parameters.AddWithValue("@Date", chosenDate);
+
+                            using (var reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    var session = new CodingSessionDTO
+                                    {
+                                        SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                                        StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                                        EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                                    };
+                                    codingSessionList.Add(session);
+                                }
+                            }
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"{methodName} executed successfully. ChosenDate: {chosenDate}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to execute {methodName}. ChosenDate: {chosenDate}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+            }
+            return codingSessionList;
+        }
     }
 }

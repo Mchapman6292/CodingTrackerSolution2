@@ -75,7 +75,6 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                     command.Parameters.AddWithValue("@DurationMinutes", _codingSessionDTO.DurationMinutes);
                     command.Parameters.AddWithValue("@CodingGoalHours", _codingSessionDTO.CodingGoalHours);
                     command.Parameters.AddWithValue("@TimeToGoalMins", _codingSessionDTO.TimeToGoalMinutes);
-                    command.Parameters.AddWithValue("@SessionNotes", _codingSessionDTO.SessionNotes ?? (object)DBNull.Value);
 
                     try
                     {
@@ -92,7 +91,5 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                 });
             }
         }
-    }
-}
     }
 }
