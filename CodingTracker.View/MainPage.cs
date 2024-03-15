@@ -160,5 +160,10 @@ namespace CodingTrackerSolution
         {
 
         }
+
+        private void MainPageProgressLabel_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

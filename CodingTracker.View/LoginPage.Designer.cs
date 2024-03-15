@@ -79,7 +79,7 @@
             // 
             // loginPageLoginButton
             // 
-            loginPageLoginButton.Location = new Point(812, 349);
+            loginPageLoginButton.Location = new Point(812, 350);
             loginPageLoginButton.Name = "loginPageLoginButton";
             loginPageLoginButton.Size = new Size(223, 33);
             loginPageLoginButton.TabIndex = 6;
@@ -122,7 +122,6 @@
         private TextBox loginPageUsernameTextbox;
         private Label loginPageErrorTextbox;
         private Button loginPageLoginButton;
-        private Button button1;
         private Button loginPageExitButton;
     }
 }

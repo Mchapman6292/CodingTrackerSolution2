@@ -4,14 +4,15 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.ICodingGoals;
 using System.Linq.Expressions;
+using CodingTracker.Common.ICodingSessions;
 
 // method to record start & end time
 // logic to hold recorded times & view them
 // user should be able to input start & end times manually j     
 
-namespace CodingTracker.Business.CodingSession
+namespace CodingTracker.Business.CodingSessions
 {
-    public class CodingSession
+    public class CodingSession : ICodingSession
     {
         private readonly IInputValidator _inputValidator;
         private readonly IApplicationLogger _appLogger;
@@ -94,7 +95,7 @@ namespace CodingTracker.Business.CodingSession
                         EndTime = DateTime.Now;
                     }
                     CalculateDurationMinutes();
-                    _codingGoal.CalculateTimeToGoal();
+                    CalculateTimeToGoal();
 
                     var codingSessionDTO = new CodingSessionDTO
                     {
@@ -214,7 +215,7 @@ namespace CodingTracker.Business.CodingSession
             }
         }
 
-        private void CalculateDurationMinutes()
+        public void CalculateDurationMinutes()
         {
             using (var activity = new Activity(nameof(CalculateDurationMinutes)).Start())
             {
@@ -265,6 +266,45 @@ namespace CodingTracker.Business.CodingSession
                 {
                     _appLogger.Error($"An error occurred during {nameof(CheckBothDurationCalculations)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     return false;
+                }
+            }
+        }
+
+        public void CalculateTimeToGoal() // This should belong in CodingGoal but moving here as a temporary fix for circular dependencies. 
+        {
+            using (var activity = new Activity(nameof(CalculateTimeToGoal)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(CalculateTimeToGoal)}. TraceID: {activity.TraceId}");
+                try
+                {
+                    if (!CodingGoalHours.HasValue || CodingGoalHours.Value <= 0)
+                    {
+                        throw new InvalidOperationException("Coding goal must be set and greater than zero.");
+                    }
+                    if (!DurationMinutes.HasValue)
+                    {
+                        throw new InvalidOperationException("Session duration is not set.");
+                    }
+
+                    int sessionDurationMinutes = DurationMinutes.Value;
+
+                    if (TimeToGoalMinutes.HasValue && TimeToGoalMinutes.Value < sessionDurationMinutes)
+                    {
+                        throw new InvalidOperationException("Session duration exceeds the remaining time to goal.");
+                    }
+
+                    if (!TimeToGoalMinutes.HasValue)
+                    {
+                        TimeToGoalMinutes = CodingGoalHours.Value * 60;
+                    }
+
+                    TimeToGoalMinutes -= sessionDurationMinutes;
+
+                    _appLogger.Info($"Time to goal calculated. TraceID: {activity.TraceId}, TimeToGoalMinutes: {TimeToGoalMinutes}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during {nameof(CalculateTimeToGoal)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                 }
             }
         }

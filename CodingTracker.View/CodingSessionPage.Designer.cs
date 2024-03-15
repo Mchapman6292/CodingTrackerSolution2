@@ -172,7 +172,6 @@
         #endregion
 
         private Guna.UI2.WinForms.Guna2CustomGradientPanel CodingSessionPageCentrePanel;
-        private Guna.UI2.WinForms.Guna2CircleButton guna2CircleButton2;
         private Guna.UI2.WinForms.Guna2CircleButton CodingSessionPageStartSessionButton;
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageMinimiseButton;
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageManualStartButton;

@@ -20,7 +20,6 @@ namespace CodingTracker.Data.DatabaseManagers
         private readonly IApplicationLogger _appLogger;
         private readonly string _connectionString; // Creates an open instance of SQLiteConnection which is then stored in _connection.
         private readonly string _databasePath;
-        private readonly IInputValidator? _validator;
         private readonly IStartConfiguration? _iStartConfiguration;
 
 
@@ -31,7 +30,6 @@ namespace CodingTracker.Data.DatabaseManagers
         {
             _appLogger = appLogger;
             _iStartConfiguration = startConfiguration;
-            _validator = validator;
             _databasePath = _iStartConfiguration.DatabasePath;
             _connectionString = _iStartConfiguration.ConnectionString;
 
