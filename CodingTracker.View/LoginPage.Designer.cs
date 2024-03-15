@@ -111,7 +111,7 @@ namespace CodingTracker.View
             // 
             // loginPageExitButton
             // 
-            loginPageExitButton.Location = new Point(1215, 425);
+            loginPageExitButton.Location = new Point(1303, 468);
             loginPageExitButton.Name = "loginPageExitButton";
             loginPageExitButton.Size = new Size(90, 41);
             loginPageExitButton.TabIndex = 8;

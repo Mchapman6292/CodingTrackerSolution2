@@ -1,8 +1,10 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View;
+using CodingTracker.View.FormFactories;
 using CodingTracker.View.IFormControllers;
 using CodingTrackerSolution;
 using System.Diagnostics;
+using CodingTracker.View.IFormFactories;
 
 public class FormController : IFormController
 {
@@ -14,8 +16,9 @@ public class FormController : IFormController
     private EditSessionPage editSessionPage;
     private SettingsPage settingsPage;
     private Form currentForm;
+    private IFormFactory _formFactory;
 
-    public FormController(IApplicationLogger appLogger, CodingSessionPage codingSessionPage, LoginPage loginPage, MainPage mainPage, ViewSessionsPage viewSessionsPage, EditSessionPage editSessionPage, SettingsPage settingsPage)
+    public FormController(IApplicationLogger appLogger, CodingSessionPage codingSessionPage, LoginPage loginPage, MainPage mainPage, ViewSessionsPage viewSessionsPage, EditSessionPage editSessionPage, SettingsPage settingsPage, IFormFactory formFactory)
     {
         _appLogger = appLogger;
         this.codingSessionPage = codingSessionPage;
@@ -24,6 +27,8 @@ public class FormController : IFormController
         this.viewSessionsPage = viewSessionsPage;
         this.editSessionPage = editSessionPage;
         this.settingsPage = settingsPage;
+        _formFactory = formFactory;
+
         this.currentForm = null;
     }
 
