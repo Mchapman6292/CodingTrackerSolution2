@@ -25,11 +25,6 @@ namespace CodingTracker.View
         }
 
 
-
-
-
-
-
         private void loginPageLoginButton_Click(object sender, EventArgs e)
         {
             string username = loginPageUsernameTextbox.Text;

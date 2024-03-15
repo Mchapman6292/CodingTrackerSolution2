@@ -10,7 +10,6 @@ namespace CodingTracker.Common.ICodingGoals
     {
         void SetCodingGoal(int goalHours);
         string FormatTimeToGoalToHHMM(int? timeToGoal);
-        void CalculateTimeToGoal();
 
     }
 }

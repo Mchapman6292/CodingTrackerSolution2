@@ -10,7 +10,7 @@ namespace CodingTracker.Common.ICodingSessions
     public interface ICodingSession
     {
         CodingSessionDTO GetCurrentSessionDTO();
-        void StartSession();
+        void StartSession(int userId);
         void EndSession();
         void SaveCurrentCodingSession();
         bool CheckIfCodingSessionActive();
@@ -18,6 +18,7 @@ namespace CodingTracker.Common.ICodingSessions
         void SetEndTimeManually();
         void CalculateDurationMinutes();
         bool CheckBothDurationCalculations();
+        void CalculateTimeToGoal();
 
 
 

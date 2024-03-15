@@ -5,22 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.ICodingGoals;
 using CodingTracker.Common.ICodingSessions;
 
 namespace CodingTracker.Business.CodingGoals
 {
-    public class CodingGoal
+    public class CodingGoal : ICodingGoal
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingSession _codingSession;
         public int? CodingGoalHours { get; set; }
         public int? TimeToGoalMinutes { get; set; }
 
 
-        public CodingGoal(IApplicationLogger appLogger, ICodingSession codingSession)
+        public CodingGoal(IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
-            _codingSession = codingSession;
         }
 
 
@@ -64,51 +63,11 @@ namespace CodingTracker.Business.CodingGoals
                     return formattedTime;
                 }
                 catch (Exception ex)
-                {
+                { 
                     _appLogger.Error($"An error occurred during {nameof(FormatTimeToGoalToHHMM)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     return null;
                 }
             }
         }
-
-        public void CalculateTimeToGoal()
-        {
-            using (var activity = new Activity(nameof(CalculateTimeToGoal)).Start())
-            {
-                _appLogger.Info($"Starting {nameof(CalculateTimeToGoal)}. TraceID: {activity.TraceId}");
-                try
-                {
-                    if (!CodingGoalHours.HasValue || CodingGoalHours.Value <= 0)
-                    {
-                        throw new InvalidOperationException("Coding goal must be set and greater than zero.");
-                    }
-                    if (_codingSession.GetCurrentSessionDTO() == null || !_codingSession.GetCurrentSessionDTO().DurationMinutes.HasValue)
-                    {
-                        throw new InvalidOperationException("Current session is not valid or duration minutes are not set.");
-                    }
-
-                    int sessionDurationMinutes = _codingSession.GetCurrentSessionDTO().DurationMinutes.Value;
-
-                    if (TimeToGoalMinutes.HasValue && TimeToGoalMinutes.Value < sessionDurationMinutes)
-                    {
-                        throw new InvalidOperationException("Session duration exceeds the remaining time to goal.");
-                    }
-
-                    if (!TimeToGoalMinutes.HasValue)
-                    {
-                        TimeToGoalMinutes = CodingGoalHours.Value * 60;
-                    }
-
-                    TimeToGoalMinutes -= sessionDurationMinutes;
-
-                    _appLogger.Info($"Time to goal calculated. TraceID: {activity.TraceId}, TimeToGoalMinutes: {TimeToGoalMinutes}");
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(CalculateTimeToGoal)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
-            }
-        }
-
     }
 }
