@@ -131,17 +131,22 @@ namespace CodingTracker.Business.CodingSession
 
                     EndTime ??= DateTime.UtcNow;
 
+                    if (!DurationMinutes.HasValue && EndTime.HasValue)
+                    {
+                        DurationMinutes = (int)(EndTime.Value - StartTime.Value).TotalMinutes;
+                    }
+
                     _currentSessionDTO = new CodingSessionDTO
                     {
                         SessionId = this.SessionId,
                         UserId = this.UserId,
                         StartTime = this.StartTime,
-                        EndTime = this.EndTime, 
+                        EndTime = this.EndTime,
                         StartDate = this.StartDate ?? this.StartTime?.Date,
-                        EndDate = this.EndDate ?? this.EndTime?.Date, 
-                        DurationMinutes = this.DurationMinutes ?? (int)((this.EndTime?.Subtract(this.StartTime.Value)).TotalMinutes),
+                        EndDate = this.EndDate ?? this.EndTime?.Date,
+                        DurationMinutes = this.DurationMinutes,
                         CodingGoalHours = this.CodingGoalHours,
-                        TimeToGoalMinutes = this.TimeToGoalMinutes
+                        TimeToGoalMinutes = this.TimeToGoalMinutes ?? 0
                     };
 
                     _appLogger.Info($"Current coding session saved. TraceID: {activity.TraceId}, SessionId: {SessionId}, EndTime: {EndTime}");
@@ -152,6 +157,8 @@ namespace CodingTracker.Business.CodingSession
                 }
             }
         }
+
+
         public bool CheckIfCodingSessionActive()
         {
             using var activity = new Activity(nameof(CheckIfCodingSessionActive)).Start();
@@ -168,7 +175,6 @@ namespace CodingTracker.Business.CodingSession
             }
             return isCodingSessionActive;
         }
-
 
 
         public void SetStartTimeManually()
@@ -216,19 +222,13 @@ namespace CodingTracker.Business.CodingSession
 
                 try
                 {
-                    if (IsStopWatchEnabled)
+                    if (!StartTime.HasValue || !EndTime.HasValue)
                     {
-                        DurationMinutes = (int)_stopwatch.Elapsed.TotalMinutes;
+                        throw new InvalidOperationException("Start Time or End Time is not set.");
                     }
-                    else
-                    {
-                        if (!StartTime.HasValue || !EndTime.HasValue || EndTime < StartTime)
-                        {
-                            throw new InvalidOperationException("Invalid Start or End Time.");
-                        }
 
-                        DurationMinutes = (int)((EndTime.Value - StartTime.Value).TotalMinutes);
-                    }
+                    TimeSpan duration = EndTime.Value - StartTime.Value;
+                    DurationMinutes = (int)duration.TotalMinutes;
 
                     _appLogger.Info($"Duration minutes calculated. TraceID: {activity.TraceId}, DurationMinutes: {DurationMinutes}");
                 }
@@ -238,7 +238,6 @@ namespace CodingTracker.Business.CodingSession
                 }
             }
         }
-
 
         public bool CheckBothDurationCalculations()
         {

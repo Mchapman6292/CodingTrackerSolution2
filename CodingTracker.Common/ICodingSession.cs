@@ -12,6 +12,7 @@ namespace CodingTracker.Common.ICodingSessions
         CodingSessionDTO GetCurrentSessionDTO();
         void StartSession();
         void EndSession();
+        void SaveCurrentCodingSession();
         bool CheckIfCodingSessionActive();
         void SetStartTimeManually();
         void SetEndTimeManually();

@@ -29,6 +29,7 @@ using CodingTrackerSolution;
 // Update datetime logic to use UTC
 // Update CodingSession calls to use _currentSessionDTO
 // refactor CodingSessionDTo to exclute CodingGoalProperties
+// Refactor databasemanager to use same connection.
 
 
 namespace CodingTracker.View.Program
