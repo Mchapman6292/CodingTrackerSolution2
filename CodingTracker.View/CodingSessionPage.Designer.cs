@@ -28,26 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges12 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges13 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges11 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges17 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges18 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges14 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges15 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges19 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges25 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges26 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges22 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges23 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges24 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             CodingSessionPageCentrePanel = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
-            CodingSessionPageStartSessionButton = new Guna.UI2.WinForms.Guna2CircleButton();
             CodingSessionPageManualStartButton = new Guna.UI2.WinForms.Guna2Button();
+            CodingSessionPageStartSessionButton = new Guna.UI2.WinForms.Guna2CircleButton();
             CodingSessionPageMinimiseButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSesisonPageTopPanel = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
             guna2CustomGradientPanel1 = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
-            guna2Button1 = new Guna.UI2.WinForms.Guna2Button();
+            CodingSessionPageExitButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSessionPageCentrePanel.SuspendLayout();
             CodingSesisonPageTopPanel.SuspendLayout();
             SuspendLayout();
@@ -56,12 +56,29 @@
             // 
             CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageManualStartButton);
             CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageStartSessionButton);
-            CodingSessionPageCentrePanel.CustomizableEdges = customizableEdges4;
+            CodingSessionPageCentrePanel.CustomizableEdges = customizableEdges17;
             CodingSessionPageCentrePanel.Location = new Point(4, 136);
             CodingSessionPageCentrePanel.Name = "CodingSessionPageCentrePanel";
-            CodingSessionPageCentrePanel.ShadowDecoration.CustomizableEdges = customizableEdges5;
+            CodingSessionPageCentrePanel.ShadowDecoration.CustomizableEdges = customizableEdges18;
             CodingSessionPageCentrePanel.Size = new Size(1300, 300);
             CodingSessionPageCentrePanel.TabIndex = 0;
+            // 
+            // CodingSessionPageManualStartButton
+            // 
+            CodingSessionPageManualStartButton.CustomizableEdges = customizableEdges14;
+            CodingSessionPageManualStartButton.DisabledState.BorderColor = Color.DarkGray;
+            CodingSessionPageManualStartButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            CodingSessionPageManualStartButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            CodingSessionPageManualStartButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            CodingSessionPageManualStartButton.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageManualStartButton.ForeColor = Color.White;
+            CodingSessionPageManualStartButton.Location = new Point(244, 216);
+            CodingSessionPageManualStartButton.Name = "CodingSessionPageManualStartButton";
+            CodingSessionPageManualStartButton.ShadowDecoration.CustomizableEdges = customizableEdges15;
+            CodingSessionPageManualStartButton.Size = new Size(180, 45);
+            CodingSessionPageManualStartButton.TabIndex = 2;
+            CodingSessionPageManualStartButton.Text = "Enter Start time manually ";
+            CodingSessionPageManualStartButton.Click += CodingSessionPageManualStartButton_Click;
             // 
             // CodingSessionPageStartSessionButton
             // 
@@ -73,42 +90,25 @@
             CodingSessionPageStartSessionButton.ForeColor = Color.White;
             CodingSessionPageStartSessionButton.Location = new Point(550, 3);
             CodingSessionPageStartSessionButton.Name = "CodingSessionPageStartSessionButton";
-            CodingSessionPageStartSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges3;
+            CodingSessionPageStartSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges16;
             CodingSessionPageStartSessionButton.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             CodingSessionPageStartSessionButton.Size = new Size(148, 148);
             CodingSessionPageStartSessionButton.TabIndex = 1;
             CodingSessionPageStartSessionButton.Text = "Start Coding Session";
             CodingSessionPageStartSessionButton.Click += CodingSessionPageStartSessionButton_Click;
             // 
-            // CodingSessionPageManualStartButton
-            // 
-            CodingSessionPageManualStartButton.CustomizableEdges = customizableEdges1;
-            CodingSessionPageManualStartButton.DisabledState.BorderColor = Color.DarkGray;
-            CodingSessionPageManualStartButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            CodingSessionPageManualStartButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            CodingSessionPageManualStartButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            CodingSessionPageManualStartButton.Font = new Font("Segoe UI", 9F);
-            CodingSessionPageManualStartButton.ForeColor = Color.White;
-            CodingSessionPageManualStartButton.Location = new Point(244, 216);
-            CodingSessionPageManualStartButton.Name = "CodingSessionPageManualStartButton";
-            CodingSessionPageManualStartButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            CodingSessionPageManualStartButton.Size = new Size(180, 45);
-            CodingSessionPageManualStartButton.TabIndex = 2;
-            CodingSessionPageManualStartButton.Text = "Enter Start time manually ";
-            CodingSessionPageManualStartButton.Click += CodingSessionPageManualStartButton_Click;
-            // 
             // CodingSessionPageMinimiseButton
             // 
-            CodingSessionPageMinimiseButton.CustomizableEdges = customizableEdges6;
+            CodingSessionPageMinimiseButton.CustomizableEdges = customizableEdges19;
             CodingSessionPageMinimiseButton.DisabledState.BorderColor = Color.DarkGray;
             CodingSessionPageMinimiseButton.DisabledState.CustomBorderColor = Color.DarkGray;
             CodingSessionPageMinimiseButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
             CodingSessionPageMinimiseButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             CodingSessionPageMinimiseButton.Font = new Font("Segoe UI", 9F);
             CodingSessionPageMinimiseButton.ForeColor = Color.White;
-            CodingSessionPageMinimiseButton.Location = new Point(1155, -2);
+            CodingSessionPageMinimiseButton.Location = new Point(1143, -2);
             CodingSessionPageMinimiseButton.Name = "CodingSessionPageMinimiseButton";
-            CodingSessionPageMinimiseButton.ShadowDecoration.CustomizableEdges = customizableEdges7;
+            CodingSessionPageMinimiseButton.ShadowDecoration.CustomizableEdges = customizableEdges20;
             CodingSessionPageMinimiseButton.Size = new Size(78, 48);
             CodingSessionPageMinimiseButton.TabIndex = 3;
             CodingSessionPageMinimiseButton.Text = "Minimise";
@@ -118,40 +118,40 @@
             // 
             CodingSesisonPageTopPanel.Controls.Add(CodingSessionPageMinimiseButton);
             CodingSesisonPageTopPanel.Controls.Add(guna2CustomGradientPanel1);
-            CodingSesisonPageTopPanel.Controls.Add(guna2Button1);
-            CodingSesisonPageTopPanel.CustomizableEdges = customizableEdges12;
+            CodingSesisonPageTopPanel.Controls.Add(CodingSessionPageExitButton);
+            CodingSesisonPageTopPanel.CustomizableEdges = customizableEdges25;
             CodingSesisonPageTopPanel.Dock = DockStyle.Top;
             CodingSesisonPageTopPanel.Location = new Point(0, 0);
             CodingSesisonPageTopPanel.Name = "CodingSesisonPageTopPanel";
-            CodingSesisonPageTopPanel.ShadowDecoration.CustomizableEdges = customizableEdges13;
+            CodingSesisonPageTopPanel.ShadowDecoration.CustomizableEdges = customizableEdges26;
             CodingSesisonPageTopPanel.Size = new Size(1300, 46);
             CodingSesisonPageTopPanel.TabIndex = 1;
             // 
             // guna2CustomGradientPanel1
             // 
-            guna2CustomGradientPanel1.CustomizableEdges = customizableEdges8;
+            guna2CustomGradientPanel1.CustomizableEdges = customizableEdges21;
             guna2CustomGradientPanel1.Location = new Point(0, -83);
             guna2CustomGradientPanel1.Name = "guna2CustomGradientPanel1";
-            guna2CustomGradientPanel1.ShadowDecoration.CustomizableEdges = customizableEdges9;
+            guna2CustomGradientPanel1.ShadowDecoration.CustomizableEdges = customizableEdges22;
             guna2CustomGradientPanel1.Size = new Size(1300, 72);
             guna2CustomGradientPanel1.TabIndex = 4;
             // 
-            // guna2Button1
+            // CodingSessionPageExitButton
             // 
-            guna2Button1.CustomizableEdges = customizableEdges10;
-            guna2Button1.DisabledState.BorderColor = Color.DarkGray;
-            guna2Button1.DisabledState.CustomBorderColor = Color.DarkGray;
-            guna2Button1.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            guna2Button1.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            guna2Button1.Font = new Font("Segoe UI", 9F);
-            guna2Button1.ForeColor = Color.White;
-            guna2Button1.Location = new Point(1227, 0);
-            guna2Button1.Name = "guna2Button1";
-            guna2Button1.ShadowDecoration.CustomizableEdges = customizableEdges11;
-            guna2Button1.Size = new Size(73, 45);
-            guna2Button1.TabIndex = 5;
-            guna2Button1.Text = "Exit";
-            guna2Button1.Click += guna2Button1_Click;
+            CodingSessionPageExitButton.CustomizableEdges = customizableEdges23;
+            CodingSessionPageExitButton.DisabledState.BorderColor = Color.DarkGray;
+            CodingSessionPageExitButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            CodingSessionPageExitButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            CodingSessionPageExitButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            CodingSessionPageExitButton.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageExitButton.ForeColor = Color.White;
+            CodingSessionPageExitButton.Location = new Point(1227, 0);
+            CodingSessionPageExitButton.Name = "CodingSessionPageExitButton";
+            CodingSessionPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges24;
+            CodingSessionPageExitButton.Size = new Size(73, 45);
+            CodingSessionPageExitButton.TabIndex = 5;
+            CodingSessionPageExitButton.Text = "Exit";
+            CodingSessionPageExitButton.Click += guna2Button1_Click;
             // 
             // CodingSessionPage
             // 
@@ -178,6 +178,6 @@
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageManualStartButton;
         private Guna.UI2.WinForms.Guna2CustomGradientPanel CodingSesisonPageTopPanel;
         private Guna.UI2.WinForms.Guna2CustomGradientPanel guna2CustomGradientPanel1;
-        private Guna.UI2.WinForms.Guna2Button guna2Button1;
+        private Guna.UI2.WinForms.Guna2Button CodingSessionPageExitButton;
     }
 }
