@@ -19,6 +19,10 @@ using CodingTracker.Data.CredentialStorage;
 using CodingTracker.Common.ICredentialStorage;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.View.FormFactories;
+using CodingTracker.View.IFormFactories;
+using CodingTrackerSolution;
+
 
 //To do
 // refactor classes to use CodingSessionDTO as parameter
@@ -53,12 +57,24 @@ namespace CodingTracker.View.Program
                 .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
                 .AddSingleton<ICredentialStorage, CredentialStorage>()
                 .AddSingleton<IApplicationLogger, ApplicationLogger>()
+                .AddSingleton<IFormFactory, FormFactory>()
+                .AddSingleton<FormFactory>()
+                .AddTransient<LoginPage>()
+                .AddSingleton<MainPage>()
+                .AddSingleton<LoginPage>()
+                .AddSingleton<CodingSessionPage>()
+                .AddSingleton<EditSessionPage>()
+                .AddSingleton<ViewSessionsPage>()
+
                 .BuildServiceProvider();
+
+            var formFactory = serviceProvider.GetRequiredService<IFormFactory>();
+            var loginPage = formFactory.CreateLoginPage();
 
 
             ApplicationConfiguration.Initialize();
 
-            Application.Run(new LoginPage()); 
+            Application.Run(loginPage);
         }
     }
 }
