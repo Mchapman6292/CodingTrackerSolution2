@@ -13,6 +13,7 @@ namespace CodingTracker.Common.IDatabaseManagers
         void EnsureDatabaseForUser();
         void CreateTableIfNotExists();
         void OpenConnectionWithRetry();
+        void CloseDatabaseConnection();
         void ExecuteCRUD(Action<SQLiteConnection> action);
         bool CheckSessionIdExist(int sessionId);
     }

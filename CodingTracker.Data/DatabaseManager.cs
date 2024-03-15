@@ -92,6 +92,11 @@ namespace CodingTracker.Data.DatabaseManagers
             }
         }
 
+        public void CloseDatabaseConnection()
+        {
+            throw new NotImplementedException();
+        }
+
 
         public void ExecuteCRUD(Action<SQLiteConnection> action)
         {
