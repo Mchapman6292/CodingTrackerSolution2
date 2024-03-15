@@ -26,7 +26,9 @@ using CodingTrackerSolution;
 
 //To do
 // refactor classes to use CodingSessionDTO as parameter
-//
+// Update datetime logic to use UTC
+// Update CodingSession calls to use _currentSessionDTO
+// refactor CodingSessionDTo to exclute CodingGoalProperties
 
 
 namespace CodingTracker.View.Program

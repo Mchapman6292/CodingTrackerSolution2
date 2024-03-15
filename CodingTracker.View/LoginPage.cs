@@ -1,4 +1,5 @@
-﻿using CodingTracker.Common.ILoginManagers;
+﻿using CodingTracker.Common.IApplicationControls;
+using CodingTracker.Common.ILoginManagers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,9 +16,11 @@ namespace CodingTracker.View
     public partial class LoginPage : Form
     {
         private readonly ILoginManager _loginManager;
-        public LoginPage(ILoginManager loginManager)
+        private readonly IApplicationControl _appControl;
+        public LoginPage(ILoginManager loginManager, IApplicationControl appcontrol)
         {
             _loginManager = loginManager;
+            _appControl = appcontrol;
             InitializeComponent();
         }
 
@@ -48,7 +51,7 @@ namespace CodingTracker.View
 
         private void loginPageExitButton_Click(object sender, EventArgs e)
         {
-
+            _appControl.ExitApplication();
         }
     }
 }
