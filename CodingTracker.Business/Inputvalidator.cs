@@ -4,20 +4,18 @@ using CodingTracker.Common.IDatabaseManagers;
 
 
 
-
+//test
 
 namespace CodingTracker.Business.InputValidators
 {
     public class InputValidator : IInputValidator
     {
-        private readonly IDatabaseManager _databaseManager;
         private readonly HashSet<string> startValidCommands = new HashSet<string> { "O", "1", "2", "3" };
         private readonly HashSet<string> viewValidCommands = new HashSet<string> { "0", "1", "2", "3", };
 
 
-        public InputValidator(IDatabaseManager databaseManager)
+        public InputValidator()
         {
-            _databaseManager = databaseManager;
         }
 
 
@@ -37,14 +35,6 @@ namespace CodingTracker.Business.InputValidators
         }
 
 
-        public bool ValidateSessionId(string input)
-        {
-            if (int.TryParse(input, out int sessionId))
-            {
-                return _databaseManager.CheckSessionIdExist(sessionId);
-            }
-            return false;
-        }
 
 
         public bool CheckStartInput(string startInput)
@@ -80,7 +70,7 @@ namespace CodingTracker.Business.InputValidators
                     return result;
                 }
 
-                Console.WriteLine("Invalid date format please enter in format yy-MM-dd";
+                Console.WriteLine("Invalid date format please enter in format yy-MM-dd");
             }
         }
 
@@ -99,11 +89,5 @@ namespace CodingTracker.Business.InputValidators
                 Console.WriteLine("Invalid time format. Please try again.");
             }
         }
-
-
-
-
-
-
     }
 }

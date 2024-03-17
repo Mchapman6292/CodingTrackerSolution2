@@ -20,6 +20,5 @@ namespace CodingTracker.Common.CodingSessionDTOs
         
         public int TimeToGoalMinutes {  get; set; }
 
-        public string? SessionNotes { get; set; }
     }
 }
