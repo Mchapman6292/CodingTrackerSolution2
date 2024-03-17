@@ -5,44 +5,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Timers;
 
 namespace CodingTracker.Business.Codingtimers
 {
-    public class CodingTimerssss
+    public class CodingTimer
     {
         private readonly IApplicationLogger _appLogger;
-        private TimeSpan _elapsedTime;
+        private TimeSpan _remainingTime;
+        private System.Timers.Timer timer;
+        private bool _isFirstTick;
 
-        public CodingTimerssss(IApplicationLogger appLogger)
+        public CodingTimer(IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
         }
 
 
-        public void Timer_Tick(object sender, EventArgs e)
+        private void StartTimer()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            using (var activity = new Activity(nameof(Timer_Tick)).Start())
+            using (var activity = new Activity(nameof(StartTimer)).Start())
             {
-                try
-                {
-                    _appLogger.Debug($"Starting {nameof(Timer_Tick)}. TraceID: {activity.TraceId}");
+                _appLogger.Debug($"Starting timer. TraceID: {activity.TraceId}");
 
-                    _elapsedTime = _elapsedTime.Add(TimeSpan.FromSeconds(1));
-
-                    CodingSessionTimerPageTimerLabel.Text = _elapsedTime.ToString(@"hh\:mm\:ss");
-
-                    stopwatch.Stop();
-                    _appLogger.Debug($"{nameof(Timer_Tick)} completed in {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"{nameof(Timer_Tick)} failed after {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
+                _stopwatch = Stopwatch.StartNew();
+                _uiTimer.Start();
             }
         }
+
+            public void Tick()
+        {
+            if (_remainingTime > TimeSpan.Zero)
+            {
+                _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
+            }
+        }
+
+        public TimeSpan GetRemainingTime()
+        {
+            return _remainingTime;
+        }
+
+        public bool IsFinished()
+        {
+            return _remainingTime <= TimeSpan.Zero;
+        }
     }
+
+}
 }

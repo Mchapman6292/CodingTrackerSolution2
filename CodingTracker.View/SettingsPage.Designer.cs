@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -38,26 +36,11 @@
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            guna2GradientPanel1 = new Guna.UI2.WinForms.Guna2GradientPanel();
             SettingsPageExitButton = new Guna.UI2.WinForms.Guna2Button();
             SettingsPageReturnMainPageButton = new Guna.UI2.WinForms.Guna2Button();
             ChangePasswordButton = new Guna.UI2.WinForms.Guna2Button();
             ChangeUsernameButton = new Guna.UI2.WinForms.Guna2Button();
-            guna2GradientPanel1.SuspendLayout();
             SuspendLayout();
-            // 
-            // guna2GradientPanel1
-            // 
-            guna2GradientPanel1.Controls.Add(SettingsPageExitButton);
-            guna2GradientPanel1.Controls.Add(SettingsPageReturnMainPageButton);
-            guna2GradientPanel1.Controls.Add(ChangePasswordButton);
-            guna2GradientPanel1.Controls.Add(ChangeUsernameButton);
-            guna2GradientPanel1.CustomizableEdges = customizableEdges9;
-            guna2GradientPanel1.Location = new Point(380, 117);
-            guna2GradientPanel1.Name = "guna2GradientPanel1";
-            guna2GradientPanel1.ShadowDecoration.CustomizableEdges = customizableEdges10;
-            guna2GradientPanel1.Size = new Size(777, 311);
-            guna2GradientPanel1.TabIndex = 0;
             // 
             // SettingsPageExitButton
             // 
@@ -68,7 +51,7 @@
             SettingsPageExitButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             SettingsPageExitButton.Font = new Font("Segoe UI", 9F);
             SettingsPageExitButton.ForeColor = Color.White;
-            SettingsPageExitButton.Location = new Point(683, 0);
+            SettingsPageExitButton.Location = new Point(1098, 0);
             SettingsPageExitButton.Name = "SettingsPageExitButton";
             SettingsPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
             SettingsPageExitButton.Size = new Size(94, 36);
@@ -84,7 +67,7 @@
             SettingsPageReturnMainPageButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             SettingsPageReturnMainPageButton.Font = new Font("Segoe UI", 9F);
             SettingsPageReturnMainPageButton.ForeColor = Color.White;
-            SettingsPageReturnMainPageButton.Location = new Point(594, 0);
+            SettingsPageReturnMainPageButton.Location = new Point(1189, 0);
             SettingsPageReturnMainPageButton.Name = "SettingsPageReturnMainPageButton";
             SettingsPageReturnMainPageButton.ShadowDecoration.CustomizableEdges = customizableEdges4;
             SettingsPageReturnMainPageButton.Size = new Size(94, 36);
@@ -100,7 +83,7 @@
             ChangePasswordButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             ChangePasswordButton.Font = new Font("Segoe UI", 9F);
             ChangePasswordButton.ForeColor = Color.White;
-            ChangePasswordButton.Location = new Point(301, 161);
+            ChangePasswordButton.Location = new Point(549, 296);
             ChangePasswordButton.Name = "ChangePasswordButton";
             ChangePasswordButton.ShadowDecoration.CustomizableEdges = customizableEdges6;
             ChangePasswordButton.Size = new Size(180, 45);
@@ -116,7 +99,7 @@
             ChangeUsernameButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             ChangeUsernameButton.Font = new Font("Segoe UI", 9F);
             ChangeUsernameButton.ForeColor = Color.White;
-            ChangeUsernameButton.Location = new Point(301, 72);
+            ChangeUsernameButton.Location = new Point(549, 193);
             ChangeUsernameButton.Name = "ChangeUsernameButton";
             ChangeUsernameButton.ShadowDecoration.CustomizableEdges = customizableEdges8;
             ChangeUsernameButton.Size = new Size(180, 45);
@@ -129,17 +112,17 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1284, 681);
-            Controls.Add(guna2GradientPanel1);
+            Controls.Add(SettingsPageReturnMainPageButton);
+            Controls.Add(SettingsPageExitButton);
+            Controls.Add(ChangePasswordButton);
+            Controls.Add(ChangeUsernameButton);
             Name = "SettingsPage";
-            Text = "MainPage";
+            Text = "SettingsPage";
             Load += SettingsPage_Load;
-            guna2GradientPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-
-        private Guna.UI2.WinForms.Guna2GradientPanel guna2GradientPanel1;
         private Guna.UI2.WinForms.Guna2Button ChangeUsernameButton;
         private Guna.UI2.WinForms.Guna2Button ChangePasswordButton;
         private Guna.UI2.WinForms.Guna2Button SettingsPageExitButton;

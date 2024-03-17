@@ -1,6 +1,6 @@
 ﻿namespace CodingTracker.View
 {
-    partial class CodingSessionTimer
+    partial class CodingSessionCountDownTimer
     {
         /// <summary>
         /// Required designer variable.
