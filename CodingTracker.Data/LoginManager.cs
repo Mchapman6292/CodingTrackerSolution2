@@ -77,7 +77,7 @@ namespace CodingTracker.Data.LoginManagers
                     {
                         _appLogger.Info($"User {username} validation failed. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
-                    return userCredential; // Returns null if no matching user, or the UserCredentialDTO if a match is found
+                    return userCredential; // Returns null if no matching user 
                 }
                 catch (Exception ex)
                 {

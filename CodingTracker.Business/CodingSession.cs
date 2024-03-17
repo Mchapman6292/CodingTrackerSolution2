@@ -27,6 +27,7 @@ namespace CodingTracker.Business.CodingSessions
         public int? DurationMinutes { get; set; }
         public int? CodingGoalHours { get; set; }
         public int? TimeToGoalMinutes { get; set; }
+        public int? SessionGoalMinutes { get; set; }
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
 

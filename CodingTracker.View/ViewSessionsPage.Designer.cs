@@ -33,22 +33,22 @@
             updateSessionButton = new Button();
             filterSessionsMenu = new ContextMenuStrip(components);
             cMenuStripDay = new ToolStripMenuItem();
-            cMenuStripWeek = new ToolStripMenuItem();
-            cMenuStripYear = new ToolStripMenuItem();
-            toolStrip1 = new ToolStrip();
             daysAsc = new ToolStripMenuItem();
             daysDesc = new ToolStripMenuItem();
+            cMenuStripWeek = new ToolStripMenuItem();
             weeksAsc = new ToolStripMenuItem();
             weeksDesc = new ToolStripMenuItem();
+            cMenuStripYear = new ToolStripMenuItem();
             yearsAsc = new ToolStripMenuItem();
             yearsDesc = new ToolStripMenuItem();
+            toolStrip1 = new ToolStrip();
             deleteSessionButton = new Button();
             filterSessionsMenu.SuspendLayout();
             SuspendLayout();
             // 
             // viewSessionsButton
             // 
-            viewSessionsButton.Location = new Point(758, 108);
+            viewSessionsButton.Location = new Point(511, 160);
             viewSessionsButton.Name = "viewSessionsButton";
             viewSessionsButton.Size = new Size(275, 66);
             viewSessionsButton.TabIndex = 0;
@@ -59,7 +59,7 @@
             // 
             // updateSessionButton
             // 
-            updateSessionButton.Location = new Point(752, 221);
+            updateSessionButton.Location = new Point(505, 259);
             updateSessionButton.Name = "updateSessionButton";
             updateSessionButton.Size = new Size(281, 81);
             updateSessionButton.TabIndex = 1;
@@ -83,6 +83,18 @@
             cMenuStripDay.Text = "Previous day";
             cMenuStripDay.Click += Previous24Hours_Click;
             // 
+            // daysAsc
+            // 
+            daysAsc.Name = "daysAsc";
+            daysAsc.Size = new Size(136, 22);
+            daysAsc.Text = "Ascending";
+            // 
+            // daysDesc
+            // 
+            daysDesc.Name = "daysDesc";
+            daysDesc.Size = new Size(136, 22);
+            daysDesc.Text = "Descending";
+            // 
             // cMenuStripWeek
             // 
             cMenuStripWeek.DropDownItems.AddRange(new ToolStripItem[] { weeksAsc, weeksDesc });
@@ -91,6 +103,18 @@
             cMenuStripWeek.Text = "Previous week";
             cMenuStripWeek.Click += cMenuStripWeek_Click;
             // 
+            // weeksAsc
+            // 
+            weeksAsc.Name = "weeksAsc";
+            weeksAsc.Size = new Size(136, 22);
+            weeksAsc.Text = "Ascending";
+            // 
+            // weeksDesc
+            // 
+            weeksDesc.Name = "weeksDesc";
+            weeksDesc.Size = new Size(136, 22);
+            weeksDesc.Text = "Descending";
+            // 
             // cMenuStripYear
             // 
             cMenuStripYear.DropDownItems.AddRange(new ToolStripItem[] { yearsAsc, yearsDesc });
@@ -98,53 +122,29 @@
             cMenuStripYear.Size = new Size(149, 22);
             cMenuStripYear.Text = "Previous year";
             // 
-            // toolStrip1
-            // 
-            toolStrip1.Location = new Point(0, 0);
-            toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(2481, 25);
-            toolStrip1.TabIndex = 2;
-            toolStrip1.Text = "toolStrip1";
-            // 
-            // daysAsc
-            // 
-            daysAsc.Name = "daysAsc";
-            daysAsc.Size = new Size(180, 22);
-            daysAsc.Text = "Ascending";
-            // 
-            // daysDesc
-            // 
-            daysDesc.Name = "daysDesc";
-            daysDesc.Size = new Size(180, 22);
-            daysDesc.Text = "Descending";
-            // 
-            // weeksAsc
-            // 
-            weeksAsc.Name = "weeksAsc";
-            weeksAsc.Size = new Size(180, 22);
-            weeksAsc.Text = "Ascending";
-            // 
-            // weeksDesc
-            // 
-            weeksDesc.Name = "weeksDesc";
-            weeksDesc.Size = new Size(180, 22);
-            weeksDesc.Text = "Descending";
-            // 
             // yearsAsc
             // 
             yearsAsc.Name = "yearsAsc";
-            yearsAsc.Size = new Size(180, 22);
+            yearsAsc.Size = new Size(136, 22);
             yearsAsc.Text = "Ascending";
             // 
             // yearsDesc
             // 
             yearsDesc.Name = "yearsDesc";
-            yearsDesc.Size = new Size(180, 22);
+            yearsDesc.Size = new Size(136, 22);
             yearsDesc.Text = "Descending";
+            // 
+            // toolStrip1
+            // 
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(1284, 25);
+            toolStrip1.TabIndex = 2;
+            toolStrip1.Text = "toolStrip1";
             // 
             // deleteSessionButton
             // 
-            deleteSessionButton.Location = new Point(758, 346);
+            deleteSessionButton.Location = new Point(511, 405);
             deleteSessionButton.Name = "deleteSessionButton";
             deleteSessionButton.Size = new Size(275, 81);
             deleteSessionButton.TabIndex = 3;
@@ -155,7 +155,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(2481, 713);
+            ClientSize = new Size(1284, 681);
             Controls.Add(deleteSessionButton);
             Controls.Add(toolStrip1);
             Controls.Add(updateSessionButton);
