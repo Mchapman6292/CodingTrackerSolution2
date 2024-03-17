@@ -50,6 +50,8 @@ namespace CodingTracker.View
         /// </summary>
         private void InitializeComponent()
         {
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             loginPageUsernameLabel = new Label();
             Password = new Label();
             loginPagePasswordTextbox = new TextBox();
@@ -57,11 +59,14 @@ namespace CodingTracker.View
             loginPageErrorTextbox = new Label();
             loginPageLoginButton = new Button();
             loginPageExitButton = new Button();
+            guna2CustomCheckBox1 = new Guna.UI2.WinForms.Guna2CustomCheckBox();
+            label1 = new Label();
+            LoginPageForgotResetAccountButton = new Button();
             SuspendLayout();
             // 
             // loginPageUsernameLabel
             // 
-            loginPageUsernameLabel.Location = new Point(631, 207);
+            loginPageUsernameLabel.Location = new Point(514, 188);
             loginPageUsernameLabel.Name = "loginPageUsernameLabel";
             loginPageUsernameLabel.Size = new Size(100, 23);
             loginPageUsernameLabel.TabIndex = 0;
@@ -69,7 +74,7 @@ namespace CodingTracker.View
             // 
             // Password
             // 
-            Password.Location = new Point(629, 270);
+            Password.Location = new Point(514, 280);
             Password.Name = "Password";
             Password.Size = new Size(100, 23);
             Password.TabIndex = 1;
@@ -79,16 +84,18 @@ namespace CodingTracker.View
             // 
             loginPagePasswordTextbox.AcceptsReturn = true;
             loginPagePasswordTextbox.CausesValidation = false;
-            loginPagePasswordTextbox.Location = new Point(812, 270);
+            loginPagePasswordTextbox.Location = new Point(514, 306);
+            loginPagePasswordTextbox.Multiline = true;
             loginPagePasswordTextbox.Name = "loginPagePasswordTextbox";
-            loginPagePasswordTextbox.Size = new Size(223, 23);
+            loginPagePasswordTextbox.Size = new Size(235, 33);
             loginPagePasswordTextbox.TabIndex = 2;
             // 
             // loginPageUsernameTextbox
             // 
-            loginPageUsernameTextbox.Location = new Point(812, 207);
+            loginPageUsernameTextbox.Location = new Point(514, 214);
+            loginPageUsernameTextbox.Multiline = true;
             loginPageUsernameTextbox.Name = "loginPageUsernameTextbox";
-            loginPageUsernameTextbox.Size = new Size(223, 23);
+            loginPageUsernameTextbox.Size = new Size(235, 33);
             loginPageUsernameTextbox.TabIndex = 3;
             // 
             // loginPageErrorTextbox
@@ -101,9 +108,9 @@ namespace CodingTracker.View
             // 
             // loginPageLoginButton
             // 
-            loginPageLoginButton.Location = new Point(812, 350);
+            loginPageLoginButton.Location = new Point(514, 410);
             loginPageLoginButton.Name = "loginPageLoginButton";
-            loginPageLoginButton.Size = new Size(223, 33);
+            loginPageLoginButton.Size = new Size(235, 38);
             loginPageLoginButton.TabIndex = 6;
             loginPageLoginButton.Text = "Login";
             loginPageLoginButton.UseVisualStyleBackColor = true;
@@ -111,19 +118,58 @@ namespace CodingTracker.View
             // 
             // loginPageExitButton
             // 
-            loginPageExitButton.Location = new Point(1303, 468);
+            loginPageExitButton.Location = new Point(1222, 1);
             loginPageExitButton.Name = "loginPageExitButton";
-            loginPageExitButton.Size = new Size(90, 41);
+            loginPageExitButton.Size = new Size(62, 32);
             loginPageExitButton.TabIndex = 8;
             loginPageExitButton.Text = "Exit";
             loginPageExitButton.UseVisualStyleBackColor = true;
             loginPageExitButton.Click += loginPageExitButton_Click;
             // 
+            // guna2CustomCheckBox1
+            // 
+            guna2CustomCheckBox1.BackColor = SystemColors.ControlLight;
+            guna2CustomCheckBox1.CheckedState.BorderColor = Color.FromArgb(94, 148, 255);
+            guna2CustomCheckBox1.CheckedState.BorderRadius = 2;
+            guna2CustomCheckBox1.CheckedState.BorderThickness = 0;
+            guna2CustomCheckBox1.CheckedState.FillColor = Color.FromArgb(94, 148, 255);
+            guna2CustomCheckBox1.CustomizableEdges = customizableEdges3;
+            guna2CustomCheckBox1.Location = new Point(514, 361);
+            guna2CustomCheckBox1.Name = "guna2CustomCheckBox1";
+            guna2CustomCheckBox1.ShadowDecoration.Color = Color.Transparent;
+            guna2CustomCheckBox1.ShadowDecoration.CustomizableEdges = customizableEdges4;
+            guna2CustomCheckBox1.Size = new Size(20, 20);
+            guna2CustomCheckBox1.TabIndex = 9;
+            guna2CustomCheckBox1.UncheckedState.BorderColor = Color.FromArgb(125, 137, 149);
+            guna2CustomCheckBox1.UncheckedState.BorderRadius = 2;
+            guna2CustomCheckBox1.UncheckedState.BorderThickness = 0;
+            guna2CustomCheckBox1.UncheckedState.FillColor = Color.FromArgb(125, 137, 149);
+            // 
+            // label1
+            // 
+            label1.Location = new Point(540, 361);
+            label1.Name = "label1";
+            label1.Size = new Size(100, 23);
+            label1.TabIndex = 10;
+            label1.Text = "Remember me";
+            // 
+            // LoginPageForgotResetAccountButton
+            // 
+            LoginPageForgotResetAccountButton.Location = new Point(1049, 641);
+            LoginPageForgotResetAccountButton.Name = "LoginPageForgotResetAccountButton";
+            LoginPageForgotResetAccountButton.Size = new Size(235, 38);
+            LoginPageForgotResetAccountButton.TabIndex = 11;
+            LoginPageForgotResetAccountButton.Text = "Reset account";
+            LoginPageForgotResetAccountButton.UseVisualStyleBackColor = true;
+            // 
             // LoginPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(2481, 584);
+            ClientSize = new Size(1284, 681);
+            Controls.Add(LoginPageForgotResetAccountButton);
+            Controls.Add(label1);
+            Controls.Add(guna2CustomCheckBox1);
             Controls.Add(loginPageExitButton);
             Controls.Add(loginPageLoginButton);
             Controls.Add(loginPageErrorTextbox);
@@ -212,5 +258,8 @@ namespace CodingTracker.View
         private Label loginPageErrorTextbox;
         private Button loginPageLoginButton;
         private Button loginPageExitButton;
+        private Guna.UI2.WinForms.Guna2CustomCheckBox guna2CustomCheckBox1;
+        private Label label1;
+        private Button LoginPageForgotResetAccountButton;
     }
 }

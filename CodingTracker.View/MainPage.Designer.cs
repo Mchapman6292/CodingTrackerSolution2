@@ -678,19 +678,22 @@
             // 
             // MainPageProgressBar
             // 
-            MainPageProgressBar.FillColor = Color.FromArgb(200, 213, 218, 223);
+            MainPageProgressBar.FillColor = Color.WhiteSmoke;
             MainPageProgressBar.Font = new Font("Segoe UI", 12F);
             MainPageProgressBar.ForeColor = Color.White;
             MainPageProgressBar.Location = new Point(873, 88);
             MainPageProgressBar.Minimum = 0;
             MainPageProgressBar.Name = "MainPageProgressBar";
-            MainPageProgressBar.ProgressColor = Color.FromArgb(0, 192, 192);
-            MainPageProgressBar.ProgressColor2 = Color.Teal;
+            MainPageProgressBar.ProgressBrushMode = Guna.UI2.WinForms.Enums.BrushMode.SolidTransition;
+            MainPageProgressBar.ProgressColor = Color.Silver;
+            MainPageProgressBar.ProgressColor2 = Color.FromArgb(0, 192, 0);
             MainPageProgressBar.ShadowDecoration.CustomizableEdges = customizableEdges23;
             MainPageProgressBar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             MainPageProgressBar.Size = new Size(160, 160);
             MainPageProgressBar.TabIndex = 56;
             MainPageProgressBar.Text = "guna2CircleProgressBar1";
+            MainPageProgressBar.TextMode = Guna.UI2.WinForms.Enums.ProgressBarTextMode.Custom;
+            MainPageProgressBar.Value = 50;
             // 
             // guna2GradientPanel32
             // 
