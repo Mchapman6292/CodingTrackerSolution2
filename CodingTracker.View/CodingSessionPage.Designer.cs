@@ -40,6 +40,7 @@
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             CodingSessionPageCentrePanel = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
+            CodingSessionPageManualStartButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSessionPageStartSessionButton = new Guna.UI2.WinForms.Guna2CircleButton();
             CodingSessionPageMinimiseButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSesisonPageTopPanel = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
@@ -51,6 +52,7 @@
             // 
             // CodingSessionPageCentrePanel
             // 
+            CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageManualStartButton);
             CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageStartSessionButton);
             CodingSessionPageCentrePanel.CustomizableEdges = customizableEdges2;
             CodingSessionPageCentrePanel.Location = new Point(4, 136);
@@ -58,6 +60,23 @@
             CodingSessionPageCentrePanel.ShadowDecoration.CustomizableEdges = customizableEdges3;
             CodingSessionPageCentrePanel.Size = new Size(1300, 300);
             CodingSessionPageCentrePanel.TabIndex = 0;
+            // 
+            // CodingSessionPageManualStartButton
+            // 
+            CodingSessionPageManualStartButton.CustomizableEdges = customizableEdges14;
+            CodingSessionPageManualStartButton.DisabledState.BorderColor = Color.DarkGray;
+            CodingSessionPageManualStartButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            CodingSessionPageManualStartButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            CodingSessionPageManualStartButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            CodingSessionPageManualStartButton.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageManualStartButton.ForeColor = Color.White;
+            CodingSessionPageManualStartButton.Location = new Point(244, 216);
+            CodingSessionPageManualStartButton.Name = "CodingSessionPageManualStartButton";
+            CodingSessionPageManualStartButton.ShadowDecoration.CustomizableEdges = customizableEdges15;
+            CodingSessionPageManualStartButton.Size = new Size(180, 45);
+            CodingSessionPageManualStartButton.TabIndex = 2;
+            CodingSessionPageManualStartButton.Text = "Enter Start time manually ";
+            CodingSessionPageManualStartButton.Click += CodingSessionPageManualStartButton_Click;
             // 
             // CodingSessionPageStartSessionButton
             // 
@@ -153,6 +172,7 @@
         private Guna.UI2.WinForms.Guna2CustomGradientPanel CodingSessionPageCentrePanel;
         private Guna.UI2.WinForms.Guna2CircleButton CodingSessionPageStartSessionButton;
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageMinimiseButton;
+        private Guna.UI2.WinForms.Guna2Button CodingSessionPageManualStartButton;
         private Guna.UI2.WinForms.Guna2CustomGradientPanel CodingSesisonPageTopPanel;
         private Guna.UI2.WinForms.Guna2CustomGradientPanel guna2CustomGradientPanel1;
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageExitButton;

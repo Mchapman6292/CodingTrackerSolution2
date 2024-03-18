@@ -35,9 +35,9 @@ namespace CodingTracker.Business.Codingtimers
         }
 
             public void Tick()
-        {
-            if (_remainingTime > TimeSpan.Zero)
             {
+            if (_remainingTime > TimeSpan.Zero)
+                {
                 _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
             }
         }
@@ -45,13 +45,13 @@ namespace CodingTracker.Business.Codingtimers
         public TimeSpan GetRemainingTime()
         {
             return _remainingTime;
-        }
+                }
 
         public bool IsFinished()
-        {
+                {
             return _remainingTime <= TimeSpan.Zero;
+            }
         }
-    }
 
-}
+    }
 }

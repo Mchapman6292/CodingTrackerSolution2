@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -36,11 +38,26 @@
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            guna2GradientPanel1 = new Guna.UI2.WinForms.Guna2GradientPanel();
             SettingsPageExitButton = new Guna.UI2.WinForms.Guna2Button();
             SettingsPageReturnMainPageButton = new Guna.UI2.WinForms.Guna2Button();
             ChangePasswordButton = new Guna.UI2.WinForms.Guna2Button();
             ChangeUsernameButton = new Guna.UI2.WinForms.Guna2Button();
+            guna2GradientPanel1.SuspendLayout();
             SuspendLayout();
+            // 
+            // guna2GradientPanel1
+            // 
+            guna2GradientPanel1.Controls.Add(SettingsPageExitButton);
+            guna2GradientPanel1.Controls.Add(SettingsPageReturnMainPageButton);
+            guna2GradientPanel1.Controls.Add(ChangePasswordButton);
+            guna2GradientPanel1.Controls.Add(ChangeUsernameButton);
+            guna2GradientPanel1.CustomizableEdges = customizableEdges9;
+            guna2GradientPanel1.Location = new Point(380, 117);
+            guna2GradientPanel1.Name = "guna2GradientPanel1";
+            guna2GradientPanel1.ShadowDecoration.CustomizableEdges = customizableEdges10;
+            guna2GradientPanel1.Size = new Size(777, 311);
+            guna2GradientPanel1.TabIndex = 0;
             // 
             // SettingsPageExitButton
             // 
@@ -119,10 +136,13 @@
             Name = "SettingsPage";
             Text = "SettingsPage";
             Load += SettingsPage_Load;
+            guna2GradientPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
+
+        private Guna.UI2.WinForms.Guna2GradientPanel guna2GradientPanel1;
         private Guna.UI2.WinForms.Guna2Button ChangeUsernameButton;
         private Guna.UI2.WinForms.Guna2Button ChangePasswordButton;
         private Guna.UI2.WinForms.Guna2Button SettingsPageExitButton;

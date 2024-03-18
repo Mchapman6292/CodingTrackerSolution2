@@ -1,7 +1,29 @@
-﻿namespace CodingTracker.View
+﻿using System;
+using System.Linq.Expressions;
+using System.Windows.Forms;
+using CodingTracker.Business.CodingSession;
+using CodingTracker.Logging.ICRUDs;
+using CodingTracker.Logging.IDatabaseManagers;
+using CodingTracker.Logging.IInputValidators;
+using CodingTracker.Logging.IUtilityServices;
+using CodingTracker.Logging.UtilityServices;
+
+namespace CodingTracker.View
 {
     partial class LoginPage
     {
+        private readonly ICRUD _crud;
+        private readonly IDatabaseManager _dbManager;
+        private readonly IInputValidator _inputValidator;
+        private readonly IUtilityService _utilityService;
+        private readonly CodingSession _codingSession;
+        private Button startSessionButton;
+        private Button endSessionButton;
+        private Button viewSessionsButton;
+        private Button setGoalButton;
+        private TextBox goalHoursTextBox;
+        private DataGridView sessionsDataGridView;
+        private bool _isSessionActive = false;
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -160,6 +182,73 @@
             PerformLayout();
         }
 
+        private void StartSessionButton_Click(object sender, EventArgs e)
+        {
+            if (!_isSessionActive)
+            {
+                try
+                {
+                    _codingSession.StartSession();
+                    _isSessionActive = true;
+                    startSessionButton.Enabled = false;
+                    MessageBox.Show("Session started.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
+            }
+        }
+
+        private void EndSessionButton_Click(object sender, EventArgs e)
+        {
+            if (_isSessionActive)
+            {
+                try
+                {
+                    _codingSession.EndSession();
+                    _isSessionActive = false;
+                    endSessionButton.Enabled = true;
+                    MessageBox.Show("Session ended.");
+                }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
+            }
+        }
+    
+
+
+
+        private void ViewSessionsButton_Click(object sender, EventArgs e)
+            {
+                try
+                {
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                }
+            }
+
+        private void SetGoalButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                
+                int goalHours = _utilityService.TryParseInt(goalHoursTextBox.Text);
+                _codingSession.SetCodingGoal(goalHours);
+                MessageBox.Show("Coding goal set.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
         #endregion
 
         private Label loginPageUsernameLabel;
