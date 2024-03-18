@@ -22,17 +22,17 @@ namespace CodingTracker.View
 
         }
 
-        private void CodingSessionPageManualStartButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void CodingSessionPageMinimiseButton_Click(object sender, EventArgs e)
         {
 
         }
 
         private void guna2Button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CodingSessionPageSetSessionGoalButton_Click(object sender, EventArgs e)
         {
 
         }

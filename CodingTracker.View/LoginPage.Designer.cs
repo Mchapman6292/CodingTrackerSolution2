@@ -1,18 +1,12 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Windows.Forms;
-using CodingTracker.Business.CodingSession;
-using CodingTracker.Logging.ICRUDs;
-using CodingTracker.Logging.IDatabaseManagers;
-using CodingTracker.Logging.IInputValidators;
-using CodingTracker.Logging.IUtilityServices;
-using CodingTracker.Logging.UtilityServices;
+﻿using CodingTracker.Business.CodingSessions;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.IInputValidators;
+using CodingTracker.Common.IUtilityServices;
 
 namespace CodingTracker.View
 {
     partial class LoginPage
     {
-        private readonly ICRUD _crud;
         private readonly IDatabaseManager _dbManager;
         private readonly IInputValidator _inputValidator;
         private readonly IUtilityService _utilityService;

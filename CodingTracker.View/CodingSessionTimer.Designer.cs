@@ -28,29 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            timer1 = new System.Windows.Forms.Timer(components);
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges11 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges12 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             CodingSessionTimerPageProgressBar = new Guna.UI2.WinForms.Guna2ProgressBar();
             CodingSessionTimerPageTimerLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
             CodingTimerPageExitButton = new Guna.UI2.WinForms.Guna2Button();
             SuspendLayout();
             // 
-            // timer1
-            // 
-            timer1.Interval = 1000;
-            // 
             // CodingSessionTimerPageProgressBar
             // 
-            CodingSessionTimerPageProgressBar.CustomizableEdges = customizableEdges5;
+            CodingSessionTimerPageProgressBar.CustomizableEdges = customizableEdges9;
             CodingSessionTimerPageProgressBar.Location = new Point(460, 338);
             CodingSessionTimerPageProgressBar.Name = "CodingSessionTimerPageProgressBar";
             CodingSessionTimerPageProgressBar.ProgressColor = Color.FromArgb(128, 255, 128);
             CodingSessionTimerPageProgressBar.ProgressColor2 = Color.Green;
-            CodingSessionTimerPageProgressBar.ShadowDecoration.CustomizableEdges = customizableEdges6;
+            CodingSessionTimerPageProgressBar.ShadowDecoration.CustomizableEdges = customizableEdges10;
             CodingSessionTimerPageProgressBar.Size = new Size(300, 30);
             CodingSessionTimerPageProgressBar.TabIndex = 0;
             CodingSessionTimerPageProgressBar.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
@@ -71,7 +65,7 @@
             // 
             // CodingTimerPageExitButton
             // 
-            CodingTimerPageExitButton.CustomizableEdges = customizableEdges7;
+            CodingTimerPageExitButton.CustomizableEdges = customizableEdges11;
             CodingTimerPageExitButton.DisabledState.BorderColor = Color.DarkGray;
             CodingTimerPageExitButton.DisabledState.CustomBorderColor = Color.DarkGray;
             CodingTimerPageExitButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
@@ -80,7 +74,7 @@
             CodingTimerPageExitButton.ForeColor = Color.White;
             CodingTimerPageExitButton.Location = new Point(1211, 0);
             CodingTimerPageExitButton.Name = "CodingTimerPageExitButton";
-            CodingTimerPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges8;
+            CodingTimerPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges12;
             CodingTimerPageExitButton.Size = new Size(73, 45);
             CodingTimerPageExitButton.TabIndex = 6;
             CodingTimerPageExitButton.Text = "Exit";
@@ -99,8 +93,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Timer timer1;
         private Guna.UI2.WinForms.Guna2ProgressBar CodingSessionTimerPageProgressBar;
         private Guna.UI2.WinForms.Guna2HtmlLabel CodingSessionTimerPageTimerLabel;
         private Guna.UI2.WinForms.Guna2Button CodingTimerPageExitButton;
