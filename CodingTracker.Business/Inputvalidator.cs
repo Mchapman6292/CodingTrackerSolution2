@@ -60,11 +60,6 @@ namespace CodingTracker.Business.InputValidators
             return false;
         }
 
-        public int TryParseSessionGoalInput(string SessionGoalHHMM)
-        {
-            var timeParts = SessionGoalHHMM.Split(':');
-
-        }
 
 
         public bool CheckStartInput(string startInput)
