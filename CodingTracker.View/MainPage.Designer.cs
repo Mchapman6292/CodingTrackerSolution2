@@ -228,8 +228,7 @@
             guna2Button2.Font = new Font("Segoe UI", 9F);
             guna2Button2.ForeColor = Color.White;
             guna2Button2.Image = (Image)resources.GetObject("guna2Button2.Image");
-            guna2Button2.ImageSize = new Size(40, 49);
-            guna2Button2.Location = new Point(1055, 0);
+            guna2Button2.Location = new Point(1096, 0);
             guna2Button2.Name = "guna2Button2";
             guna2Button2.ShadowDecoration.CustomizableEdges = customizableEdges2;
             guna2Button2.Size = new Size(45, 33);
@@ -248,10 +247,10 @@
             guna2Button1.ForeColor = Color.Gray;
             guna2Button1.Image = (Image)resources.GetObject("guna2Button1.Image");
             guna2Button1.ImeMode = ImeMode.NoControl;
-            guna2Button1.Location = new Point(992, 0);
+            guna2Button1.Location = new Point(1055, 0);
             guna2Button1.Name = "guna2Button1";
             guna2Button1.ShadowDecoration.CustomizableEdges = customizableEdges4;
-            guna2Button1.Size = new Size(67, 33);
+            guna2Button1.Size = new Size(45, 30);
             guna2Button1.TabIndex = 4;
             guna2Button1.Click += guna2Button1_Click;
             // 
@@ -393,6 +392,7 @@
             // 
             panel3.BackColor = Color.FromArgb(249, 249, 249);
             panel3.Controls.Add(guna2GradientPanel33);
+            panel3.Controls.Add(guna2Button2);
             panel3.Controls.Add(guna2GradientPanel4);
             panel3.Controls.Add(guna2GradientPanel3);
             panel3.Controls.Add(guna2GradientPanel2);
@@ -407,7 +407,6 @@
             // guna2GradientPanel33
             // 
             guna2GradientPanel33.Controls.Add(guna2Button1);
-            guna2GradientPanel33.Controls.Add(guna2Button2);
             guna2GradientPanel33.CustomizableEdges = customizableEdges13;
             guna2GradientPanel33.Location = new Point(0, 0);
             guna2GradientPanel33.Name = "guna2GradientPanel33";
@@ -436,7 +435,7 @@
             // 
             pictureBox1.BackColor = Color.FromArgb(255, 128, 0);
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(125, 6);
+            pictureBox1.Location = new Point(165, -8);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(100, 39);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;

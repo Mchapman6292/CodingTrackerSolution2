@@ -179,7 +179,7 @@ namespace CodingTracker.Data.CredentialStorage
             /// </summary>
             /// <param name="password"></param>
             /// <returns></returns>
-            public string HashPassword(string password)
+            public string HashPassword(string password) /// use lib function
         {
             try
             {

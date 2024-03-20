@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IDatabaseManagers;
+using System.Text.RegularExpressions;
 
 
 
@@ -34,6 +35,30 @@ namespace CodingTracker.Business.InputValidators
             throw new NotImplementedException();
         }
 
+
+        public bool IsValidTimeFormatHHMM(string input)
+        {
+            // Regex pattern to match a time format of HH:mm
+            string pattern = @"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
+            return Regex.IsMatch(input, pattern);
+        }
+
+        public bool TryParseTime(string input, out TimeSpan timeSpan)
+        {
+            timeSpan = default;
+
+            if (IsValidTimeFormatHHMM(input))
+            {
+                string[] parts = input.Split(':');
+                if (int.TryParse(parts[0], out int hours) && int.TryParse(parts[1], out int minutes))
+                {
+                    timeSpan = new TimeSpan(hours, minutes, 0);
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
 
 
@@ -78,7 +103,6 @@ namespace CodingTracker.Business.InputValidators
         {
             while (true)
             {
-                Console.WriteLine("Please enter the time (HH:mm):");
                 string userInput = Console.ReadLine();
 
                 if (CheckTimeInput(userInput, out DateTime result))

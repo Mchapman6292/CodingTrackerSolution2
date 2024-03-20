@@ -68,7 +68,7 @@
             SettingsPageExitButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             SettingsPageExitButton.Font = new Font("Segoe UI", 9F);
             SettingsPageExitButton.ForeColor = Color.White;
-            SettingsPageExitButton.Location = new Point(683, 0);
+            SettingsPageExitButton.Location = new Point(1098, 0);
             SettingsPageExitButton.Name = "SettingsPageExitButton";
             SettingsPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
             SettingsPageExitButton.Size = new Size(94, 36);
@@ -84,7 +84,7 @@
             SettingsPageReturnMainPageButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             SettingsPageReturnMainPageButton.Font = new Font("Segoe UI", 9F);
             SettingsPageReturnMainPageButton.ForeColor = Color.White;
-            SettingsPageReturnMainPageButton.Location = new Point(594, 0);
+            SettingsPageReturnMainPageButton.Location = new Point(1189, 0);
             SettingsPageReturnMainPageButton.Name = "SettingsPageReturnMainPageButton";
             SettingsPageReturnMainPageButton.ShadowDecoration.CustomizableEdges = customizableEdges4;
             SettingsPageReturnMainPageButton.Size = new Size(94, 36);
@@ -100,7 +100,7 @@
             ChangePasswordButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             ChangePasswordButton.Font = new Font("Segoe UI", 9F);
             ChangePasswordButton.ForeColor = Color.White;
-            ChangePasswordButton.Location = new Point(301, 161);
+            ChangePasswordButton.Location = new Point(549, 296);
             ChangePasswordButton.Name = "ChangePasswordButton";
             ChangePasswordButton.ShadowDecoration.CustomizableEdges = customizableEdges6;
             ChangePasswordButton.Size = new Size(180, 45);
@@ -116,7 +116,7 @@
             ChangeUsernameButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             ChangeUsernameButton.Font = new Font("Segoe UI", 9F);
             ChangeUsernameButton.ForeColor = Color.White;
-            ChangeUsernameButton.Location = new Point(301, 72);
+            ChangeUsernameButton.Location = new Point(549, 193);
             ChangeUsernameButton.Name = "ChangeUsernameButton";
             ChangeUsernameButton.ShadowDecoration.CustomizableEdges = customizableEdges8;
             ChangeUsernameButton.Size = new Size(180, 45);
@@ -129,9 +129,12 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1284, 681);
-            Controls.Add(guna2GradientPanel1);
+            Controls.Add(SettingsPageReturnMainPageButton);
+            Controls.Add(SettingsPageExitButton);
+            Controls.Add(ChangePasswordButton);
+            Controls.Add(ChangeUsernameButton);
             Name = "SettingsPage";
-            Text = "MainPage";
+            Text = "SettingsPage";
             Load += SettingsPage_Load;
             guna2GradientPanel1.ResumeLayout(false);
             ResumeLayout(false);

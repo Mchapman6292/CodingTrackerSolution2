@@ -1,15 +1,12 @@
 ﻿using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.ILoginManagers;
+using CodingTracker.Common.IApplicationLoggers;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
+using LibVLCSharp.Shared;
+using LibVLCSharp.WinForms;
+using System.Diagnostics;
 
 namespace CodingTracker.View
 {
@@ -17,13 +14,48 @@ namespace CodingTracker.View
     {
         private readonly ILoginManager _loginManager;
         private readonly IApplicationControl _appControl;
-        public LoginPage(ILoginManager loginManager, IApplicationControl appcontrol)
+        private readonly IApplicationLogger _appLogger;
+        private LibVLC _libVLC;
+        private VideoView _videoView;
+
+        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger)
         {
             _loginManager = loginManager;
-            _appControl = appcontrol;
+            _appControl = appControl;
+            _appLogger = applogger;
             InitializeComponent();
+            InitializeVLCPlayer();
         }
 
+        private void InitializeVLCPlayer()
+        {
+            Core.Initialize();
+            _libVLC = new LibVLC();
+
+            _videoView = new VideoView
+            {
+                Location = new Point(838, 188),
+                Size = new Size(316, 234),
+                MediaPlayer = new MediaPlayer(_libVLC)
+            };
+            this.Controls.Add(_videoView);
+            _videoView.BringToFront();
+
+            string videoFilePath = CodingTracker.View.Properties.Settings.Default.VLCPath;
+            if (File.Exists(videoFilePath))
+            {
+                var media = new Media(_libVLC, new Uri(videoFilePath));
+                media.AddOption("input-repeat=65535"); // Loop the video indefinitely
+                _videoView.MediaPlayer.Play(media);
+
+                _appLogger.Info($"VLC player loaded video from {videoFilePath}");
+            }
+            else
+            {
+                _appLogger.Warning($"VLC player video file not found at {videoFilePath}");
+                MessageBox.Show("Video file not found at the specified path: " + videoFilePath);
+            }
+        }
 
         private void loginPageLoginButton_Click(object sender, EventArgs e)
         {
@@ -40,7 +72,6 @@ namespace CodingTracker.View
             {
                 loginPageErrorTextbox.Visible = true;
                 loginPageErrorTextbox.Text = "Login failed. Please check your username and password.";
-
             }
         }
 

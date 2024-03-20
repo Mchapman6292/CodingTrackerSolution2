@@ -27,6 +27,9 @@ using CodingTracker.View.FormFactories;
 using CodingTracker.View.IFormFactories;
 using CodingTrackerSolution;
 
+// To do
+// Validator & parse methods for CodingSession Goal
+//Stopwatch logic 
 
 namespace CodingTracker.View.Program
 {

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingGoals;
-using CodingTracker.Common.ICodingSessions;
 
 namespace CodingTracker.Business.CodingGoals
 {
@@ -16,15 +11,14 @@ namespace CodingTracker.Business.CodingGoals
         public int? CodingGoalHours { get; set; }
         public int? TimeToGoalMinutes { get; set; }
 
-
         public CodingGoal(IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
         }
 
-
         public void SetCodingGoal(int goalHours)
         {
+            var methodStopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(SetCodingGoal)).Start())
             {
                 _appLogger.Info($"Starting {nameof(SetCodingGoal)}. TraceID: {activity.TraceId}, GoalHours: {goalHours}");
@@ -32,18 +26,21 @@ namespace CodingTracker.Business.CodingGoals
                 {
                     CodingGoalHours = goalHours;
                     TimeToGoalMinutes = CodingGoalHours * 60;
+                    methodStopwatch.Stop();
 
-                    _appLogger.Info($"Coding goal set. TraceID: {activity.TraceId}, CodingGoalHours: {CodingGoalHours}, TimeToGoalMinutes: {TimeToGoalMinutes}");
+                    _appLogger.Info($"Coding goal set. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}, CodingGoalHours: {CodingGoalHours}, TimeToGoalMinutes: {TimeToGoalMinutes}");
                 }
                 catch (Exception ex)
                 {
-                    _appLogger.Error($"An error occurred during {nameof(SetCodingGoal)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    methodStopwatch.Stop();
+                    _appLogger.Error($"An error occurred during {nameof(SetCodingGoal)}. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                 }
             }
         }
 
         public string FormatTimeToGoalToHHMM(int? timeToGoal)
         {
+            var methodStopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(FormatTimeToGoalToHHMM)).Start())
             {
                 _appLogger.Info($"Formatting time to goal in HHMM. TraceID: {activity.TraceId}, TimeToGoal: {timeToGoal}");
@@ -58,13 +55,15 @@ namespace CodingTracker.Business.CodingGoals
                     int hours = totalMinutes / 60;
                     int remainingMinutes = totalMinutes % 60;
                     string formattedTime = $"{hours:D2}:{remainingMinutes:D2}";
+                    methodStopwatch.Stop();
 
-                    _appLogger.Info($"Time to goal formatted. TraceID: {activity.TraceId}, FormattedTime: {formattedTime}");
+                    _appLogger.Info($"Time to goal formatted. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}, FormattedTime: {formattedTime}");
                     return formattedTime;
                 }
                 catch (Exception ex)
-                { 
-                    _appLogger.Error($"An error occurred during {nameof(FormatTimeToGoalToHHMM)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                {
+                    methodStopwatch.Stop();
+                    _appLogger.Error($"An error occurred during {nameof(FormatTimeToGoalToHHMM)}. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     return null;
                 }
             }

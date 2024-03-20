@@ -20,6 +20,23 @@ namespace CodingTracker.Logging.ApplicationLoggers
                 .CreateLogger();
         }
 
+        public void LogActivity(string methodName, Action<Activity> logAction, Action action)
+        {
+            using (var activity = new Activity(methodName).Start())
+            {
+                try
+                {
+                    logAction?.Invoke(activity);
+                    action?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Error($"Exception in {methodName}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+            }
+        }
+
         // Method overloading, allows mulitple methods with same name but different parameter lists. 
         public void Info(string message) => _logger.Information(message); // General information regarding app operations, e.g user login.
         public void Info(string message, params object[] propertyValues) => _logger.Information(message, propertyValues);
