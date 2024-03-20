@@ -46,7 +46,6 @@ namespace CodingTracker.View
         {
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoginPage));
             loginPageUsernameLabel = new Label();
             Password = new Label();
             loginPagePasswordTextbox = new TextBox();
@@ -58,8 +57,8 @@ namespace CodingTracker.View
             label1 = new Label();
             LoginPageForgotResetAccountButton = new Button();
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            LoginPageMonitorImage = new AxWMPLib.AxWindowsMediaPlayer();
-            ((System.ComponentModel.ISupportInitialize)LoginPageMonitorImage).BeginInit();
+            LoginPageVLCPLayer = new LibVLCSharp.WinForms.VideoView();
+            ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).BeginInit();
             SuspendLayout();
             // 
             // loginPageUsernameLabel
@@ -160,22 +159,22 @@ namespace CodingTracker.View
             LoginPageForgotResetAccountButton.Text = "Reset account";
             LoginPageForgotResetAccountButton.UseVisualStyleBackColor = true;
             // 
-            // LoginPageMonitorImage
+            // LoginPageVLCPLayer
             // 
-            LoginPageMonitorImage.Enabled = true;
-            LoginPageMonitorImage.Location = new Point(835, 97);
-            LoginPageMonitorImage.Name = "LoginPageMonitorImage";
-            LoginPageMonitorImage.OcxState = (AxHost.State)resources.GetObject("LoginPageMonitorImage.OcxState");
-            LoginPageMonitorImage.Size = new Size(276, 206);
-            LoginPageMonitorImage.TabIndex = 12;
-            LoginPageMonitorImage.Enter += LoginPageMonitorImage_Enter_1;
+            LoginPageVLCPLayer.BackColor = Color.Black;
+            LoginPageVLCPLayer.Location = new Point(838, 188);
+            LoginPageVLCPLayer.MediaPlayer = null;
+            LoginPageVLCPLayer.Name = "LoginPageVLCPLayer";
+            LoginPageVLCPLayer.Size = new Size(316, 234);
+            LoginPageVLCPLayer.TabIndex = 13;
+            LoginPageVLCPLayer.Text = "videoView1";
             // 
             // LoginPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1284, 681);
-            Controls.Add(LoginPageMonitorImage);
+            Controls.Add(LoginPageVLCPLayer);
             Controls.Add(LoginPageForgotResetAccountButton);
             Controls.Add(label1);
             Controls.Add(guna2CustomCheckBox1);
@@ -187,11 +186,10 @@ namespace CodingTracker.View
             Controls.Add(Password);
             Controls.Add(loginPageUsernameLabel);
             Name = "LoginPage";
-            ((System.ComponentModel.ISupportInitialize)LoginPageMonitorImage).EndInit();
+            ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
-
 
         private void EndSessionButton_Click(object sender, EventArgs e)
         {
@@ -242,6 +240,6 @@ namespace CodingTracker.View
         private Label label1;
         private Button LoginPageForgotResetAccountButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private AxWMPLib.AxWindowsMediaPlayer LoginPageMonitorImage;
+        private LibVLCSharp.WinForms.VideoView LoginPageVLCPLayer;
     }
 }

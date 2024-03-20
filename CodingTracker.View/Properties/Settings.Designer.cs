@@ -25,11 +25,21 @@ namespace CodingTracker.View.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\"C:\\Users\\mchap\\source\\repos\\CodingTrackerSolutionClone2\\CodingTracker.View\\FormM" +
-            "edia\\PcScreenPixelArt.mp4\"")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\mchap\\source\\repos\\CodingTrackerSolutionClone2\\CodingTracker.View\\FormMe" +
+            "dia\\PcScreenPixelArt.mp4")]
         public string VideoPath {
             get {
                 return ((string)(this["VideoPath"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\mchap\\source\\repos\\CodingTrackerSolutionClone2\\CodingTracker.View\\FormMe" +
+            "dia\\PcScreenPixelArt.mp4")]
+        public string VLCPath {
+            get {
+                return ((string)(this["VLCPath"]));
             }
         }
     }

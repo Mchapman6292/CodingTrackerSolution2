@@ -3,7 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="VideoPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">"C:\Users\mchap\source\repos\CodingTrackerSolutionClone2\CodingTracker.View\FormMedia\PcScreenPixelArt.mp4"</Value>
+      <Value Profile="(Default)">C:\Users\mchap\source\repos\CodingTrackerSolutionClone2\CodingTracker.View\FormMedia\PcScreenPixelArt.mp4</Value>
+    </Setting>
+    <Setting Name="VLCPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Users\mchap\source\repos\CodingTrackerSolutionClone2\CodingTracker.View\FormMedia\PcScreenPixelArt.mp4</Value>
     </Setting>
   </Settings>
 </SettingsFile>
