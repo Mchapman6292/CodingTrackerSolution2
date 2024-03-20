@@ -189,7 +189,7 @@ namespace CodingTracker.Business.CodingSessions
                     StartDate = _inputValidator.GetValidDateFromUser();
                     StartTime = _inputValidator.GetValidTimeFromUser();
 
-                    _appLogger.Info($"Start time manually set. TraceID: {activity.TraceId}, StartDate: {StartDate}, StartTime: {StartTime}");
+                    _appLogger.Info($"StartCountDownTimer time manually set. TraceID: {activity.TraceId}, StartDate: {StartDate}, StartTime: {StartTime}");
                 }
                 catch (Exception ex)
                 {
@@ -226,7 +226,7 @@ namespace CodingTracker.Business.CodingSessions
                 {
                     if (!StartTime.HasValue || !EndTime.HasValue)
                     {
-                        throw new InvalidOperationException("Start Time or End Time is not set.");
+                        throw new InvalidOperationException("StartCountDownTimer Time or End Time is not set.");
                     }
 
                     TimeSpan duration = EndTime.Value - StartTime.Value;

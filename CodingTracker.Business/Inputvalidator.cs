@@ -103,7 +103,6 @@ namespace CodingTracker.Business.InputValidators
         {
             while (true)
             {
-                Console.WriteLine("Please enter the time (HH:mm):");
                 string userInput = Console.ReadLine();
 
                 if (CheckTimeInput(userInput, out DateTime result))

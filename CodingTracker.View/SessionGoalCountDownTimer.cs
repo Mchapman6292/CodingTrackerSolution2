@@ -1,14 +1,17 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.ISessionGoalCountDownTimer;
+using System.Windows.Forms;
 using System;
 using System.Diagnostics;
 
-namespace CodingTracker.Business
+namespace CodingTracker.View.SessionGoalCountDownTimers
 {
-    public class SessionGoalCountDownTimer : IDisposable
+    public class SessionGoalCountDownTimer : IDisposable, ISessionGoalCountDownTimer
     {
         private readonly IApplicationLogger _appLogger;
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private TimeSpan _maxTime;
+        private System.Windows.Forms.Timer _timer;
         public event Action<TimeSpan> TimeChanged;
         public event Action CountDownFinished;
 
@@ -17,12 +20,30 @@ namespace CodingTracker.Business
         public SessionGoalCountDownTimer(IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
+            _timer = new System.Windows.Forms.Timer();
+            _timer.Tick += Timer_Tick; // Event for timer tick
         }
 
-        public void SetTime(int minutes, int seconds = 0)
+        public void Timer_Tick(object sender, EventArgs e)
+        {
+            if (_stopwatch.Elapsed < _maxTime)
+            {
+                TimeChanged?.Invoke(_maxTime - _stopwatch.Elapsed);
+            }
+            else
+            {
+                _timer.Stop();
+                _stopwatch.Stop();
+                CountDownFinished?.Invoke();
+                _appLogger.Info($"Timer countdown finished.");
+            }
+        }
+
+
+        public void SetCountDownTimer(int minutes, int seconds = 0)
         {
             var methodStopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(SetTime)).Start())
+            using (var activity = new Activity(nameof(SetCountDownTimer)).Start())
             {
                 _maxTime = TimeSpan.FromSeconds(minutes * 60 + seconds);
                 methodStopwatch.Stop();
@@ -30,17 +51,17 @@ namespace CodingTracker.Business
             }
         }
 
-        public void Start()
+        public void StartCountDownTimer()
         {
             var methodStopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(Start)).Start())
+            using (var activity = new Activity(nameof(StartCountDownTimer)).Start())
             {
                 _appLogger.Debug($"Starting timer. TraceID: {activity.TraceId}");
 
                 if (_maxTime > TimeSpan.Zero)
                 {
                     _stopwatch.Start();
-                    CheckTime();
+                    CheckTimeCountDownTimer();
                     methodStopwatch.Stop();
                     _appLogger.Debug($"Timer started. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
@@ -52,10 +73,10 @@ namespace CodingTracker.Business
             }
         }
 
-        private void CheckTime()
+        public void CheckTimeCountDownTimer()
         {
             var methodStopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(CheckTime)).Start())
+            using (var activity = new Activity(nameof(CheckTimeCountDownTimer)).Start())
             {
                 if (_stopwatch.Elapsed < _maxTime)
                 {
@@ -71,10 +92,10 @@ namespace CodingTracker.Business
             }
         }
 
-        public void Stop()
+        public void StopCountDownTimer()
         {
             var methodStopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(Stop)).Start())
+            using (var activity = new Activity(nameof(StopCountDownTimer)).Start())
             {
                 _stopwatch.Stop();
                 TimeChanged?.Invoke(_maxTime - _stopwatch.Elapsed);

@@ -44,8 +44,9 @@ namespace CodingTracker.View
         /// </summary>
         private void InitializeComponent()
         {
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoginPage));
             loginPageUsernameLabel = new Label();
             Password = new Label();
             loginPagePasswordTextbox = new TextBox();
@@ -56,6 +57,9 @@ namespace CodingTracker.View
             guna2CustomCheckBox1 = new Guna.UI2.WinForms.Guna2CustomCheckBox();
             label1 = new Label();
             LoginPageForgotResetAccountButton = new Button();
+            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            LoginPageMonitorImage = new AxWMPLib.AxWindowsMediaPlayer();
+            ((System.ComponentModel.ISupportInitialize)LoginPageMonitorImage).BeginInit();
             SuspendLayout();
             // 
             // loginPageUsernameLabel
@@ -127,11 +131,11 @@ namespace CodingTracker.View
             guna2CustomCheckBox1.CheckedState.BorderRadius = 2;
             guna2CustomCheckBox1.CheckedState.BorderThickness = 0;
             guna2CustomCheckBox1.CheckedState.FillColor = Color.FromArgb(94, 148, 255);
-            guna2CustomCheckBox1.CustomizableEdges = customizableEdges3;
+            guna2CustomCheckBox1.CustomizableEdges = customizableEdges1;
             guna2CustomCheckBox1.Location = new Point(514, 361);
             guna2CustomCheckBox1.Name = "guna2CustomCheckBox1";
             guna2CustomCheckBox1.ShadowDecoration.Color = Color.Transparent;
-            guna2CustomCheckBox1.ShadowDecoration.CustomizableEdges = customizableEdges4;
+            guna2CustomCheckBox1.ShadowDecoration.CustomizableEdges = customizableEdges2;
             guna2CustomCheckBox1.Size = new Size(20, 20);
             guna2CustomCheckBox1.TabIndex = 9;
             guna2CustomCheckBox1.UncheckedState.BorderColor = Color.FromArgb(125, 137, 149);
@@ -156,11 +160,22 @@ namespace CodingTracker.View
             LoginPageForgotResetAccountButton.Text = "Reset account";
             LoginPageForgotResetAccountButton.UseVisualStyleBackColor = true;
             // 
+            // LoginPageMonitorImage
+            // 
+            LoginPageMonitorImage.Enabled = true;
+            LoginPageMonitorImage.Location = new Point(835, 97);
+            LoginPageMonitorImage.Name = "LoginPageMonitorImage";
+            LoginPageMonitorImage.OcxState = (AxHost.State)resources.GetObject("LoginPageMonitorImage.OcxState");
+            LoginPageMonitorImage.Size = new Size(276, 206);
+            LoginPageMonitorImage.TabIndex = 12;
+            LoginPageMonitorImage.Enter += LoginPageMonitorImage_Enter_1;
+            // 
             // LoginPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1284, 681);
+            Controls.Add(LoginPageMonitorImage);
             Controls.Add(LoginPageForgotResetAccountButton);
             Controls.Add(label1);
             Controls.Add(guna2CustomCheckBox1);
@@ -172,27 +187,11 @@ namespace CodingTracker.View
             Controls.Add(Password);
             Controls.Add(loginPageUsernameLabel);
             Name = "LoginPage";
+            ((System.ComponentModel.ISupportInitialize)LoginPageMonitorImage).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
-        private void StartSessionButton_Click(object sender, EventArgs e)
-        {
-            if (!_isSessionActive)
-            {
-                try
-                {
-                    _codingSession.StartSession();
-                    _isSessionActive = true;
-                    startSessionButton.Enabled = false;
-                    MessageBox.Show("Session started.");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error: {ex.Message}");
-                }
-            }
-        }
 
         private void EndSessionButton_Click(object sender, EventArgs e)
         {
@@ -229,20 +228,7 @@ namespace CodingTracker.View
                 }
             }
 
-        private void SetGoalButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                
-                int goalHours = _utilityService.TryParseInt(goalHoursTextBox.Text);
-                _codingSession.SetCodingGoal(goalHours);
-                MessageBox.Show("Coding goal set.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error: {ex.Message}");
-            }
-        }
+
         #endregion
 
         private Label loginPageUsernameLabel;
@@ -255,5 +241,7 @@ namespace CodingTracker.View
         private Guna.UI2.WinForms.Guna2CustomCheckBox guna2CustomCheckBox1;
         private Label label1;
         private Button LoginPageForgotResetAccountButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private AxWMPLib.AxWindowsMediaPlayer LoginPageMonitorImage;
     }
 }

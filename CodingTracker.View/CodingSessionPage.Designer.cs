@@ -30,21 +30,21 @@ namespace CodingTracker.View
         /// </summary>
         private void InitializeComponent()
         {
-            CustomizableEdges customizableEdges6 = new CustomizableEdges();
-            CustomizableEdges customizableEdges7 = new CustomizableEdges();
-            CustomizableEdges customizableEdges3 = new CustomizableEdges();
-            CustomizableEdges customizableEdges4 = new CustomizableEdges();
-            CustomizableEdges customizableEdges5 = new CustomizableEdges();
-            CustomizableEdges customizableEdges8 = new CustomizableEdges();
-            CustomizableEdges customizableEdges9 = new CustomizableEdges();
-            CustomizableEdges customizableEdges14 = new CustomizableEdges();
-            CustomizableEdges customizableEdges15 = new CustomizableEdges();
-            CustomizableEdges customizableEdges10 = new CustomizableEdges();
-            CustomizableEdges customizableEdges11 = new CustomizableEdges();
-            CustomizableEdges customizableEdges12 = new CustomizableEdges();
-            CustomizableEdges customizableEdges13 = new CustomizableEdges();
-            CustomizableEdges customizableEdges1 = new CustomizableEdges();
-            CustomizableEdges customizableEdges2 = new CustomizableEdges();
+            CustomizableEdges customizableEdges19 = new CustomizableEdges();
+            CustomizableEdges customizableEdges20 = new CustomizableEdges();
+            CustomizableEdges customizableEdges16 = new CustomizableEdges();
+            CustomizableEdges customizableEdges17 = new CustomizableEdges();
+            CustomizableEdges customizableEdges18 = new CustomizableEdges();
+            CustomizableEdges customizableEdges21 = new CustomizableEdges();
+            CustomizableEdges customizableEdges22 = new CustomizableEdges();
+            CustomizableEdges customizableEdges27 = new CustomizableEdges();
+            CustomizableEdges customizableEdges28 = new CustomizableEdges();
+            CustomizableEdges customizableEdges23 = new CustomizableEdges();
+            CustomizableEdges customizableEdges24 = new CustomizableEdges();
+            CustomizableEdges customizableEdges25 = new CustomizableEdges();
+            CustomizableEdges customizableEdges26 = new CustomizableEdges();
+            CustomizableEdges customizableEdges29 = new CustomizableEdges();
+            CustomizableEdges customizableEdges30 = new CustomizableEdges();
             CodingSessionPageCentrePanel = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
             CodingSessionPageSetSessionGoalButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSessionPageStartSessionButton = new Guna.UI2.WinForms.Guna2CircleButton();
@@ -52,26 +52,28 @@ namespace CodingTracker.View
             CodingSesisonPageTopPanel = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
             guna2CustomGradientPanel1 = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
             CodingSessionPageExitButton = new Guna.UI2.WinForms.Guna2Button();
-            SessionGoalTextBox = new Guna.UI2.WinForms.Guna2TextBox();
+            CodingSessionPageSessionGoalInputPanel = new Guna.UI2.WinForms.Guna2ShadowPanel();
+            CodingSessionPageSessionGoalTextBox = new Guna.UI2.WinForms.Guna2TextBox();
             CodingSessionPageCentrePanel.SuspendLayout();
             CodingSesisonPageTopPanel.SuspendLayout();
+            CodingSessionPageSessionGoalInputPanel.SuspendLayout();
             SuspendLayout();
             // 
             // CodingSessionPageCentrePanel
             // 
-            CodingSessionPageCentrePanel.Controls.Add(SessionGoalTextBox);
+            CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageSessionGoalInputPanel);
             CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageSetSessionGoalButton);
             CodingSessionPageCentrePanel.Controls.Add(CodingSessionPageStartSessionButton);
-            CodingSessionPageCentrePanel.CustomizableEdges = customizableEdges6;
+            CodingSessionPageCentrePanel.CustomizableEdges = customizableEdges19;
             CodingSessionPageCentrePanel.Location = new Point(4, 136);
             CodingSessionPageCentrePanel.Name = "CodingSessionPageCentrePanel";
-            CodingSessionPageCentrePanel.ShadowDecoration.CustomizableEdges = customizableEdges7;
+            CodingSessionPageCentrePanel.ShadowDecoration.CustomizableEdges = customizableEdges20;
             CodingSessionPageCentrePanel.Size = new Size(1300, 300);
             CodingSessionPageCentrePanel.TabIndex = 0;
             // 
             // CodingSessionPageSetSessionGoalButton
             // 
-            CodingSessionPageSetSessionGoalButton.CustomizableEdges = customizableEdges3;
+            CodingSessionPageSetSessionGoalButton.CustomizableEdges = customizableEdges16;
             CodingSessionPageSetSessionGoalButton.DisabledState.BorderColor = Color.DarkGray;
             CodingSessionPageSetSessionGoalButton.DisabledState.CustomBorderColor = Color.DarkGray;
             CodingSessionPageSetSessionGoalButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
@@ -80,7 +82,7 @@ namespace CodingTracker.View
             CodingSessionPageSetSessionGoalButton.ForeColor = Color.White;
             CodingSessionPageSetSessionGoalButton.Location = new Point(734, 168);
             CodingSessionPageSetSessionGoalButton.Name = "CodingSessionPageSetSessionGoalButton";
-            CodingSessionPageSetSessionGoalButton.ShadowDecoration.CustomizableEdges = customizableEdges4;
+            CodingSessionPageSetSessionGoalButton.ShadowDecoration.CustomizableEdges = customizableEdges17;
             CodingSessionPageSetSessionGoalButton.Size = new Size(180, 45);
             CodingSessionPageSetSessionGoalButton.TabIndex = 2;
             CodingSessionPageSetSessionGoalButton.Text = "Set session goal";
@@ -96,16 +98,16 @@ namespace CodingTracker.View
             CodingSessionPageStartSessionButton.ForeColor = Color.White;
             CodingSessionPageStartSessionButton.Location = new Point(534, 79);
             CodingSessionPageStartSessionButton.Name = "CodingSessionPageStartSessionButton";
-            CodingSessionPageStartSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges5;
+            CodingSessionPageStartSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges18;
             CodingSessionPageStartSessionButton.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             CodingSessionPageStartSessionButton.Size = new Size(148, 148);
             CodingSessionPageStartSessionButton.TabIndex = 1;
-            CodingSessionPageStartSessionButton.Text = "Start Coding Session";
+            CodingSessionPageStartSessionButton.Text = "StartCountDownTimer Coding Session";
             CodingSessionPageStartSessionButton.Click += CodingSessionPageStartSessionButton_Click;
             // 
             // CodingSessionPageMinimiseButton
             // 
-            CodingSessionPageMinimiseButton.CustomizableEdges = customizableEdges8;
+            CodingSessionPageMinimiseButton.CustomizableEdges = customizableEdges21;
             CodingSessionPageMinimiseButton.DisabledState.BorderColor = Color.DarkGray;
             CodingSessionPageMinimiseButton.DisabledState.CustomBorderColor = Color.DarkGray;
             CodingSessionPageMinimiseButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
@@ -114,7 +116,7 @@ namespace CodingTracker.View
             CodingSessionPageMinimiseButton.ForeColor = Color.White;
             CodingSessionPageMinimiseButton.Location = new Point(1143, -2);
             CodingSessionPageMinimiseButton.Name = "CodingSessionPageMinimiseButton";
-            CodingSessionPageMinimiseButton.ShadowDecoration.CustomizableEdges = customizableEdges9;
+            CodingSessionPageMinimiseButton.ShadowDecoration.CustomizableEdges = customizableEdges22;
             CodingSessionPageMinimiseButton.Size = new Size(78, 48);
             CodingSessionPageMinimiseButton.TabIndex = 3;
             CodingSessionPageMinimiseButton.Text = "Minimise";
@@ -125,26 +127,26 @@ namespace CodingTracker.View
             CodingSesisonPageTopPanel.Controls.Add(CodingSessionPageMinimiseButton);
             CodingSesisonPageTopPanel.Controls.Add(guna2CustomGradientPanel1);
             CodingSesisonPageTopPanel.Controls.Add(CodingSessionPageExitButton);
-            CodingSesisonPageTopPanel.CustomizableEdges = customizableEdges14;
+            CodingSesisonPageTopPanel.CustomizableEdges = customizableEdges27;
             CodingSesisonPageTopPanel.Dock = DockStyle.Top;
             CodingSesisonPageTopPanel.Location = new Point(0, 0);
             CodingSesisonPageTopPanel.Name = "CodingSesisonPageTopPanel";
-            CodingSesisonPageTopPanel.ShadowDecoration.CustomizableEdges = customizableEdges15;
+            CodingSesisonPageTopPanel.ShadowDecoration.CustomizableEdges = customizableEdges28;
             CodingSesisonPageTopPanel.Size = new Size(1300, 46);
             CodingSesisonPageTopPanel.TabIndex = 1;
             // 
             // guna2CustomGradientPanel1
             // 
-            guna2CustomGradientPanel1.CustomizableEdges = customizableEdges10;
+            guna2CustomGradientPanel1.CustomizableEdges = customizableEdges23;
             guna2CustomGradientPanel1.Location = new Point(0, -83);
             guna2CustomGradientPanel1.Name = "guna2CustomGradientPanel1";
-            guna2CustomGradientPanel1.ShadowDecoration.CustomizableEdges = customizableEdges11;
+            guna2CustomGradientPanel1.ShadowDecoration.CustomizableEdges = customizableEdges24;
             guna2CustomGradientPanel1.Size = new Size(1300, 72);
             guna2CustomGradientPanel1.TabIndex = 4;
             // 
             // CodingSessionPageExitButton
             // 
-            CodingSessionPageExitButton.CustomizableEdges = customizableEdges12;
+            CodingSessionPageExitButton.CustomizableEdges = customizableEdges25;
             CodingSessionPageExitButton.DisabledState.BorderColor = Color.DarkGray;
             CodingSessionPageExitButton.DisabledState.CustomBorderColor = Color.DarkGray;
             CodingSessionPageExitButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
@@ -153,32 +155,43 @@ namespace CodingTracker.View
             CodingSessionPageExitButton.ForeColor = Color.White;
             CodingSessionPageExitButton.Location = new Point(1227, 0);
             CodingSessionPageExitButton.Name = "CodingSessionPageExitButton";
-            CodingSessionPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges13;
+            CodingSessionPageExitButton.ShadowDecoration.CustomizableEdges = customizableEdges26;
             CodingSessionPageExitButton.Size = new Size(73, 45);
             CodingSessionPageExitButton.TabIndex = 5;
             CodingSessionPageExitButton.Text = "Exit";
             CodingSessionPageExitButton.Click += guna2Button1_Click;
             // 
-            // SessionGoalTextBox
+            // CodingSessionPageSessionGoalInputPanel
             // 
-            SessionGoalTextBox.BorderColor = Color.Red;
-            SessionGoalTextBox.CustomizableEdges = customizableEdges1;
-            SessionGoalTextBox.DefaultText = "";
-            SessionGoalTextBox.DisabledState.BorderColor = Color.FromArgb(208, 208, 208);
-            SessionGoalTextBox.DisabledState.FillColor = Color.FromArgb(226, 226, 226);
-            SessionGoalTextBox.DisabledState.ForeColor = Color.FromArgb(138, 138, 138);
-            SessionGoalTextBox.DisabledState.PlaceholderForeColor = Color.FromArgb(138, 138, 138);
-            SessionGoalTextBox.FocusedState.BorderColor = Color.FromArgb(94, 148, 255);
-            SessionGoalTextBox.Font = new Font("Segoe UI", 9F);
-            SessionGoalTextBox.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
-            SessionGoalTextBox.Location = new Point(958, 177);
-            SessionGoalTextBox.Name = "SessionGoalTextBox";
-            SessionGoalTextBox.PasswordChar = '\0';
-            SessionGoalTextBox.PlaceholderText = "";
-            SessionGoalTextBox.SelectedText = "";
-            SessionGoalTextBox.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            SessionGoalTextBox.Size = new Size(200, 36);
-            SessionGoalTextBox.TabIndex = 3;
+            CodingSessionPageSessionGoalInputPanel.BackColor = Color.Transparent;
+            CodingSessionPageSessionGoalInputPanel.Controls.Add(CodingSessionPageSessionGoalTextBox);
+            CodingSessionPageSessionGoalInputPanel.FillColor = Color.White;
+            CodingSessionPageSessionGoalInputPanel.Location = new Point(956, 163);
+            CodingSessionPageSessionGoalInputPanel.Name = "CodingSessionPageSessionGoalInputPanel";
+            CodingSessionPageSessionGoalInputPanel.ShadowColor = Color.Black;
+            CodingSessionPageSessionGoalInputPanel.Size = new Size(200, 50);
+            CodingSessionPageSessionGoalInputPanel.TabIndex = 3;
+            CodingSessionPageSessionGoalInputPanel.Visible = false;
+            // 
+            // CodingSessionPageSessionGoalTextBox
+            // 
+            CodingSessionPageSessionGoalTextBox.CustomizableEdges = customizableEdges29;
+            CodingSessionPageSessionGoalTextBox.DefaultText = "";
+            CodingSessionPageSessionGoalTextBox.DisabledState.BorderColor = Color.FromArgb(208, 208, 208);
+            CodingSessionPageSessionGoalTextBox.DisabledState.FillColor = Color.FromArgb(226, 226, 226);
+            CodingSessionPageSessionGoalTextBox.DisabledState.ForeColor = Color.FromArgb(138, 138, 138);
+            CodingSessionPageSessionGoalTextBox.DisabledState.PlaceholderForeColor = Color.FromArgb(138, 138, 138);
+            CodingSessionPageSessionGoalTextBox.FocusedState.BorderColor = Color.FromArgb(94, 148, 255);
+            CodingSessionPageSessionGoalTextBox.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageSessionGoalTextBox.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
+            CodingSessionPageSessionGoalTextBox.Location = new Point(20, 5);
+            CodingSessionPageSessionGoalTextBox.Name = "CodingSessionPageSessionGoalTextBox";
+            CodingSessionPageSessionGoalTextBox.PasswordChar = '\0';
+            CodingSessionPageSessionGoalTextBox.PlaceholderText = "";
+            CodingSessionPageSessionGoalTextBox.SelectedText = "";
+            CodingSessionPageSessionGoalTextBox.ShadowDecoration.CustomizableEdges = customizableEdges30;
+            CodingSessionPageSessionGoalTextBox.Size = new Size(152, 42);
+            CodingSessionPageSessionGoalTextBox.TabIndex = 0;
             // 
             // CodingSessionPage
             // 
@@ -193,6 +206,7 @@ namespace CodingTracker.View
             WindowState = FormWindowState.Maximized;
             CodingSessionPageCentrePanel.ResumeLayout(false);
             CodingSesisonPageTopPanel.ResumeLayout(false);
+            CodingSessionPageSessionGoalInputPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -207,6 +221,7 @@ namespace CodingTracker.View
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageExitButton;
         private CustomizableEdges customizableEdges14;
         private CustomizableEdges customizableEdges15;
-        private Guna.UI2.WinForms.Guna2TextBox SessionGoalTextBox;
+        private Guna.UI2.WinForms.Guna2ShadowPanel CodingSessionPageSessionGoalInputPanel;
+        private Guna.UI2.WinForms.Guna2TextBox CodingSessionPageSessionGoalTextBox;
     }
 }

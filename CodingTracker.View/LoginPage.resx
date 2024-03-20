@@ -117,4 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="backgroundWorker1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="LoginPageMonitorImage.OcxState" mimetype="application/x-microsoft.net.object.binary.base64">
+    <value>
+        AAEAAAD/////AQAAAAAAAAAMAgAAAEZTeXN0ZW0uV2luZG93cy5Gb3JtcywgQ3VsdHVyZT1uZXV0cmFs
+        LCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5BQEAAAAhU3lzdGVtLldpbmRvd3MuRm9ybXMu
+        QXhIb3N0K1N0YXRlAQAAAAREYXRhBwICAAAACQMAAAAPAwAAAI8BAAACAQAAAAEAAAAAAAAAAAAAAAB6
+        AQAAAQMAAAgA2AAAACIAQwA6AFwAVQBzAGUAcgBzAFwAbQBjAGgAYQBwAFwAcwBvAHUAcgBjAGUAXABy
+        AGUAcABvAHMAXABDAG8AZABpAG4AZwBUAHIAYQBjAGsAZQByAFMAbwBsAHUAdABpAG8AbgBDAGwAbwBu
+        AGUAMgBcAEMAbwBkAGkAbgBnAFQAcgBhAGMAawBlAHIALgBWAGkAZQB3AFwARgBvAHIAbQBNAGUAZABp
+        AGEAXABQAGMAUwBjAHIAZQBlAG4AUABpAHgAZQBsAEEAcgB0AC4AbQBwADQAIgAAAAUAAAAAAAAA8D8D
+        AAAAAAAFAAAAAAAAAAAACAACAAAAAAADAAEAAAALAP//AwAAAAAACwD//wgAAgAAAAAAAwAyAAAACwAA
+        AAgACgAAAGYAdQBsAGwAAAALAAAACwAAAAsA//8LAP//CwAAAAgAAgAAAAAACAACAAAAAAAIAAIAAAAA
+        AAgAAgAAAAAACwAAAIccAABKFQAACw==
+</value>
+  </data>
 </root>

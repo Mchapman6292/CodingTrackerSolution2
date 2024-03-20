@@ -1,9 +1,12 @@
 ﻿
 
+using System.Diagnostics;
+
 namespace CodingTracker.Common.IApplicationLoggers
 {
     public interface IApplicationLogger
     {
+        void LogActivity(string methodName, Action<Activity> logAction, Action action);
         void Info(string message);
         void Info(string message, params object[] propertyValues); 
         void Debug(string message);
