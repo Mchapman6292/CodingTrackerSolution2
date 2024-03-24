@@ -6,88 +6,92 @@ using CodingTrackerSolution;
 using System.Diagnostics;
 using CodingTracker.View.IFormFactories;
 
-public class FormController : IFormController
+namespace CodingTracker.View.FormControllers
 {
-    private readonly IApplicationLogger _appLogger;
-    private CodingSessionPage codingSessionPage;
-    private LoginPage loginPage;
-    private MainPage mainPage;
-    private ViewSessionsPage viewSessionsPage;
-    private EditSessionPage editSessionPage;
-    private SettingsPage settingsPage;
-    private Form currentForm;
-    private IFormFactory _formFactory;
-
-    public FormController(IApplicationLogger appLogger, CodingSessionPage codingSessionPage, LoginPage loginPage, MainPage mainPage, ViewSessionsPage viewSessionsPage, EditSessionPage editSessionPage, SettingsPage settingsPage, IFormFactory formFactory)
+    public class FormController : IFormController
     {
-        _appLogger = appLogger;
-        this.codingSessionPage = codingSessionPage;
-        this.loginPage = loginPage;
-        this.mainPage = mainPage;
-        this.viewSessionsPage = viewSessionsPage;
-        this.editSessionPage = editSessionPage;
-        this.settingsPage = settingsPage;
-        _formFactory = formFactory;
+        private readonly IApplicationLogger _appLogger;
 
-        this.currentForm = null;
-    }
+        private Form currentForm;
+        private IFormFactory _formFactory;
 
-    public void ShowLoginPage()
-    {
-        LogAndSwitchForm(loginPage, nameof(ShowLoginPage));
-    }
-
-    public void ShowMainPage()
-    {
-        LogAndSwitchForm(mainPage, nameof(ShowMainPage));
-    }
-
-    public void ShowCodingSessionPage()
-    {
-        LogAndSwitchForm(codingSessionPage, nameof(ShowCodingSessionPage));
-    }
-
-    public void ShowEditSessionPage()
-    {
-        LogAndSwitchForm(editSessionPage, nameof(ShowEditSessionPage));
-    }
-
-    public void ShowViewSessionPage()
-    {
-        LogAndSwitchForm(viewSessionsPage, nameof(ShowEditSessionPage));
-    }
-
-    public void ShowSettingsPage()
-    {
-        LogAndSwitchForm(settingsPage, nameof(ShowSettingsPage));
-    }
-    public void LogAndSwitchForm(Form newForm, string methodName)
-    {
-        using (var activity = new Activity(methodName).Start())
+        public FormController(IApplicationLogger appLogger, IFormFactory formFactory)
         {
-            _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, CurrentForm: {currentForm?.Name}, NewForm: {newForm.Name}");
+            _appLogger = appLogger;
+            _formFactory = formFactory;
 
-            try
-            {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                if (currentForm != null)
-                {
-                    currentForm.Hide();
-                    _appLogger.Info($"Hid form: {currentForm.Name}. TraceID: {activity.TraceId}");
-                    currentForm.Dispose();
-                }
-                currentForm = newForm;
-                currentForm.Show();
-                stopwatch.Stop();
-                _appLogger.Info($"Showed form: {newForm.Name}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"Failed to switch forms in {methodName}. Error: {ex.Message}. TraceID: {Activity.Current?.TraceId}");
-            }
+            this.currentForm = null;
         }
 
+        public void ShowLoginPage()
+        {
+            var loginPage = _formFactory.CreateLoginPage();
+            LogAndSwitchForm(loginPage, nameof(ShowLoginPage));
+        }
+
+        public void ShowMainPage()
+        {
+            var mainPage = _formFactory.CreateMainPage();
+            LogAndSwitchForm(mainPage, nameof(ShowMainPage));
+        }
+
+        public void ShowCodingSessionPage()
+        {
+            var codingSessionPage = _formFactory.CreateCodingSessionPage();
+            LogAndSwitchForm(codingSessionPage, nameof(ShowCodingSessionPage));
+        }
+
+        public void ShowEditSessionPage()
+        {
+            var editSessionPage = _formFactory.CreateEditSessionPage();
+            LogAndSwitchForm(editSessionPage, nameof(ShowEditSessionPage));
+        }
+
+        public void ShowViewSessionPage()
+        {
+            var viewSessionsPage = _formFactory.CreateViewSessionsPage();
+            LogAndSwitchForm(viewSessionsPage, nameof(ShowViewSessionPage));
+        }
+
+        public void ShowSettingsPage()
+        {
+            var settingsPage = _formFactory.CreateSettingsPage();
+            LogAndSwitchForm(settingsPage, nameof(ShowSettingsPage));
+        }
+
+        public void ShowCreateAccountPage()
+        {
+            var createAccountPage = _formFactory.CreateAccountPage();
+            LogAndSwitchForm(createAccountPage, nameof(ShowCreateAccountPage));
+        }
+        public void LogAndSwitchForm(Form newForm, string methodName)
+        {
+            using (var activity = new Activity(methodName).Start())
+            {
+                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, CurrentForm: {currentForm?.Name}, NewForm: {newForm.Name}");
+
+                try
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    if (currentForm != null)
+                    {
+                        currentForm.Hide();
+                        _appLogger.Info($"Hid form: {currentForm.Name}. TraceID: {activity.TraceId}");
+                        currentForm.Dispose();
+                    }
+                    currentForm = newForm;
+                    currentForm.Show();
+                    stopwatch.Stop();
+                    _appLogger.Info($"Showed form: {newForm.Name}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Failed to switch forms in {methodName}. Error: {ex.Message}. TraceID: {Activity.Current?.TraceId}");
+                }
+            }
 
 
+
+        }
     }
 }

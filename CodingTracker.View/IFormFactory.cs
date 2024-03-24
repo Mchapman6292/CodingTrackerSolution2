@@ -16,6 +16,7 @@ namespace CodingTracker.View.IFormFactories
         public EditSessionPage CreateEditSessionPage();
         public SettingsPage CreateSettingsPage();
         public ViewSessionsPage CreateViewSessionsPage();
+        public CreateAccountPage CreateAccountPage();
 
 
 

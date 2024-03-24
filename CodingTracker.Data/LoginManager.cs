@@ -1,6 +1,6 @@
 ﻿using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.ICredentialStorage;
+using CodingTracker.Common.ICredentialManagers;
 using System.Data.SQLite;
 using System.Data.SqlClient;
 using CodingTracker.Common.UserCredentialDTOs;
@@ -16,9 +16,9 @@ namespace CodingTracker.Data.LoginManagers
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
-        private readonly ICredentialStorage _credentialStorage;
+        private readonly ICredentialManager _credentialStorage;
         private readonly CodingSessionDTO _codingSessionDTO;
-        public LoginManager(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialStorage credentialStorage)
+        public LoginManager(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialStorage)
         {
             _databaseManager = databaseManager;
             _credentialStorage = credentialStorage;

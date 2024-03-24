@@ -9,7 +9,7 @@ using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingGoals;
 using CodingTracker.Common.ICodingSessions;
-using CodingTracker.Common.ICredentialStorage;
+using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.ILoginManagers;
@@ -19,17 +19,24 @@ using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
-using CodingTracker.Data.CredentialStorage;
+using CodingTracker.Data.CredentialManagers;
 using CodingTracker.Data.DatabaseManagers;
 using CodingTracker.Data.LoginManagers;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.IFormFactories;
+using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
+using CodingTracker.View.SessionGoalCountDownTimers;
+using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTrackerSolution;
 
 // To do
 // Validator & parse methods for CodingSession Goal
-//Stopwatch logic 
+//Stopwatch logic   
+
+
+// Seperate logic for creating the user id via autoincrement while handling the password etc within credentialstorage is not consistent.  m
 
 namespace CodingTracker.View.Program
 {
@@ -65,11 +72,13 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<ILoginManager, LoginManager>()
                     .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
-                    .AddSingleton<ICredentialStorage, CredentialStorage>()
+                    .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
                     .AddSingleton<ICodingGoal, CodingGoal>()
+                    .AddSingleton<IFormController, FormController>()
+                    .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimer>()
                     .AddTransient<LoginPage>()
                     .AddSingleton<MainPage>()
                     .AddSingleton<CodingSessionPage>()

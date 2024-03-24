@@ -1,4 +1,4 @@
-﻿using CodingTracker.Common.ISessionGoalCountDownTimer;
+﻿using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IApplicationLoggers;
 using System;

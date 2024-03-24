@@ -2,7 +2,7 @@
 using System.Text;
 using System.Security.Cryptography;
 using CodingTracker.Common.UserCredentialDTOs;
-using CodingTracker.Common.ICredentialStorage;
+using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
 using CodingTracker.Common.IApplicationLoggers;
@@ -11,26 +11,26 @@ using System.Net;
 
 
 // Pass DTO as parameter to methods that act on multiple properties
-namespace CodingTracker.Data.CredentialStorage
+namespace CodingTracker.Data.CredentialManagers
 {
-    public class CredentialStorage : ICredentialStorage
+    public class CredentialManager : ICredentialManager
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
 
-        public CredentialStorage(IApplicationLogger applogger,  IDatabaseManager databaseManager)
+        public CredentialManager(IApplicationLogger applogger,  IDatabaseManager databaseManager)
         {
             _appLogger = applogger;
             _databaseManager = databaseManager;
         }
 
-        public void AddCredentials(UserCredentialDTO credential)
+        public void CreateAccount(string username, string password )
         {
-            using (var activity = new Activity(nameof(AddCredentials)).Start()) // Start a new activity
+            using (var activity = new Activity(nameof(CreateAccount)).Start()) // Start a new activity
             {
-                _appLogger.Debug($"Starting {nameof(AddCredentials)}. TraceID: {activity.TraceId}, UserId: {credential.UserId}, Username: {credential.Username}");
+                _appLogger.Debug($"Starting {nameof(CreateAccount)}. TraceID: {activity.TraceId},  Username: {username}");
 
-                string hashedPassword = HashPassword(credential.Password);
+                string hashedPassword = HashPassword(password);
                 _databaseManager.ExecuteCRUD(connection =>
                 {
                     using var command = new SQLiteCommand(@"
@@ -48,9 +48,8 @@ namespace CodingTracker.Data.CredentialStorage
                         @PasswordHash
                     )"
                                 , connection);
-
-                    command.Parameters.AddWithValue("@UserId", credential.UserId);
-                    command.Parameters.AddWithValue("@Username", credential.Username);
+;
+                    command.Parameters.AddWithValue("@Username", username);
                     command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
                     try
@@ -58,16 +57,49 @@ namespace CodingTracker.Data.CredentialStorage
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         int affectedRows = command.ExecuteNonQuery();
                         stopwatch.Stop();
-                        _appLogger.Info($"Credentials added successfully for {credential.Username}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        _appLogger.Info($"Credentials added successfully for {username}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
                     catch (SQLiteException ex)
                     {
-                        _appLogger.Error($"Failed to add credentials for {credential.Username}. Error: {ex.Message}. TraceID: {Activity.Current?.TraceId}");
+                        _appLogger.Error($"Failed to add credentials for {username}. Error: {ex.Message}. TraceID: {Activity.Current?.TraceId}");
                     }
                 });
             }
         }
 
+        public bool IsAccountCreatedSuccessfully(string username)
+        {
+            using (var activity = new Activity(nameof(IsAccountCreatedSuccessfully)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(IsAccountCreatedSuccessfully)}. TraceID: {activity.TraceId}, Username: {username}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                bool isCreated = false;
+                _databaseManager.ExecuteCRUD(connection =>
+                {
+                    using var command = new SQLiteCommand(@"
+                SELECT EXISTS(SELECT 1 FROM UserCredentials WHERE Username = @Username)",
+                        connection);
+
+                    command.Parameters.AddWithValue("@Username", username);
+
+                    try
+                    {
+                        isCreated = Convert.ToBoolean(command.ExecuteScalar());
+                        stopwatch.Stop();
+                        _appLogger.Info($"{nameof(IsAccountCreatedSuccessfully)} completed for {username}. Account exists: {isCreated}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
+                    catch (SQLiteException ex)
+                    {
+                        stopwatch.Stop();
+                        _appLogger.Error($"Failed to check if account was created for {username}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    }
+                });
+
+                return isCreated;
+            }
+        }
 
 
         public void UpdateUserName(int userId, string newUserName)

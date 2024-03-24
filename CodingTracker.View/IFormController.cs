@@ -17,6 +17,7 @@ namespace CodingTracker.View.IFormControllers
         void ShowEditSessionPage();
         void ShowViewSessionPage();
         void ShowSettingsPage();
+        void ShowCreateAccountPage();
 
     }
 }
