@@ -1,10 +1,10 @@
 ﻿using CodingTracker.Common.UserCredentialDTOs;
 
-namespace CodingTracker.Common.ICredentialStorage
+namespace CodingTracker.Common.ICredentialManagers
 {
-    public interface ICredentialStorage
+    public interface ICredentialManager
     {
-        void AddCredentials(UserCredentialDTO credential);
+        void CreateAccount(string username, string password);
         void UpdateUserName(int userId, string newUserName);
         void UpdatePassword(int userId, string newPassword);
         void DeleteCredentials(int userId);

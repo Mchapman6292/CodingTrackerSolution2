@@ -68,6 +68,10 @@ namespace CodingTracker.View.FormFactories
         {
             return CreateForm<ViewSessionsPage>(nameof(CreateViewSessionsPage));
         }
-
+        
+        public CreateAccountPage CreateAccountPage() 
+        {
+            return CreateForm<CreateAccountPage>(nameof(CreateAccountPage));    
+        }
     }
 }
