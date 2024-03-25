@@ -70,11 +70,10 @@ namespace CodingTracker.View
                 MediaPlayer = new MediaPlayer(_libVLC)
             };
 
-            // Set the location and size of the VideoView control manually
-            _videoView.Location = new Point(430, 3); // Adjust these values to position the video within the form
-            _videoView.Size = new Size(854, 676); // Adjust these values to size the video appropriately
+            _videoView.Location = new Point(0, 0);
+            _videoView.Size = new Size(888, 581); ; // This has been set manually through trial & error. If the size is set to a smaller figure black borders appear around the mp4 despite borders being disabled. 
 
-            this.Controls.Add(_videoView);
+            LoginPageMediaPanel.Controls.Add(_videoView);
             _videoView.BringToFront();
 
             string videoFilePath = CodingTracker.View.Properties.Settings.Default.VLCPath;
@@ -84,9 +83,8 @@ namespace CodingTracker.View
                 media.AddOption("input-repeat=65535"); // Loop the video indefinitely
                 _videoView.MediaPlayer.Play(media);
 
-                // Adjust the video scale and aspect ratio if needed
                 _videoView.MediaPlayer.Scale = 0; // 0 means "fit to the control's size"
-                                                  // _videoView.MediaPlayer.AspectRatio = "16:9"; // Uncomment and adjust if you need to set a specific aspect ratio
+
 
                 _appLogger.Info($"VLC player loaded video from {videoFilePath}");
             }
@@ -96,6 +94,7 @@ namespace CodingTracker.View
                 MessageBox.Show("Video file not found at the specified path: " + videoFilePath);
             }
         }
+
 
         private void loginPageLoginButton_Click(object sender, EventArgs e)
         {
@@ -115,10 +114,6 @@ namespace CodingTracker.View
             }
         }
 
-        private void loginPageExitButton_Click(object sender, EventArgs e)
-        {
-            _appControl.ExitApplication();
-        }
 
         private void LoginPageCreateAccountButton_Click(object sender, EventArgs e)
         {
@@ -132,6 +127,11 @@ namespace CodingTracker.View
         {
             _formController.ShowCreateAccountPage();
 
+        }
+
+        private void LoginPageExitControlBox_Click(object sender, EventArgs e)
+        {
+            _appControl.ExitApplication();
         }
     }
 }
