@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace CodingTracker.Common.IInputValidators
 {
-    public interface IInputValidator
+    public interface IInputValidator 
     {
 
         bool CheckDateInput(string input, out DateTime result);
         bool CheckTimeInput(string input, out DateTime result);
         bool IsValidTimeFormatHHMM(string input);
         bool TryParseTime(string input, out TimeSpan timeSpan);
-        public void CheckLoginInput();
-        public bool CheckStartInput(string startInput);
-        public bool CheckViewInput(string viewInput);
+
+        bool ValidatePassword(string password);
+        bool ValidateUsername(string username);
 
 
 

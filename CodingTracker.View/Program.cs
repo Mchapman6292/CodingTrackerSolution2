@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using CodingTracker.Business.ApplicationControls;
 using CodingTracker.Business.CodingGoals;
 using CodingTracker.Business.CodingSessions;
-using CodingTracker.Business.InputValidators;
+using CodingTracker.Common.InputValidators;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingGoals;
