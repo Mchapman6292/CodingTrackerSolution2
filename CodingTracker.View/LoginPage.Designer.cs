@@ -56,8 +56,14 @@ namespace CodingTracker.View
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges11 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges12 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoginPage));
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges13 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges14 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges19 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges15 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges17 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges18 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             loginPageErrorTextbox = new Label();
             label1 = new Label();
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -68,13 +74,18 @@ namespace CodingTracker.View
             loginPageLoginButton = new Guna.UI2.WinForms.Guna2Button();
             LoginPageCreateAccountButton = new Guna.UI2.WinForms.Guna2Button();
             LoginPageForgotPasswordButton = new Guna.UI2.WinForms.Guna2Button();
-            guna2ImageButton1 = new Guna.UI2.WinForms.Guna2ImageButton();
+            LoginPageMediaPanel = new Guna.UI2.WinForms.Guna2Panel();
+            guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
+            guna2ControlBox1 = new Guna.UI2.WinForms.Guna2ControlBox();
+            LoginPageExitControlBox = new Guna.UI2.WinForms.Guna2ControlBox();
             ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).BeginInit();
+            LoginPageMediaPanel.SuspendLayout();
+            guna2Panel1.SuspendLayout();
             SuspendLayout();
             // 
             // loginPageErrorTextbox
             // 
-            loginPageErrorTextbox.Location = new Point(809, 425);
+            loginPageErrorTextbox.Location = new Point(58, 447);
             loginPageErrorTextbox.Name = "loginPageErrorTextbox";
             loginPageErrorTextbox.Size = new Size(226, 23);
             loginPageErrorTextbox.TabIndex = 5;
@@ -91,12 +102,13 @@ namespace CodingTracker.View
             // 
             // LoginPageVLCPLayer
             // 
-            LoginPageVLCPLayer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            LoginPageVLCPLayer.AccessibleName = " ";
             LoginPageVLCPLayer.BackColor = Color.Black;
-            LoginPageVLCPLayer.Location = new Point(490, 46);
+            LoginPageVLCPLayer.Location = new Point(0, 0);
+            LoginPageVLCPLayer.Margin = new Padding(0);
             LoginPageVLCPLayer.MediaPlayer = null;
             LoginPageVLCPLayer.Name = "LoginPageVLCPLayer";
-            LoginPageVLCPLayer.Size = new Size(798, 638);
+            LoginPageVLCPLayer.Size = new Size(820, 558);
             LoginPageVLCPLayer.TabIndex = 13;
             // 
             // loginPageUsernameTextbox
@@ -232,20 +244,58 @@ namespace CodingTracker.View
             LoginPageForgotPasswordButton.TabIndex = 20;
             LoginPageForgotPasswordButton.Text = "Forgot Password?";
             // 
-            // guna2ImageButton1
+            // LoginPageMediaPanel
             // 
-            guna2ImageButton1.CheckedState.ImageSize = new Size(64, 64);
-            guna2ImageButton1.HoverState.ImageSize = new Size(64, 64);
-            guna2ImageButton1.Image = (Image)resources.GetObject("guna2ImageButton1.Image");
-            guna2ImageButton1.ImageOffset = new Point(0, 0);
-            guna2ImageButton1.ImageRotate = 0F;
-            guna2ImageButton1.Location = new Point(1140, 2);
-            guna2ImageButton1.Name = "guna2ImageButton1";
-            guna2ImageButton1.PressedState.ImageSize = new Size(64, 64);
-            guna2ImageButton1.ShadowDecoration.CustomizableEdges = customizableEdges13;
-            guna2ImageButton1.Size = new Size(41, 20);
-            guna2ImageButton1.TabIndex = 21;
-            guna2ImageButton1.Click += loginPageExitButton_Click;
+            LoginPageMediaPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            LoginPageMediaPanel.Controls.Add(LoginPageVLCPLayer);
+            LoginPageMediaPanel.CustomizableEdges = customizableEdges13;
+            LoginPageMediaPanel.ForeColor = Color.FromArgb(35, 34, 50);
+            LoginPageMediaPanel.Location = new Point(461, 48);
+            LoginPageMediaPanel.Margin = new Padding(0);
+            LoginPageMediaPanel.Name = "LoginPageMediaPanel";
+            LoginPageMediaPanel.ShadowDecoration.CustomizableEdges = customizableEdges14;
+            LoginPageMediaPanel.Size = new Size(820, 558);
+            LoginPageMediaPanel.TabIndex = 22;
+            // 
+            // guna2Panel1
+            // 
+            guna2Panel1.Controls.Add(guna2ControlBox1);
+            guna2Panel1.Controls.Add(LoginPageExitControlBox);
+            guna2Panel1.CustomizableEdges = customizableEdges19;
+            guna2Panel1.Location = new Point(0, 1);
+            guna2Panel1.Name = "guna2Panel1";
+            guna2Panel1.ShadowDecoration.CustomizableEdges = customizableEdges20;
+            guna2Panel1.Size = new Size(1281, 33);
+            guna2Panel1.TabIndex = 23;
+            // 
+            // guna2ControlBox1
+            // 
+            guna2ControlBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            guna2ControlBox1.ControlBoxType = Guna.UI2.WinForms.Enums.ControlBoxType.MinimizeBox;
+            guna2ControlBox1.CustomizableEdges = customizableEdges15;
+            guna2ControlBox1.FillColor = Color.FromArgb(25, 24, 40);
+            guna2ControlBox1.HoverState.FillColor = Color.FromArgb(0, 9, 43);
+            guna2ControlBox1.HoverState.IconColor = Color.White;
+            guna2ControlBox1.IconColor = Color.White;
+            guna2ControlBox1.Location = new Point(1195, 0);
+            guna2ControlBox1.Name = "guna2ControlBox1";
+            guna2ControlBox1.ShadowDecoration.CustomizableEdges = customizableEdges16;
+            guna2ControlBox1.Size = new Size(45, 29);
+            guna2ControlBox1.TabIndex = 25;
+            // 
+            // LoginPageExitControlBox
+            // 
+            LoginPageExitControlBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            LoginPageExitControlBox.CustomizableEdges = customizableEdges17;
+            LoginPageExitControlBox.FillColor = Color.FromArgb(25, 24, 40);
+            LoginPageExitControlBox.HoverState.IconColor = Color.White;
+            LoginPageExitControlBox.IconColor = Color.White;
+            LoginPageExitControlBox.Location = new Point(1236, 1);
+            LoginPageExitControlBox.Name = "LoginPageExitControlBox";
+            LoginPageExitControlBox.ShadowDecoration.CustomizableEdges = customizableEdges18;
+            LoginPageExitControlBox.Size = new Size(45, 29);
+            LoginPageExitControlBox.TabIndex = 24;
+            LoginPageExitControlBox.Click += LoginPageExitControlBox_Click;
             // 
             // LoginPage
             // 
@@ -253,19 +303,21 @@ namespace CodingTracker.View
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 34, 50);
             ClientSize = new Size(1284, 681);
-            Controls.Add(guna2ImageButton1);
+            Controls.Add(guna2Panel1);
             Controls.Add(LoginPageForgotPasswordButton);
             Controls.Add(LoginPageCreateAccountButton);
             Controls.Add(loginPageLoginButton);
             Controls.Add(LoginPageRememberMeToggle);
             Controls.Add(LoginPagePasswordTextbox);
             Controls.Add(loginPageUsernameTextbox);
-            Controls.Add(LoginPageVLCPLayer);
             Controls.Add(label1);
             Controls.Add(loginPageErrorTextbox);
+            Controls.Add(LoginPageMediaPanel);
             Name = "LoginPage";
             WindowState = FormWindowState.Minimized;
             ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).EndInit();
+            LoginPageMediaPanel.ResumeLayout(false);
+            guna2Panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -315,6 +367,9 @@ namespace CodingTracker.View
         private Guna.UI2.WinForms.Guna2Button loginPageLoginButton;
         private Guna.UI2.WinForms.Guna2Button LoginPageCreateAccountButton;
         private Guna.UI2.WinForms.Guna2Button LoginPageForgotPasswordButton;
-        private Guna.UI2.WinForms.Guna2ImageButton guna2ImageButton1;
+        private Guna.UI2.WinForms.Guna2Panel LoginPageMediaPanel;
+        private Guna.UI2.WinForms.Guna2Panel guna2Panel1;
+        private Guna.UI2.WinForms.Guna2ControlBox LoginPageExitControlBox;
+        private Guna.UI2.WinForms.Guna2ControlBox guna2ControlBox1;
     }
 }

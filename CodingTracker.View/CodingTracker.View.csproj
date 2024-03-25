@@ -30,6 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DevExpress.DotNet.Web.ProjectTemplates" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Mvvm.CodeGenerators" Version="22.1.1" />
     <PackageReference Include="Guna.Charts.WinForms" Version="1.0.9" />
     <PackageReference Include="Guna.UI2.WinForms" Version="2.0.4.6" />
     <PackageReference Include="LibVLCSharp" Version="3.8.2" />
