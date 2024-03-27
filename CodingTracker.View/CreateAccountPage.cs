@@ -14,6 +14,7 @@ using CodingTracker.Common.IInputValidators;
 using CodingTracker.View.IFormControllers;
 using System.Diagnostics;
 using CodingTracker.View;
+using System.Security.Principal;
 
 namespace CodingTracker.View
 {
@@ -24,7 +25,7 @@ namespace CodingTracker.View
         private readonly IInputValidator _inputValidator;
         private readonly IApplicationLogger _appLogger;
         private readonly IFormController _formController;
-        public event EventHandler AccountCreatedSuccessfully;
+        public Action<string> AccountCreatedCallback { get; set; }
 
         public CreateAccountPage(ICredentialManager credentialManager, IInputValidator inputValidator, IApplicationLogger appLogger, IFormController formController)
         {
@@ -52,16 +53,27 @@ namespace CodingTracker.View
                 string password = CreateAccountPasswordTextbox.Text;
 
                 var usernameResult = _inputValidator.ValidateUsername(username);
-                var passwordResult = _inputValidator.ValidatePassword(password);    
+                var passwordResult = _inputValidator.ValidatePassword(password);
 
-                if ((usernameResult.IsValid && passwordResult.IsValid))
+                if (usernameResult.IsValid && passwordResult.IsValid)
                 {
                     try
                     {
                         _credentialManager.CreateAccount(username, password);
-                        _appLogger.Info($"Account creation successful for user: {username}. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                        AccountCreatedSuccessfully?.Invoke(this, EventArgs.Empty);
-                        _formController.ShowLoginPage();
+
+                        // Checks if credentials have been added to the database. 
+                        if (_credentialManager.IsAccountCreatedSuccessfully(username))
+                        {
+                            _appLogger.Info($"Account creation successful for user: {username}. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+
+                            AccountCreatedCallback?.Invoke("Account created successfully.");
+                            _formController.ShowLoginPage();
+                        }
+                        else
+                        {
+                            _appLogger.Warning($"Account creation verification failed for user: {username}. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                            DisplayErrorMessage("Account creation failed. Please try again.");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -71,14 +83,15 @@ namespace CodingTracker.View
                 }
                 else
                 {
-                    // Only triggers if the username or password does not match requirements, displays all error messages.
                     var errorMessages = $"{usernameResult.GetAllErrorMessages()}\n{passwordResult.GetAllErrorMessages()}";
                     _appLogger.Warning($"Validation failed for username or password. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     DisplayErrorMessage(errorMessages);
-                    
                 }
             }
             overallStopwatch.Stop();
         }
+
+ 
+
     }
 }

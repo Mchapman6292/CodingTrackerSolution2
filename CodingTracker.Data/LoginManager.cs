@@ -133,7 +133,8 @@ namespace CodingTracker.Data.LoginManagers
         }
 
 
-        public List<CodingSessionDTO> ViewSpecific(string chosenDate)
+
+        public List<CodingSessionDTO> ViewSpecific(string chosenDate) // Change
         {
             var methodName = nameof(ViewSpecific);
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();

@@ -14,8 +14,7 @@ namespace CodingTracker.Common.UserCredentialDTOs
 
         public string Password { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? LastLogin { get; set; }
+
 
 
     }

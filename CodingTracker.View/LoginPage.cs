@@ -108,47 +108,46 @@ namespace CodingTracker.View
 
             if (loginCredentials != null)
             {
-                MessageBox.Show("Login successful.");
+                _formController.ShowMainPage();
             }
             else
             {
-                loginPageErrorTextbox.Visible = true;
-                loginPageErrorTextbox.Text = "Login failed. Please check your username and password.";
+                LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
             }
         }
 
-        private void CreateAccountPageCreateAccountButton_Click(object sender, EventArgs e)
+        private void AccountCreatedSuccessfully(string message)
         {
-            var createAccountPage = _formController.ShowCreateAccountPage();
-            createAccountPage.AccountCreatedSuccessfully += (sender, args) =>
+            _appLogger.Debug("AccountCreatedSuccessfully method called.");
+
+            this.Invoke((MethodInvoker)(() =>
             {
-                LoginPageDisplayErrorMessage("Account created successfully.");
-            };
+                _appLogger.Debug("Inside Invoke method of AccountCreatedSuccessfully.");
+                LoginPageDisplaySuccessMessage(message);
+            }));
         }
 
-        private void LoginPageCreateAccountButton_Click(object sender, EventArgs e)
+        private void LoginPageDisplaySuccessMessage(string message)
         {
-            _formController.ShowCreateAccountPage();
-            string username = loginPageUsernameTextbox.Text;
-            string password = LoginPagePasswordTextbox.Text;
-            _credentialManager.CreateAccount(username, password); // c
+
+            LoginPageCreationSuccessTextBox.Text = message;
         }
+
+
 
         private void LoginPageCreateAccountButton_Click_1(object sender, EventArgs e)
         {
-            _formController.ShowCreateAccountPage();
+            var createAccountPage = _formController.ShowCreateAccountPage();
+            createAccountPage.AccountCreatedCallback = AccountCreatedSuccessfully;
 
         }
 
         private void LoginPageExitControlBox_Click(object sender, EventArgs e)
         {
             _appControl.ExitApplication();
+
         }
 
-        private void LoginPageDisplayErrorMessage(string message)
-        {
-            LoginPageCreationSuccessTextBox.Text = message;
-        }
 
     }
 }

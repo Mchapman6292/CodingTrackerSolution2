@@ -202,9 +202,7 @@ namespace CodingTracker.Data.DatabaseManagers
                 CREATE TABLE IF NOT EXISTS UserCredentials (
                     UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL,
-                    CreatedAt DATETIME,
-                    LastLogin DATETIME
+                    PasswordHash TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS CodingSessions (

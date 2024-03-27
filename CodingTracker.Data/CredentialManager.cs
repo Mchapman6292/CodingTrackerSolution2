@@ -31,19 +31,18 @@ namespace CodingTracker.Data.CredentialManagers
                 _appLogger.Debug($"Starting {nameof(CreateAccount)}. TraceID: {activity.TraceId},  Username: {username}");
 
                 string hashedPassword = HashPassword(password);
+                DateTime accountCreationDate = DateTime.UtcNow;
                 _databaseManager.ExecuteCRUD(connection =>
                 {
                     using var command = new SQLiteCommand(@"
                     INSERT INTO
                         UserCredentials
                     (
-                        UserId,
                         Username,
                         PasswordHash
                     )
                     VALUES
                     (
-                        @UserId,
                         @Username,
                         @PasswordHash
                     )"

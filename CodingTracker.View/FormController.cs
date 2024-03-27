@@ -59,10 +59,11 @@ namespace CodingTracker.View.FormControllers
             LogAndSwitchForm(settingsPage, nameof(ShowSettingsPage));
         }
 
-        public void ShowCreateAccountPage()
+        public CreateAccountPage ShowCreateAccountPage()
         {
             var createAccountPage = _formFactory.CreateAccountPage();
             LogAndSwitchForm(createAccountPage, nameof(ShowCreateAccountPage));
+            return createAccountPage; // Return the instance for callback setup
         }
         public void LogAndSwitchForm(Form newForm, string methodName)
         {

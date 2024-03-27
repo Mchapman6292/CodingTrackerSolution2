@@ -87,7 +87,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     _databaseManager.ExecuteCRUD(connection =>
                     {
                         using var command = new SQLiteCommand(@"
-                    SELECT UserId, Username, PasswordHash, CreatedAt, LastLogin FROM UserCredentials", connection);
+                    SELECT UserId, Username, PasswordHash FROM UserCredentials", connection);
 
                         using (var reader = command.ExecuteReader())
                         {
@@ -97,9 +97,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                                 {
                                     UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
                                     Username = reader.GetString(reader.GetOrdinal("Username")),
-                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
-                                    CreatedAt = reader.IsDBNull(reader.GetOrdinal("CreatedAt")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
-                                    LastLogin = reader.IsDBNull(reader.GetOrdinal("LastLogin")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("LastLogin"))
+                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
                                 };
                                 userCredentialsList.Add(userCredentials);
                             }
