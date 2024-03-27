@@ -62,6 +62,8 @@ namespace CodingTracker.View
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges15 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges22 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges17 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges18 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             loginPageErrorTextbox = new Label();
@@ -77,6 +79,7 @@ namespace CodingTracker.View
             LoginPageMediaPanel = new Guna.UI2.WinForms.Guna2Panel();
             guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
             guna2ControlBox1 = new Guna.UI2.WinForms.Guna2ControlBox();
+            LoginPageCreationSuccessTextBox = new Guna.UI2.WinForms.Guna2TextBox();
             LoginPageExitControlBox = new Guna.UI2.WinForms.Guna2ControlBox();
             ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).BeginInit();
             LoginPageMediaPanel.SuspendLayout();
@@ -125,7 +128,7 @@ namespace CodingTracker.View
             loginPageUsernameTextbox.FillColor = Color.FromArgb(35, 34, 50);
             loginPageUsernameTextbox.FocusedState.BorderColor = Color.FromArgb(94, 148, 255);
             loginPageUsernameTextbox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            loginPageUsernameTextbox.ForeColor = Color.FromArgb(35, 34, 50);
+            loginPageUsernameTextbox.ForeColor = Color.White;
             loginPageUsernameTextbox.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
             loginPageUsernameTextbox.Location = new Point(31, 162);
             loginPageUsernameTextbox.Name = "loginPageUsernameTextbox";
@@ -154,13 +157,14 @@ namespace CodingTracker.View
             LoginPagePasswordTextbox.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
             LoginPagePasswordTextbox.Location = new Point(31, 236);
             LoginPagePasswordTextbox.Name = "LoginPagePasswordTextbox";
-            LoginPagePasswordTextbox.PasswordChar = '\0';
+            LoginPagePasswordTextbox.PasswordChar = '●';
             LoginPagePasswordTextbox.PlaceholderForeColor = Color.Azure;
             LoginPagePasswordTextbox.PlaceholderText = "Password";
             LoginPagePasswordTextbox.SelectedText = "";
             LoginPagePasswordTextbox.ShadowDecoration.CustomizableEdges = customizableEdges4;
             LoginPagePasswordTextbox.Size = new Size(200, 36);
             LoginPagePasswordTextbox.TabIndex = 16;
+            LoginPagePasswordTextbox.UseSystemPasswordChar = true;
             // 
             // LoginPageRememberMeToggle
             // 
@@ -283,6 +287,30 @@ namespace CodingTracker.View
             guna2ControlBox1.Size = new Size(45, 29);
             guna2ControlBox1.TabIndex = 25;
             // 
+            // LoginPageCreationSuccessTextBox
+            // 
+            LoginPageCreationSuccessTextBox.BorderColor = Color.FromArgb(35, 34, 50);
+            LoginPageCreationSuccessTextBox.CustomizableEdges = customizableEdges21;
+            LoginPageCreationSuccessTextBox.DefaultText = "";
+            LoginPageCreationSuccessTextBox.DisabledState.BorderColor = Color.FromArgb(208, 208, 208);
+            LoginPageCreationSuccessTextBox.DisabledState.FillColor = Color.FromArgb(226, 226, 226);
+            LoginPageCreationSuccessTextBox.DisabledState.ForeColor = Color.FromArgb(138, 138, 138);
+            LoginPageCreationSuccessTextBox.DisabledState.PlaceholderForeColor = Color.FromArgb(138, 138, 138);
+            LoginPageCreationSuccessTextBox.FillColor = Color.FromArgb(35, 34, 50);
+            LoginPageCreationSuccessTextBox.FocusedState.BorderColor = Color.FromArgb(94, 148, 255);
+            LoginPageCreationSuccessTextBox.Font = new Font("Segoe UI", 9F);
+            LoginPageCreationSuccessTextBox.ForeColor = Color.YellowGreen;
+            LoginPageCreationSuccessTextBox.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
+            LoginPageCreationSuccessTextBox.Location = new Point(44, 434);
+            LoginPageCreationSuccessTextBox.Name = "LoginPageCreationSuccessTextBox";
+            LoginPageCreationSuccessTextBox.PasswordChar = '\0';
+            LoginPageCreationSuccessTextBox.PlaceholderForeColor = Color.FromArgb(35, 34, 50);
+            LoginPageCreationSuccessTextBox.PlaceholderText = "";
+            LoginPageCreationSuccessTextBox.SelectedText = "";
+            LoginPageCreationSuccessTextBox.ShadowDecoration.CustomizableEdges = customizableEdges22;
+            LoginPageCreationSuccessTextBox.Size = new Size(200, 36);
+            LoginPageCreationSuccessTextBox.TabIndex = 24;
+            // 
             // LoginPageExitControlBox
             // 
             LoginPageExitControlBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -303,6 +331,7 @@ namespace CodingTracker.View
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 34, 50);
             ClientSize = new Size(1284, 681);
+            Controls.Add(LoginPageCreationSuccessTextBox);
             Controls.Add(guna2Panel1);
             Controls.Add(LoginPageForgotPasswordButton);
             Controls.Add(LoginPageCreateAccountButton);
@@ -369,7 +398,8 @@ namespace CodingTracker.View
         private Guna.UI2.WinForms.Guna2Button LoginPageForgotPasswordButton;
         private Guna.UI2.WinForms.Guna2Panel LoginPageMediaPanel;
         private Guna.UI2.WinForms.Guna2Panel guna2Panel1;
-        private Guna.UI2.WinForms.Guna2ControlBox LoginPageExitControlBox;
         private Guna.UI2.WinForms.Guna2ControlBox guna2ControlBox1;
+        private Guna.UI2.WinForms.Guna2TextBox LoginPageCreationSuccessTextBox;
+        private Guna.UI2.WinForms.Guna2ControlBox LoginPageExitControlBox;
     }
 }

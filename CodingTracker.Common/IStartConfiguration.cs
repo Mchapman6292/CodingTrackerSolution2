@@ -10,5 +10,7 @@ namespace CodingTracker.Common.IStartConfigurations
     {
         public string ConnectionString { get; }
         public string DatabasePath { get; }
+
+        void LoadConfiguration();
     }
 }

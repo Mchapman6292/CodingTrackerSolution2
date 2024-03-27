@@ -2,6 +2,7 @@
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Common.UserCredentialDTOs;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
@@ -71,6 +72,53 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 return durationMinutesList;
             }
         }
+
+        public List<dynamic> ReadAllUserCredentials()
+        {
+            using (var activity = new Activity(nameof(ReadAllUserCredentials)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ReadAllUserCredentials)}. TraceID: {activity.TraceId}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                List<dynamic> userCredentialsList = new List<dynamic>();
+
+                try
+                {
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                    SELECT UserId, Username, PasswordHash FROM UserCredentials", connection);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var userCredentials = new
+                                {
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    Username = reader.GetString(reader.GetOrdinal("Username")),
+                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
+                                };
+                                userCredentialsList.Add(userCredentials);
+                            }
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Successfully read all user credentials. Count: {userCredentialsList.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to read user credentials. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    throw;
+                }
+
+                return userCredentialsList;
+            }
+        }
+
+
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)
         {
             var methodName = nameof(ViewRecentSession);

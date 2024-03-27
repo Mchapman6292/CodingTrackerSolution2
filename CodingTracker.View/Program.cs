@@ -29,14 +29,15 @@ using CodingTracker.View.IFormControllers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.SessionGoalCountDownTimers;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
+using CodingTracker.Common.IInputValidationResults;
 using CodingTrackerSolution;
+using System.ComponentModel.DataAnnotations;
+using CodingTracker.Common.InputValidationResults;
 
-// To do
-// Validator & parse methods for CodingSession Goal
-//Stopwatch logic   
-
-
-// Seperate logic for creating the user id via autoincrement while handling the password etc within credentialstorage is not consistent.  m
+/// To do
+/// Change get validDate & Time inputvalidator
+/// Consistent appraoch to DTO
+/// Add event logic to show account created succesfully in loginpage.
 
 namespace CodingTracker.View.Program
 {
@@ -48,24 +49,29 @@ namespace CodingTracker.View.Program
             var services = new ServiceCollection();
             ConfigureServices(services);
 
+
+
             using var serviceProvider = services.BuildServiceProvider();
             ApplicationConfiguration.Initialize();
 
             var formFactory = serviceProvider.GetRequiredService<IFormFactory>();
             var loginPage = formFactory.CreateLoginPage();
+            var dbManager = serviceProvider.GetRequiredService<IDatabaseManager>();
+            dbManager.EnsureDatabaseForUser();
+            dbManager.CreateTableIfNotExists();
             Application.Run(loginPage);
         }
 
         private static void ConfigureServices(IServiceCollection services)
         {
             var configurationBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                .AddJsonFile("AppSettings.json", optional: false, reloadOnChange: false)
                 .AddEnvironmentVariables();
 
             IConfiguration configuration = configurationBuilder.Build();
 
             services.AddSingleton<IConfiguration>(configuration)
-                    .AddSingleton<IStartConfiguration, StartConfiguration>()
+                    .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
                     .AddSingleton<IUtilityService, UtilityService>()
@@ -79,11 +85,17 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingGoal, CodingGoal>()
                     .AddSingleton<IFormController, FormController>()
                     .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimer>()
+                    .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddTransient<LoginPage>()
                     .AddSingleton<MainPage>()
                     .AddSingleton<CodingSessionPage>()
                     .AddSingleton<EditSessionPage>()
-                    .AddSingleton<ViewSessionsPage>();
+                    .AddSingleton<ViewSessionsPage>()
+                    .AddSingleton<CreateAccountPage>();
+
+            var startConfiguration = services.BuildServiceProvider()
+                                             .GetRequiredService<IStartConfiguration>();
+            startConfiguration.LoadConfiguration();
         }
     }
 }

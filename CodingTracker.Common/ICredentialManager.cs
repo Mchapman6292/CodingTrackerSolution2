@@ -12,5 +12,7 @@ namespace CodingTracker.Common.ICredentialManagers
 
         string HashPassword(string password);
 
+        bool IsAccountCreatedSuccessfully(string username);
+
     }
 }

@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Threading;
 
 namespace CodingTracker.Data.DatabaseManagers
-// Async methods for background operations
 {
     public class DatabaseManager : IDatabaseManager
     {
@@ -48,7 +47,7 @@ namespace CodingTracker.Data.DatabaseManagers
 
             using (var activity = new Activity(nameof(OpenConnectionWithRetry)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(OpenConnectionWithRetry)}. TraceID: {activity.TraceId}");
+                _appLogger.Debug($"Starting {nameof(OpenConnectionWithRetry)} Using connection string: {_connectionString}. TraceID: {activity.TraceId}");
 
                 while (attempt < maxRetryCount)
                 {
@@ -92,7 +91,29 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public void CloseDatabaseConnection()
         {
-            throw new NotImplementedException();
+            using (var activity = new Activity(nameof(CloseDatabaseConnection)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(CloseDatabaseConnection)}. TraceID: {activity.TraceId}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                try
+                {
+                    if(_connection != null && _connection.State != ConnectionState.Closed)
+                    {
+                        _connection.Close();
+                        _appLogger.Info($"Database connection closed successfully. TraceID: {activity.TraceId}");
+                    }
+                    else
+                    {
+                        _appLogger.Info($"Database connection was already closed. TraceID: {activity.TraceId}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Failed to close database connection. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+            }
         }
 
 
@@ -106,6 +127,7 @@ namespace CodingTracker.Data.DatabaseManagers
 
                 try
                 {
+                    _appLogger.Debug($"The connection string being used: {_connectionString}");
                     OpenConnectionWithRetry();
 
                     action(_connection);
@@ -177,12 +199,10 @@ namespace CodingTracker.Data.DatabaseManagers
                     using var command = _connection.CreateCommand();
 
                     command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS Users (
+                CREATE TABLE IF NOT EXISTS UserCredentials (
                     UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL,
-                    CreatedAt DATETIME NOT NULL,
-                    LastLogin DATETIME
+                    PasswordHash TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS CodingSessions (
@@ -196,7 +216,7 @@ namespace CodingTracker.Data.DatabaseManagers
                     CodingGoalHours INTEGER,
                     TimeToGoalMinutes INTEGER,
                     SessionNotes TEXT,
-                    FOREIGN KEY(UserId) REFERENCES Users(UserId)
+                    FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
                 );";
 
                     int affectedRows = command.ExecuteNonQuery();

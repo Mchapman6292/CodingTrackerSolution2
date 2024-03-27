@@ -23,7 +23,6 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private LibVLC _libVLC;
         private VideoView _videoView;
-        private int borderRadius = 30;
 
         public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController)
         {
@@ -37,12 +36,15 @@ namespace CodingTracker.View
             InitializeVLCPlayer();
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+
+
+        // Custom paint method: Draws the rounded corners for the form.
+        protected override void OnPaint(PaintEventArgs e) 
         {
             base.OnPaint(e);
 
             GraphicsPath path = new GraphicsPath();
-            int radius = 40; // You can adjust this value to control the rounding
+            int radius = 40; 
 
             // Top left arc
             path.AddArc(0, 0, radius, radius, 180, 90);
@@ -60,6 +62,7 @@ namespace CodingTracker.View
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             e.Graphics.DrawPath(new Pen(Color.Black, 2), path);
         }
+
         private void InitializeVLCPlayer()
         {
             Core.Initialize();
@@ -83,7 +86,7 @@ namespace CodingTracker.View
                 media.AddOption("input-repeat=65535"); // Loop the video indefinitely
                 _videoView.MediaPlayer.Play(media);
 
-                _videoView.MediaPlayer.Scale = 0; // 0 means "fit to the control's size"
+                _videoView.MediaPlayer.Scale = 0; // = 0 so that it fills to the size of the MediaPanel.
 
 
                 _appLogger.Info($"VLC player loaded video from {videoFilePath}");
@@ -105,33 +108,46 @@ namespace CodingTracker.View
 
             if (loginCredentials != null)
             {
-                MessageBox.Show("Login successful.");
+                _formController.ShowMainPage();
             }
             else
             {
-                loginPageErrorTextbox.Visible = true;
-                loginPageErrorTextbox.Text = "Login failed. Please check your username and password.";
+                LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
             }
         }
 
-
-        private void LoginPageCreateAccountButton_Click(object sender, EventArgs e)
+        private void AccountCreatedSuccessfully(string message)
         {
-            _formController.ShowCreateAccountPage();
-            string username = loginPageUsernameTextbox.Text;
-            string password = LoginPagePasswordTextbox.Text;
-            _credentialManager.CreateAccount(username, password); // change to loginpage textbox
+            _appLogger.Debug("AccountCreatedSuccessfully method called.");
+
+            this.Invoke((MethodInvoker)(() =>
+            {
+                _appLogger.Debug("Inside Invoke method of AccountCreatedSuccessfully.");
+                LoginPageDisplaySuccessMessage(message);
+            }));
         }
+
+        private void LoginPageDisplaySuccessMessage(string message)
+        {
+
+            LoginPageCreationSuccessTextBox.Text = message;
+        }
+
+
 
         private void LoginPageCreateAccountButton_Click_1(object sender, EventArgs e)
         {
-            _formController.ShowCreateAccountPage();
+            var createAccountPage = _formController.ShowCreateAccountPage();
+            createAccountPage.AccountCreatedCallback = AccountCreatedSuccessfully;
 
         }
 
         private void LoginPageExitControlBox_Click(object sender, EventArgs e)
         {
             _appControl.ExitApplication();
+
         }
+
+
     }
 }

@@ -9,14 +9,15 @@ namespace CodingTracker.Data.Configurations
     public class StartConfiguration : IStartConfiguration
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly IConfiguration _configuration; 
+        private readonly IConfiguration _configuration;
         public string ConnectionString { get; private set; }
         public string DatabasePath { get; private set; }
 
         public StartConfiguration(IApplicationLogger appLogger, IConfiguration configuration)
         {
             _appLogger = appLogger;
-            _configuration = configuration; 
+            _configuration = configuration;
+            LoadConfiguration();
         }
 
         public void LoadConfiguration()
@@ -27,6 +28,7 @@ namespace CodingTracker.Data.Configurations
 
                 try
                 {
+                    _appLogger.Debug($"The raw connection string is: {_configuration["ConnectionStrings:ConnectionString"]}");
                     ConnectionString = _configuration.GetSection("DatabaseConfig:ConnectionString").Value;
                     DatabasePath = _configuration.GetSection("DatabaseConfig:DatabasePath").Value;
 
