@@ -34,13 +34,17 @@ using CodingTracker.View.IMessageBoxManagers;
 using CodingTracker.View.MessageBoxManagers;
 using System.ComponentModel.DataAnnotations;
 using CodingTracker.Common.InputValidationResults;
+using CodingTracker.Business.PanelColorControls;
+using CodingTracker.Common.IPanelColorControls;
+using CodingTracker.Common.IErrorHandlers;
+using CodingTracker.Common.ErrorHandlers;
 
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
 /// Add event logic to show account created succesfully in loginpage.
 /// Check all methods end stopwatch timing when error is thrown
-/// 
+/// Review database methods to add more sql lite exceptions. 
 
 namespace CodingTracker.View.Program
 {
@@ -90,6 +94,8 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimer>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
+                    .AddSingleton<IPanelColorControl, PanelColorControl>()
+                    .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddTransient<LoginPage>()
                     .AddSingleton<MainPage>()
                     .AddSingleton<CodingSessionPage>()
