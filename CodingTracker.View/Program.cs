@@ -30,7 +30,8 @@ using CodingTracker.View.FormControllers;
 using CodingTracker.View.SessionGoalCountDownTimers;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidationResults;
-using CodingTrackerSolution;
+using CodingTracker.View.IMessageBoxManagers;
+using CodingTracker.View.MessageBoxManagers;
 using System.ComponentModel.DataAnnotations;
 using CodingTracker.Common.InputValidationResults;
 
@@ -38,6 +39,8 @@ using CodingTracker.Common.InputValidationResults;
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
 /// Add event logic to show account created succesfully in loginpage.
+/// Check all methods end stopwatch timing when error is thrown
+/// 
 
 namespace CodingTracker.View.Program
 {
@@ -86,6 +89,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IFormController, FormController>()
                     .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimer>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
+                    .AddSingleton<IMessageBoxManager, MessageBoxManager>()
                     .AddTransient<LoginPage>()
                     .AddSingleton<MainPage>()
                     .AddSingleton<CodingSessionPage>()
