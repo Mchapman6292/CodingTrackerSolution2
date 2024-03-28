@@ -10,7 +10,7 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 {
     public interface IDatabaseSessionRead
     {
-        List<int> ReadSessionDurationMinutes();
+        List<int> ReadSessionDurationMinutes(int numberOfDays);
 
         List<CodingSessionDTO> ViewAllSession(bool partialView = false);
         List<CodingSessionDTO> ViewSpecific(string chosenDate);

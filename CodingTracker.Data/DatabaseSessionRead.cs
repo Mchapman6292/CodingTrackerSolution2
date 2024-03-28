@@ -30,7 +30,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
         }
 
 
-        public List<int> ReadSessionDurationMinutes()
+        public List<int> ReadSessionDurationMinutes(int numberOfDays)
         {
             using (var activity = new Activity(nameof(ReadSessionDurationMinutes)).Start())
             {
@@ -50,7 +50,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         {
                             while (reader.Read())
                             {
-                                if (!reader.IsDBNull(reader.GetOrdinal("DurationMinutes")))
+                                if (!reader.IsDBNull(reader.GetOrdinal("DurationMinutes"))) // GetOrdinal finds the index of the "DurationMinutes" column in the result set, used to check if the column value is null.
                                 {
                                     int durationMinutes = reader.GetInt32(reader.GetOrdinal("DurationMinutes"));
                                     durationMinutesList.Add(durationMinutes);
@@ -358,9 +358,9 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         SELECT SessionId, StartTime, EndTime FROM 
                             CodingSessions 
                         WHERE 
-                            strftime('%W', StartTime) = strftime('%W', @Date) 
+                            StartTime('%W', StartTime) = StartTime('%W', @Date) 
                         AND
-                            strftime('%Y', StartTime) = strftime('%Y', @Date) 
+                            StartTime('%Y', StartTime) = StartTime('%Y', @Date) 
                         AND 
                             DATE(StartTime) <= DATE(@Date)
                         ORDER BY StartTime {order}";

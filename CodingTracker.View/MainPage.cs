@@ -11,6 +11,9 @@ using System.Windows.Forms;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.IFormControllers;
+using Guna;
+using Guna.UI2.WinForms;
+using CodingTracker.Common.IPanelColorControls;
 
 namespace CodingTracker.View
 {
@@ -18,12 +21,14 @@ namespace CodingTracker.View
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IFormController _formController;
+        private readonly IPanelColorControl _panelColorControl;
 
-        public MainPage(IApplicationLogger applogger, IFormController formController)
+        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl)
         {
             InitializeComponent();
             _appLogger = applogger;
             _formController = formController;
+            _panelColorControl = panelControl;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -120,6 +125,41 @@ namespace CodingTracker.View
                     MessageBox.Show("Unable to open the Settings Page. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void UpdateLabels(Panel parentPanel)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(UpdateLabels)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(UpdateLabels)}. TraceID: {activity.TraceId}");
+
+                foreach (Label label in parentPanel.Controls.OfType<Label>())
+                {
+                    // Update label text or properties here
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(UpdateLabels)} completed. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+            }
+        }
+
+        private void UpdateGradientPanels(Panel parentPanel)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(UpdateGradientPanels)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(UpdateGradientPanels)}. TraceID: {activity.TraceId}");
+
+                foreach (Guna2GradientPanel gradientPanel in parentPanel.Controls.OfType<Guna2GradientPanel>())
+                {
+                    // Update gradient panel properties here
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(UpdateGradientPanels)} completed. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+            }
+
         }
     }
 }
