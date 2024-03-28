@@ -5,6 +5,7 @@ using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.ICodingGoals;
 using System.Linq.Expressions;
 using CodingTracker.Common.ICodingSessions;
+using CodingTracker.Common.IErrorHandlers;
 
 // method to record start & end time
 // logic to hold recorded times & view them
@@ -17,6 +18,7 @@ namespace CodingTracker.Business.CodingSessions
         private readonly IInputValidator _inputValidator;
         private readonly IApplicationLogger _appLogger;
         private readonly ICodingGoal _codingGoal;
+        private readonly IErrorHandler _errorHandler;
         private CodingSessionDTO _currentSessionDTO;
         public int SessionId { get; set; }
         public int UserId { get; set; }
@@ -37,11 +39,12 @@ namespace CodingTracker.Business.CodingSessions
 
 
 
-        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal)
+        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
             _codingGoal = codingGoal;
+            _errorHandler = errorHandler;
 
         }
         public CodingSessionDTO GetCurrentSessionDTO()
@@ -49,134 +52,102 @@ namespace CodingTracker.Business.CodingSessions
             return _currentSessionDTO;
         }
 
-        public void StartSession(int userId)
+    public void StartSession(int userId)
+    {
+        _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
         {
-            using (var activity = new Activity(nameof(StartSession)).Start())
+            UserId = userId; 
+            DateTime startTime = DateTime.Now;
+
+            if (IsStopWatchEnabled)
             {
-                _appLogger.Info($"Starting {nameof(StartSession)}. TraceID: {activity.TraceId}");
-                try
-                {
-                    UserId = userId; 
-                    DateTime startTime = DateTime.Now;
-
-                    if (IsStopWatchEnabled)
-                    {
-                        _stopwatch.Start();
-                    }
-
-                    _currentSessionDTO = new CodingSessionDTO
-                    {
-                        UserId = this.UserId,
-                        StartTime = startTime,
-                        StartDate = startTime.Date 
-                    };
-
-                    _appLogger.Info($"Session started for UserId: {UserId}. TraceID: {activity.TraceId}, StartTime: {startTime}");
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(StartSession)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
+                _stopwatch.Start();
             }
-        }
 
-        public void EndSession()
+            _currentSessionDTO = new CodingSessionDTO
+            {
+                UserId = this.UserId,
+                StartTime = startTime,
+                StartDate = startTime.Date 
+            };
+
+            _appLogger.Info($"Session started for UserId: {UserId}, StartTime: {startTime}");
+        }, nameof(StartSession));
+    }
+    public void EndSession()
+    {
+        _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
         {
-            using (var activity = new Activity(nameof(EndSession)).Start())
+            if (IsStopWatchEnabled)
             {
-                _appLogger.Info($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
-                try
-                {
-                    if (IsStopWatchEnabled)
-                    {
-                        _stopwatch.Stop();
-                    }
-                    else
-                    {
-                        EndTime = DateTime.Now;
-                    }
-                    CalculateDurationMinutes();
-                    CalculateTimeToGoal();
-
-                    var codingSessionDTO = new CodingSessionDTO
-                    {
-                        SessionId = this.SessionId,
-                        UserId = this.UserId,
-                        StartTime = this.StartTime,
-                        EndTime = this.EndTime,
-                        StartDate = this.StartDate,
-                        EndDate = this.EndDate,
-                        DurationMinutes = this.DurationMinutes,
-                        CodingGoalHours = this.CodingGoalHours,
-                        TimeToGoalMinutes = this.TimeToGoalMinutes ?? 0,
-                    };
-                    _appLogger.Info($"Session ended. TraceID: {activity.TraceId}, IsStopWatchEnabled: {IsStopWatchEnabled}, EndTime: {EndTime}, DurationMinutes: {DurationMinutes}");
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(EndSession)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
+                _stopwatch.Stop();
             }
-        }
+            else
+            {
+                EndTime = DateTime.Now;
+            }
+            CalculateDurationMinutes();
+            CalculateTimeToGoal();
 
-        public void SaveCurrentCodingSession()
+            var codingSessionDTO = new CodingSessionDTO
+            {
+                SessionId = this.SessionId,
+                UserId = this.UserId,
+                StartTime = this.StartTime,
+                EndTime = this.EndTime,
+                StartDate = this.StartDate,
+                EndDate = this.EndDate,
+                DurationMinutes = this.DurationMinutes,
+                CodingGoalHours = this.CodingGoalHours,
+                TimeToGoalMinutes = this.TimeToGoalMinutes ?? 0,
+            };
+            _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, EndTime: {EndTime}, DurationMinutes: {DurationMinutes}");
+        }, nameof(EndSession));
+    }
+
+    public void SaveCurrentCodingSession()
+    {
+        _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
         {
-            using (var activity = new Activity(nameof(SaveCurrentCodingSession)).Start())
+            if (!StartTime.HasValue)
             {
-                _appLogger.Info($"Saving current coding session. TraceID: {activity.TraceId}");
-                try
-                {
-                    if (!StartTime.HasValue)
-                    {
-                        throw new InvalidOperationException("Session start time is not set.");
-                    }
-
-                    EndTime ??= DateTime.UtcNow;
-
-                    if (!DurationMinutes.HasValue && EndTime.HasValue)
-                    {
-                        DurationMinutes = (int)(EndTime.Value - StartTime.Value).TotalMinutes;
-                    }
-
-                    _currentSessionDTO = new CodingSessionDTO
-                    {
-                        SessionId = this.SessionId,
-                        UserId = this.UserId,
-                        StartTime = this.StartTime,
-                        EndTime = this.EndTime,
-                        StartDate = this.StartDate ?? this.StartTime?.Date,
-                        EndDate = this.EndDate ?? this.EndTime?.Date,
-                        DurationMinutes = this.DurationMinutes,
-                        CodingGoalHours = this.CodingGoalHours,
-                        TimeToGoalMinutes = this.TimeToGoalMinutes ?? 0
-                    };
-
-                    _appLogger.Info($"Current coding session saved. TraceID: {activity.TraceId}, SessionId: {SessionId}, EndTime: {EndTime}");
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(SaveCurrentCodingSession)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
+                throw new InvalidOperationException("Session start time is not set.");
             }
-        }
+
+            EndTime ??= DateTime.UtcNow;
+
+            if (!DurationMinutes.HasValue && EndTime.HasValue)
+            {
+                DurationMinutes = (int)(EndTime.Value - StartTime.Value).TotalMinutes;
+            }
+
+            _currentSessionDTO = new CodingSessionDTO
+            {
+                SessionId = this.SessionId,
+                UserId = this.UserId,
+                StartTime = this.StartTime,
+                EndTime = this.EndTime,
+                StartDate = this.StartDate ?? this.StartTime?.Date,
+                EndDate = this.EndDate ?? this.EndTime?.Date,
+                DurationMinutes = this.DurationMinutes,
+                CodingGoalHours = this.CodingGoalHours,
+                TimeToGoalMinutes = this.TimeToGoalMinutes ?? 0
+            };
+
+            _appLogger.Info($"Current coding session saved, SessionId: {SessionId}, EndTime: {EndTime}");
+        }, nameof(SaveCurrentCodingSession));
+    }
 
 
-        public bool CheckIfCodingSessionActive()
+    public bool CheckIfCodingSessionActive()
+    {
+        return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
         {
-            using var activity = new Activity(nameof(CheckIfCodingSessionActive)).Start();
-            _appLogger.Info($"Checking if coding session is active. TraceID: {activity.TraceId})");
-            try
-            {
-                bool isActive = isCodingSessionActive;
-                _appLogger.Info($"Coding session active status: {isActive}. TraceID: {activity.TraceId}");
-                return isActive;
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"An error occurred during {nameof(CheckIfCodingSessionActive)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-            }
-            return isCodingSessionActive;
-        }
+            bool isActive = isCodingSessionActive;
+            _appLogger.Info($"Coding session active status: {isActive}");
+            return isActive;
+        }, nameof(CheckIfCodingSessionActive));
+    }
 
 
         public void SetStartTimeManually()
