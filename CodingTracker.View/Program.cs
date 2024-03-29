@@ -45,6 +45,7 @@ using CodingTracker.Common.ErrorHandlers;
 /// Add event logic to show account created succesfully in loginpage.
 /// Check all methods end stopwatch timing when error is thrown
 /// Review database methods to add more sql lite exceptions. 
+/// Review all methods were thrown is used. 
 
 namespace CodingTracker.View.Program
 {
