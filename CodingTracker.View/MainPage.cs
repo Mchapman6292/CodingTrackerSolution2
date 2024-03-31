@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Data;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.FormControllers;
 using CodingTracker.View.IFormControllers;
-using Guna;
-using Guna.UI2.WinForms;
 using CodingTracker.Common.IPanelColorControls;
+using CodingTracker.Common.IErrorHandlers;
+using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Common.ICodingSessions;
+using CodingTracker.View.IFormFactories;
+
+
 
 namespace CodingTracker.View
 {
@@ -22,13 +16,23 @@ namespace CodingTracker.View
         private readonly IApplicationLogger _appLogger;
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
+        private readonly IErrorHandler _errorHandler;
+        private readonly IPanelColorControl _colorControl;
+        private readonly IDatabaseSessionRead _databaseRead;
+        private readonly ICodingSession _codingSession;
+        private readonly IFormFactory _formFactory;
 
-        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl)
+
+        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory)
         {
             InitializeComponent();
             _appLogger = applogger;
             _formController = formController;
             _panelColorControl = panelControl;
+            _errorHandler = errorHandler;
+            _databaseRead = databaseRead;
+            _codingSession = codingSession;
+            _formFactory = formFactory;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -38,128 +42,53 @@ namespace CodingTracker.View
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
         {
-            using (var activity = new Activity(nameof(MainPageCodingSessionButton_Click)))
-            {
-                _appLogger.Debug($"Starting {MainPageCodingSessionButton_Click}. TraceID: {activity.TraceId}.");
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    _formController.ShowCodingSessionPage();
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully displayed Coding Session Page. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to display Coding Session Page. Error: {ex.Message}. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-
-
-                    MessageBox.Show("Unable to open the Coding Session Page. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            _formController.HandleAndShowForm(_formFactory.CreateCodingSessionPage, nameof(CodingSessionPage));
         }
 
 
         private void MainPageEditSessionsButton_Click(object sender, EventArgs e)
         {
-            using (var activity = new Activity(nameof(MainPageEditSessionsButton_Click)).Start())
-            {
-                _appLogger.Debug($"Starting {nameof(MainPageEditSessionsButton_Click)}. TraceID: {activity.TraceId}");
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    _formController.ShowEditSessionPage();
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully displayed Edit Session Page. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to display Edit Session Page. Error: {ex.Message}. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    MessageBox.Show("Unable to open the Edit Session Page. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            _formController.HandleAndShowForm(_formFactory.CreateEditSessionPage, nameof(EditSessionPage));
         }
 
         private void MainPageViewSessionsButton_Click(object sender, EventArgs e)
         {
-            using (var activity = new Activity(nameof(MainPageViewSessionsButton_Click)).Start())
-            {
-                _appLogger.Debug($"Starting {nameof(MainPageViewSessionsButton_Click)}. TraceID: {activity.TraceId}");
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    _formController.ShowViewSessionPage();
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully displayed View Session Page. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to display View Session Page. Error: {ex.Message}. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    MessageBox.Show("Unable to open the View Session Page. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            _formController.HandleAndShowForm(_formFactory.CreateViewSessionsPage, nameof(ViewSessionsPage));
         }
 
         private void MainPageSettingsButton_Click(object sender, EventArgs e)
         {
-            using (var activity = new Activity(nameof(MainPageSettingsButton_Click)).Start())
-            {
-                _appLogger.Debug($"Starting {nameof(MainPageSettingsButton_Click)}. TraceID: {activity.TraceId}");
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    _formController.ShowSettingsPage();
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully displayed Settings Page. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to display Settings Page. Error: {ex.Message}. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    MessageBox.Show("Unable to open the Settings Page. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            _formController.HandleAndShowForm(_formFactory.CreateSettingsPage, nameof(SettingsPage));
         }
+
 
         private void UpdateLabels(Panel parentPanel)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(UpdateLabels)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(UpdateLabels)}. TraceID: {activity.TraceId}");
-
-                foreach (Label label in parentPanel.Controls.OfType<Label>())
+                List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
+                var labels = parentPanel.Controls.OfType<Label>().ToList();
+                for (int i = 0; i < last28Days.Count && i < labels.Count; i++)
                 {
-                    // Update label text or properties here
+                    labels[i].Text = last28Days[i].ToShortDateString();
                 }
-
-                stopwatch.Stop();
-                _appLogger.Info($"{nameof(UpdateLabels)} completed. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
             }
         }
 
         private void UpdateGradientPanels(Panel parentPanel)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(UpdateGradientPanels)).Start())
+            List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
+            List<int> sessionDurations = _databaseRead.ReadSessionDurationMinutes(28);
+
+            var labels = parentPanel.Controls.OfType<Label>().ToList();
+            for (int i = 0; i < last28Days.Count && i < labels.Count; i++)
             {
-                _appLogger.Debug($"Starting {nameof(UpdateGradientPanels)}. TraceID: {activity.TraceId}");
+                int duration = sessionDurations.ElementAtOrDefault(i);
+                SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
+                Color color = _panelColorControl.GetColorFromSessionColor(sessionColor);
 
-                foreach (Guna2GradientPanel gradientPanel in parentPanel.Controls.OfType<Guna2GradientPanel>())
-                {
-                    // Update gradient panel properties here
-                }
-
-                stopwatch.Stop();
-                _appLogger.Info($"{nameof(UpdateGradientPanels)} completed. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                labels[i].BackColor = color;
+                labels[i].Text = last28Days[i].ToShortDateString();
             }
-
         }
     }
 }

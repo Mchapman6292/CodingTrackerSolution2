@@ -46,6 +46,8 @@ using CodingTracker.Common.ErrorHandlers;
 /// Check all methods end stopwatch timing when error is thrown
 /// Review database methods to add more sql lite exceptions. 
 /// Review all methods were thrown is used. 
+/// Centralize errorboxmessage logic.
+/// Add tests to ensure that the labels and panel days correspond.
 
 namespace CodingTracker.View.Program
 {

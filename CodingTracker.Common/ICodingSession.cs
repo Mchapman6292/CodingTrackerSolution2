@@ -20,6 +20,8 @@ namespace CodingTracker.Common.ICodingSessions
         bool CheckBothDurationCalculations();
         void CalculateTimeToGoal();
 
+        List<DateTime> GetDatesPrevious28days();
+
 
 
 

@@ -2,7 +2,6 @@
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.ICredentialManagers;
 using System.Data.SQLite;
-using System.Data.SqlClient;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;

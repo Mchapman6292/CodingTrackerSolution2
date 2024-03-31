@@ -106,5 +106,8 @@ namespace CodingTracker.Common.ErrorHandlers
 
             return result; // Return the result of the function execution
         }
+
+
+
     }
 }
