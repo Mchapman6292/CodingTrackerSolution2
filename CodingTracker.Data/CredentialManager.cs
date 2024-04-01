@@ -24,43 +24,51 @@ namespace CodingTracker.Data.CredentialManagers
             _databaseManager = databaseManager;
         }
 
-        public void CreateAccount(string username, string password )
+        public void CreateAccount(string username, string password)
         {
-            using (var activity = new Activity(nameof(CreateAccount)).Start()) // Start a new activity
+            using (var activity = new Activity(nameof(CreateAccount)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(CreateAccount)}. TraceID: {activity.TraceId},  Username: {username}");
+                _appLogger.Debug($"Starting {nameof(CreateAccount)}. TraceID: {activity.TraceId}, Username: {username}");
 
                 string hashedPassword = HashPassword(password);
                 DateTime accountCreationDate = DateTime.UtcNow;
+                _appLogger.Debug($"Password hashed for {username}. TraceID: {activity.TraceId}, AccountCreationDate: {accountCreationDate}");
+
                 _databaseManager.ExecuteCRUD(connection =>
                 {
                     using var command = new SQLiteCommand(@"
-                    INSERT INTO
-                        UserCredentials
-                    (
-                        Username,
-                        PasswordHash
-                    )
-                    VALUES
-                    (
-                        @Username,
-                        @PasswordHash
-                    )"
-                                , connection);
-;
+                INSERT INTO UserCredentials
+                (
+                    Username,
+                    PasswordHash
+                )
+                VALUES
+                (
+                    @Username,
+                    @PasswordHash
+                )", connection);
+
                     command.Parameters.AddWithValue("@Username", username);
                     command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
                     try
                     {
                         Stopwatch stopwatch = Stopwatch.StartNew();
+                        _appLogger.Debug($"Executing INSERT command for {username}. TraceID: {activity.TraceId}");
+
                         int affectedRows = command.ExecuteNonQuery();
+
                         stopwatch.Stop();
                         _appLogger.Info($"Credentials added successfully for {username}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
                     catch (SQLiteException ex)
                     {
-                        _appLogger.Error($"Failed to add credentials for {username}. Error: {ex.Message}. TraceID: {Activity.Current?.TraceId}");
+                        _appLogger.Error($"Failed to add credentials for {username}. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Catching general exceptions can help identify other potential issues
+                        _appLogger.Error($"An unexpected error occurred while adding credentials for {username}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     }
                 });
             }

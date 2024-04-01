@@ -9,7 +9,7 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Diagnostics;
 
-namespace CodingTracker.Data
+namespace CodingTracker.Data.DatabaseSessionUpdates
 {
     public class DatabaseSessionUpdate : IDatabaseSessionUpdate
     {

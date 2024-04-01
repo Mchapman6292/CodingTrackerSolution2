@@ -2,6 +2,8 @@
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.IFormControllers;
+using CodingTracker.View.IFormSwitchers;
+using CodingTracker.Common.ILoginManagers;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -21,10 +23,11 @@ namespace CodingTracker.View
         private readonly IApplicationLogger _appLogger;
         private readonly ICredentialManager _credentialManager;
         private readonly IFormController _formController;
+        private readonly IFormSwitcher _formSwitcher;
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController)
+        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher)
         {
             _loginManager = loginManager;
             _appControl = appControl;
@@ -34,17 +37,18 @@ namespace CodingTracker.View
             this.FormBorderStyle = FormBorderStyle.None;
             InitializeComponent();
             InitializeVLCPlayer();
+            _formSwitcher = formSwitcher;
         }
 
 
 
         // Custom paint method: Draws the rounded corners for the form.
-        protected override void OnPaint(PaintEventArgs e) 
+        protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
             GraphicsPath path = new GraphicsPath();
-            int radius = 40; 
+            int radius = 40;
 
             // Top left arc
             path.AddArc(0, 0, radius, radius, 180, 90);
@@ -108,7 +112,8 @@ namespace CodingTracker.View
 
             if (loginCredentials != null)
             {
-                _formController.ShowMainPage();
+                _formSwitcher.SwitchToMainPage();
+                _appLogger.Info("User logged in success.");
             }
             else
             {
@@ -137,7 +142,7 @@ namespace CodingTracker.View
 
         private void LoginPageCreateAccountButton_Click_1(object sender, EventArgs e)
         {
-            var createAccountPage = _formController.ShowCreateAccountPage();
+            var createAccountPage = _formSwitcher.SwitchToCreateAccountPage();
             createAccountPage.AccountCreatedCallback = AccountCreatedSuccessfully;
 
         }
@@ -148,6 +153,14 @@ namespace CodingTracker.View
 
         }
 
+        private void loginPageLoginButton_Click_1(object sender, EventArgs e)
+        {
 
+        }
+
+        private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
+        {
+           
+        }
     }
 }

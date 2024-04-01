@@ -16,5 +16,6 @@ namespace CodingTracker.Common.IDatabaseManagers
         void CloseDatabaseConnection();
         void ExecuteCRUD(Action<SQLiteConnection> action);
         bool CheckSessionIdExist(int sessionId);
+        void UpdateUserCredentialsTable();
     }
 }

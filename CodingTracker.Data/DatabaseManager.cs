@@ -189,6 +189,35 @@ namespace CodingTracker.Data.DatabaseManagers
         }
 
 
+
+        public void UpdateUserCredentialsTable()
+        {
+            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+            {
+                using (var activity = new Activity(nameof(UpdateUserCredentialsTable)).Start())
+                {
+                    _appLogger.Debug($"Starting {nameof(UpdateUserCredentialsTable)}. TraceID: {activity.TraceId}");
+
+                    OpenConnectionWithRetry();
+
+                    using var command = _connection.CreateCommand();
+                    command.CommandText = "DROP TABLE IF EXISTS UserCredentials;";
+                    command.ExecuteNonQuery();
+
+                    // Recreate the table with the new schema
+                    command.CommandText = @"
+                CREATE TABLE UserCredentials (
+                    UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Username TEXT NOT NULL UNIQUE,
+                    PasswordHash TEXT NOT NULL
+                );";
+                    command.ExecuteNonQuery();
+
+                    _appLogger.Info($"Updated UserCredentials table successfully. TraceID: {activity.TraceId}");
+                }
+            }, nameof(UpdateUserCredentialsTable), true);
+        }
+
         public bool CheckSessionIdExist(int sessionId)
         {
             return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>

@@ -139,15 +139,15 @@ namespace CodingTracker.Business.CodingSessions
     }
 
 
-    public bool CheckIfCodingSessionActive()
-    {
-        return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+        public bool CheckIfCodingSessionActive()
         {
-            bool isActive = isCodingSessionActive;
-            _appLogger.Info($"Coding session active status: {isActive}");
-            return isActive;
-        }, nameof(CheckIfCodingSessionActive));
-    }
+            return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+            {
+                bool isActive = isCodingSessionActive;
+                _appLogger.Info($"Coding session active status: {isActive}");
+                return isActive;
+            }, nameof(CheckIfCodingSessionActive));
+        }
 
 
         public void SetStartTimeManually()

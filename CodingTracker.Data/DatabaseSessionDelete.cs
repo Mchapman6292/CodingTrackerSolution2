@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using CodingTracker.Common.IApplicationLoggers;
 
-namespace CodingTracker.Data
+namespace CodingTracker.Data.DatabaseSessionDeletes
 {
     public class DatabaseSessionDelete : IDatabaseSessionDelete
     {

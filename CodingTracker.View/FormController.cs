@@ -19,7 +19,7 @@ namespace CodingTracker.View.FormControllers
             _errorHandler = errorHandler;
         }
 
-        public void HandleAndShowForm(Func<Form> createForm, string methodName, bool closeCurrent = true)
+        public void HandleAndShowForm(Func<Form> createForm, string methodName, bool closeCurrent = true) // Handles the logic for closing forms & implementing error handling logic via ExecutePageAction
         {
             ExecutePageAction(() =>
             {
@@ -54,7 +54,10 @@ namespace CodingTracker.View.FormControllers
             _appLogger.Info($"Opened {newForm.Name}");
         }
 
-        public void CloseTargetForm(Form targetForm)
+
+
+
+        public void CloseTargetForm(Form targetForm) // Probably not needed but keep for now. 
         {
             if (targetForm == null) return; 
 
@@ -63,8 +66,8 @@ namespace CodingTracker.View.FormControllers
                 _appLogger.Info($"Closing form: {targetForm.Name}");
                 targetForm.Invoke(new Action(() =>
                 {
-                    targetForm.Hide(); // Hide the form first.
-                    targetForm.Dispose(); // Then dispose of it to release resources.
+                    targetForm.Hide();
+                    targetForm.Dispose(); 
                 }));
             }
         }

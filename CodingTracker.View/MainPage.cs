@@ -6,6 +6,7 @@ using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.View.IFormFactories;
+using CodingTracker.View.IFormSwitchers;
 
 
 
@@ -21,9 +22,10 @@ namespace CodingTracker.View
         private readonly IDatabaseSessionRead _databaseRead;
         private readonly ICodingSession _codingSession;
         private readonly IFormFactory _formFactory;
+        private readonly IFormSwitcher _formSwitcher;
 
 
-        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory)
+        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher = null)
         {
             InitializeComponent();
             _appLogger = applogger;
@@ -33,6 +35,7 @@ namespace CodingTracker.View
             _databaseRead = databaseRead;
             _codingSession = codingSession;
             _formFactory = formFactory;
+            _formSwitcher = formSwitcher;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -42,23 +45,23 @@ namespace CodingTracker.View
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
         {
-            _formController.HandleAndShowForm(_formFactory.CreateCodingSessionPage, nameof(CodingSessionPage));
+            _formSwitcher.SwitchToMainPage();
         }
 
 
         private void MainPageEditSessionsButton_Click(object sender, EventArgs e)
         {
-            _formController.HandleAndShowForm(_formFactory.CreateEditSessionPage, nameof(EditSessionPage));
+            _formSwitcher.SwitchToEditSessionPage();
         }
 
         private void MainPageViewSessionsButton_Click(object sender, EventArgs e)
         {
-            _formController.HandleAndShowForm(_formFactory.CreateViewSessionsPage, nameof(ViewSessionsPage));
+            _formSwitcher.SwitchToViewSessionsPage();
         }
 
         private void MainPageSettingsButton_Click(object sender, EventArgs e)
         {
-            _formController.HandleAndShowForm(_formFactory.CreateSettingsPage, nameof(SettingsPage));
+            _formSwitcher.SwitchToSettingsPage();
         }
 
 

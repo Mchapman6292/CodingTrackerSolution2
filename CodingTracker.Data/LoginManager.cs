@@ -33,37 +33,51 @@ namespace CodingTracker.Data.LoginManagers
                 try
                 {
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    var hashedPassword = _credentialStorage.HashPassword(password);
 
-                    UserCredentialDTO userCredential = null; 
+                    _appLogger.Debug($"Hashing password for {username}. TraceID: {activity.TraceId}");
+                    var hashedPassword = _credentialStorage.HashPassword(password);
+                    _appLogger.Debug($"Password hashed for {username}. TraceID: {activity.TraceId}");
+
+                    UserCredentialDTO userCredential = null;
 
                     _databaseManager.ExecuteCRUD(connection =>
                     {
                         using var command = connection.CreateCommand();
                         command.CommandText = @"
-                        SELECT 
-                                UserId, Username, PasswordHash 
-                        FROM 
-                                UserCredentials 
-                        WHERE 
-                                Username = @Username";
+                SELECT 
+                        UserId, Username, PasswordHash 
+                FROM 
+                        UserCredentials 
+                WHERE 
+                        Username = @Username";
                         command.Parameters.AddWithValue("@Username", username);
 
+                        _appLogger.Debug($"Executing database query for {username}. TraceID: {activity.TraceId}");
                         using var reader = command.ExecuteReader();
-                        if (reader.Read())  
+                        if (reader.Read())
                         {
+                            _appLogger.Debug($"User record found for {username}. TraceID: {activity.TraceId}");
+
                             var storedHash = reader["PasswordHash"].ToString();
                             if (hashedPassword == storedHash)
                             {
-                              
+                                _appLogger.Debug($"Password match for {username}. TraceID: {activity.TraceId}");
+
                                 userCredential = new UserCredentialDTO
                                 {
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     Username = reader["Username"].ToString(),
                                     Password = password
                                 };
-
                             }
+                            else
+                            {
+                                _appLogger.Info($"Password mismatch for {username}. TraceID: {activity.TraceId}");
+                            }
+                        }
+                        else
+                        {
+                            _appLogger.Info($"No user record found for {username}. TraceID: {activity.TraceId}");
                         }
                     });
 
@@ -76,11 +90,12 @@ namespace CodingTracker.Data.LoginManagers
                     {
                         _appLogger.Info($"User {username} validation failed. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
+
                     return userCredential; // Returns null if no matching user 
                 }
                 catch (Exception ex)
                 {
-                    _appLogger.Error($"An error occurred during {nameof(ValidateLogin)} for username {username}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    _appLogger.Error($"An error occurred during {nameof(ValidateLogin)} for username {username}. Error: {ex.GetType().Name} - {ex.Message}. TraceID: {activity.TraceId}", ex);
                     return null;
                 }
             }
@@ -103,7 +118,7 @@ namespace CodingTracker.Data.LoginManagers
                         using var command = connection.CreateCommand();
                         command.CommandText = @"
                             UPDATE 
-                                Users
+                                UserCredentials
                             SET 
                                 PasswordHash = @HashedPassword
                             WHERE
