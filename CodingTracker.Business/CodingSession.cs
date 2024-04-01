@@ -139,15 +139,15 @@ namespace CodingTracker.Business.CodingSessions
     }
 
 
-    public bool CheckIfCodingSessionActive()
-    {
-        return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+        public bool CheckIfCodingSessionActive()
         {
-            bool isActive = isCodingSessionActive;
-            _appLogger.Info($"Coding session active status: {isActive}");
-            return isActive;
-        }, nameof(CheckIfCodingSessionActive));
-    }
+            return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+            {
+                bool isActive = isCodingSessionActive;
+                _appLogger.Info($"Coding session active status: {isActive}");
+                return isActive;
+            }, nameof(CheckIfCodingSessionActive));
+        }
 
 
         public void SetStartTimeManually()
@@ -279,6 +279,16 @@ namespace CodingTracker.Business.CodingSessions
                     _appLogger.Error($"An error occurred during {nameof(CalculateTimeToGoal)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                 }
             }
+        }
+        public List<DateTime> GetDatesPrevious28days()
+        {
+            List<DateTime> dates = new List<DateTime>();
+            DateTime today = DateTime.Today;
+            for (int i = 1; i <= 28; i++)
+            {
+                dates.Add(today.AddDays(-i));
+            }
+            return dates;
         }
     }
 }

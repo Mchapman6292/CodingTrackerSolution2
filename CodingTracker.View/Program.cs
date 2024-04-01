@@ -38,6 +38,16 @@ using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Common.IPanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ErrorHandlers;
+using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.FormSwitchers;
+using CodingTracker.Data.DatabaseSessionInserts;
+using CodingTracker.Common.IDatabaseSessionInserts;
+using CodingTracker.Common.IDatabaseSessionDeletes;
+using CodingTracker.Data.DatabaseSessionDeletes;
+using CodingTracker.Data.DatabaseSessionReads;
+using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Data.DatabaseSessionUpdates;
+using CodingTracker.Common.IDatabaseSessionUpdates;
 
 /// To do
 /// Change get validDate & Time inputvalidator
@@ -46,6 +56,9 @@ using CodingTracker.Common.ErrorHandlers;
 /// Check all methods end stopwatch timing when error is thrown
 /// Review database methods to add more sql lite exceptions. 
 /// Review all methods were thrown is used. 
+/// Centralize errorboxmessage logic.
+/// Add tests to ensure that the labels and panel days correspond.
+/// Change CatchErrorsAndLogWithStopwatch so that it does not call the method itself. 
 
 namespace CodingTracker.View.Program
 {
@@ -82,6 +95,10 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
+                    .AddSingleton<IDatabaseSessionDelete, DatabaseSessionDelete>()
+                    .AddSingleton<IDatabaseSessionInsert, DatabaseSessionInsert>()
+                    .AddSingleton<IDatabaseSessionUpdate, DatabaseSessionUpdate>()
+                    .AddSingleton<IDatabaseSessionRead, DatabaseSessionRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<ILoginManager, LoginManager>()
@@ -97,6 +114,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
                     .AddSingleton<IPanelColorControl, PanelColorControl>()
                     .AddSingleton<IErrorHandler, ErrorHandler>()
+                    .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddTransient<LoginPage>()
                     .AddSingleton<MainPage>()
                     .AddSingleton<CodingSessionPage>()

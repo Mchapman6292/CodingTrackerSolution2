@@ -15,6 +15,7 @@ using CodingTracker.View.IFormControllers;
 using System.Diagnostics;
 using CodingTracker.View;
 using System.Security.Principal;
+using CodingTracker.View.IFormSwitchers;
 
 namespace CodingTracker.View
 {
@@ -25,15 +26,17 @@ namespace CodingTracker.View
         private readonly IInputValidator _inputValidator;
         private readonly IApplicationLogger _appLogger;
         private readonly IFormController _formController;
+        private readonly IFormSwitcher _formSwitcher;
         public Action<string> AccountCreatedCallback { get; set; }
 
-        public CreateAccountPage(ICredentialManager credentialManager, IInputValidator inputValidator, IApplicationLogger appLogger, IFormController formController)
+        public CreateAccountPage(ICredentialManager credentialManager, IInputValidator inputValidator, IApplicationLogger appLogger, IFormController formController, IFormSwitcher formSwitcher)
         {
             InitializeComponent();
             _credentialManager = credentialManager;
             _inputValidator = inputValidator;
             _appLogger = appLogger;
             _formController = formController;
+            _formSwitcher = formSwitcher;
         }
 
         private void DisplayErrorMessage(string message)
@@ -67,7 +70,7 @@ namespace CodingTracker.View
                             _appLogger.Info($"Account creation successful for user: {username}. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
 
                             AccountCreatedCallback?.Invoke("Account created successfully.");
-                            _formController.ShowLoginPage();
+                            _formSwitcher.SwitchToLoginPage();
                         }
                         else
                         {

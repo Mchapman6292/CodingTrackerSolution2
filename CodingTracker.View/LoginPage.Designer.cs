@@ -62,10 +62,10 @@ namespace CodingTracker.View
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges15 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges22 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges17 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges18 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges22 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             loginPageErrorTextbox = new Label();
             label1 = new Label();
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -79,8 +79,8 @@ namespace CodingTracker.View
             LoginPageMediaPanel = new Guna.UI2.WinForms.Guna2Panel();
             guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
             guna2ControlBox1 = new Guna.UI2.WinForms.Guna2ControlBox();
-            LoginPageCreationSuccessTextBox = new Guna.UI2.WinForms.Guna2TextBox();
             LoginPageExitControlBox = new Guna.UI2.WinForms.Guna2ControlBox();
+            LoginPageCreationSuccessTextBox = new Guna.UI2.WinForms.Guna2TextBox();
             ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).BeginInit();
             LoginPageMediaPanel.SuspendLayout();
             guna2Panel1.SuspendLayout();
@@ -204,6 +204,7 @@ namespace CodingTracker.View
             loginPageLoginButton.Size = new Size(120, 38);
             loginPageLoginButton.TabIndex = 18;
             loginPageLoginButton.Text = "Login";
+            loginPageLoginButton.Click += loginPageLoginButton_Click;
             // 
             // LoginPageCreateAccountButton
             // 
@@ -247,6 +248,7 @@ namespace CodingTracker.View
             LoginPageForgotPasswordButton.Size = new Size(134, 23);
             LoginPageForgotPasswordButton.TabIndex = 20;
             LoginPageForgotPasswordButton.Text = "Forgot Password?";
+            LoginPageForgotPasswordButton.Click += LoginPageForgotPasswordButton_Click;
             // 
             // LoginPageMediaPanel
             // 
@@ -287,6 +289,20 @@ namespace CodingTracker.View
             guna2ControlBox1.Size = new Size(45, 29);
             guna2ControlBox1.TabIndex = 25;
             // 
+            // LoginPageExitControlBox
+            // 
+            LoginPageExitControlBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            LoginPageExitControlBox.CustomizableEdges = customizableEdges17;
+            LoginPageExitControlBox.FillColor = Color.FromArgb(25, 24, 40);
+            LoginPageExitControlBox.HoverState.IconColor = Color.White;
+            LoginPageExitControlBox.IconColor = Color.White;
+            LoginPageExitControlBox.Location = new Point(1236, 1);
+            LoginPageExitControlBox.Name = "LoginPageExitControlBox";
+            LoginPageExitControlBox.ShadowDecoration.CustomizableEdges = customizableEdges18;
+            LoginPageExitControlBox.Size = new Size(45, 29);
+            LoginPageExitControlBox.TabIndex = 24;
+            LoginPageExitControlBox.Click += LoginPageExitControlBox_Click;
+            // 
             // LoginPageCreationSuccessTextBox
             // 
             LoginPageCreationSuccessTextBox.BorderColor = Color.FromArgb(35, 34, 50);
@@ -310,20 +326,6 @@ namespace CodingTracker.View
             LoginPageCreationSuccessTextBox.ShadowDecoration.CustomizableEdges = customizableEdges22;
             LoginPageCreationSuccessTextBox.Size = new Size(200, 36);
             LoginPageCreationSuccessTextBox.TabIndex = 24;
-            // 
-            // LoginPageExitControlBox
-            // 
-            LoginPageExitControlBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            LoginPageExitControlBox.CustomizableEdges = customizableEdges17;
-            LoginPageExitControlBox.FillColor = Color.FromArgb(25, 24, 40);
-            LoginPageExitControlBox.HoverState.IconColor = Color.White;
-            LoginPageExitControlBox.IconColor = Color.White;
-            LoginPageExitControlBox.Location = new Point(1236, 1);
-            LoginPageExitControlBox.Name = "LoginPageExitControlBox";
-            LoginPageExitControlBox.ShadowDecoration.CustomizableEdges = customizableEdges18;
-            LoginPageExitControlBox.Size = new Size(45, 29);
-            LoginPageExitControlBox.TabIndex = 24;
-            LoginPageExitControlBox.Click += LoginPageExitControlBox_Click;
             // 
             // LoginPage
             // 

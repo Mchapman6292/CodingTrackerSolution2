@@ -7,6 +7,7 @@ using CodingTracker.Common.IInputValidators;
 using System.Data;
 using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.IErrorHandlers;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
@@ -20,19 +21,19 @@ namespace CodingTracker.Data.DatabaseManagers
         private readonly string _connectionString; // Creates an open instance of SQLiteConnection which is then stored in _connection.
         private readonly string _databasePath;
         private readonly IStartConfiguration? _iStartConfiguration;
+        private readonly IErrorHandler _errorHandler;
 
 
 
 
 
-        public DatabaseManager(IApplicationLogger appLogger, IStartConfiguration startConfiguration, IInputValidator validator) // Provides the database path for the current user.
+        public DatabaseManager(IApplicationLogger appLogger, IStartConfiguration startConfiguration, IInputValidator validator, IErrorHandler errorHandler) // Provides the database path for the current user.
         {
             _appLogger = appLogger;
             _iStartConfiguration = startConfiguration;
             _databasePath = _iStartConfiguration.DatabasePath;
             _connectionString = _iStartConfiguration.ConnectionString;
-
-
+            _errorHandler = errorHandler;
         }
 
         public static string GetTodayDate() => DateTime.Today.ToString("yyyy-MM-dd");
@@ -119,41 +120,26 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public void ExecuteCRUD(Action<SQLiteConnection> action)
         {
-            using (var activity = new Activity(nameof(ExecuteCRUD)).Start())
+            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {
-                _appLogger.Debug($"Starting {nameof(ExecuteCRUD)}. TraceID: {activity.TraceId}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    _appLogger.Debug($"The connection string being used: {_connectionString}");
-                    OpenConnectionWithRetry();
-
-                    action(_connection);
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Executed CRUD operation successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute CRUD operation. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
-            }
+                OpenConnectionWithRetry();
+                action(_connection);
+            }, nameof(ExecuteCRUD), true);
         }
 
 
         public void EnsureDatabaseForUser()
         {
-            if (_connection == null || _connection.ConnectionString != $"Data Source={_databasePath};Version=3;")
+            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {
-                _connection?.Close();
-                _connection = new SQLiteConnection($"Data Source={_databasePath};Version=3;");
-                _connection.Open();
-                CreateTableIfNotExists();
-            }
+                if (_connection == null || _connection.ConnectionString != $"Data Source={_databasePath};Version=3;")
+                {
+                    _connection?.Close();
+                    _connection = new SQLiteConnection($"Data Source={_databasePath};Version=3;");
+                    _connection.Open();
+                    CreateTableIfNotExists();
+                }
+            }, nameof(EnsureDatabaseForUser), true);
         }
 
 
@@ -161,111 +147,91 @@ namespace CodingTracker.Data.DatabaseManagers
 
         private void EnsureDatabaseConnection()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(EnsureDatabaseConnection)).Start())
+            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {
-                _appLogger.Debug($"Starting {nameof(EnsureDatabaseConnection)}. TraceID: {activity.TraceId}");
-
-                try
+                if (_connection == null || _connection.State != ConnectionState.Open)
                 {
-                    if (_connection == null || _connection.State != ConnectionState.Open)
-                    {
-                        OpenConnectionWithRetry();
-                    }
-                    stopwatch.Stop();
-                    _appLogger.Info($"Database connection ensured successfully. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    OpenConnectionWithRetry();
                 }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to ensure database connection. Error: {ex.Message}. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
-            }
+            }, nameof(EnsureDatabaseConnection), true);
         }
 
 
 
         public void CreateTableIfNotExists()
         {
-            using (var activity = new Activity(nameof(CreateTableIfNotExists)).Start())
+            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {
-                _appLogger.Info($"Starting {nameof(CreateTableIfNotExists)}. TraceID: {activity.TraceId}.");
+                using var command = _connection.CreateCommand();
+                command.CommandText = @"
+            CREATE TABLE IF NOT EXISTS UserCredentials (
+                UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                Username TEXT NOT NULL UNIQUE,
+                PasswordHash TEXT NOT NULL
+            );
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
+            CREATE TABLE IF NOT EXISTS CodingSessions (
+                SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId INTEGER NOT NULL,
+                StartTime DATETIME NOT NULL,
+                EndTime DATETIME,
+                StartDate DATETIME NOT NULL,
+                EndDate DATETIME,
+                DurationMinutes INTEGER,
+                CodingGoalHours INTEGER,
+                TimeToGoalMinutes INTEGER,
+                SessionNotes TEXT,
+                FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+            );";
 
-                try
-                {
-                    using var command = _connection.CreateCommand();
-
-                    command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS UserCredentials (
-                    UserId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS CodingSessions (
-                    SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    UserId INTEGER NOT NULL,
-                    StartTime DATETIME NOT NULL,
-                    EndTime DATETIME,
-                    StartDate DATETIME NOT NULL,
-                    EndDate DATETIME,
-                    DurationMinutes INTEGER,
-                    CodingGoalHours INTEGER,
-                    TimeToGoalMinutes INTEGER,
-                    SessionNotes TEXT,
-                    FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
-                );";
-
-                    int affectedRows = command.ExecuteNonQuery();
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Tables created/verified successfully. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (SQLiteException ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to create/verify tables. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                }
-            }
+                command.ExecuteNonQuery();
+            }, nameof(CreateTableIfNotExists), true);
         }
 
 
+
+        public void UpdateUserCredentialsTable()
+        {
+            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+            {
+                using (var activity = new Activity(nameof(UpdateUserCredentialsTable)).Start())
+                {
+                    _appLogger.Debug($"Starting {nameof(UpdateUserCredentialsTable)}. TraceID: {activity.TraceId}");
+
+                    OpenConnectionWithRetry();
+
+                    using var command = _connection.CreateCommand();
+                    command.CommandText = "DROP TABLE IF EXISTS UserCredentials;";
+                    command.ExecuteNonQuery();
+
+                    // Recreate the table with the new schema
+                    command.CommandText = @"
+                CREATE TABLE UserCredentials (
+                    UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Username TEXT NOT NULL UNIQUE,
+                    PasswordHash TEXT NOT NULL
+                );";
+                    command.ExecuteNonQuery();
+
+                    _appLogger.Info($"Updated UserCredentials table successfully. TraceID: {activity.TraceId}");
+                }
+            }, nameof(UpdateUserCredentialsTable), true);
+        }
+
         public bool CheckSessionIdExist(int sessionId)
         {
-            using (var activity = new Activity(nameof(CheckSessionIdExist)).Start())
+            return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {
-                _appLogger.Debug($"Starting {nameof(CheckSessionIdExist)}. TraceID: {activity.TraceId}, SessionId: {sessionId}");
+                OpenConnectionWithRetry();
+                using var command = _connection.CreateCommand();
+                command.CommandText = @"
+            SELECT COUNT(*) FROM CodingSessions
+            WHERE SessionId = @SessionId";
+                command.Parameters.AddWithValue("@SessionId", sessionId);
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    OpenConnectionWithRetry();
-                    using var command = _connection.CreateCommand();
-
-                    command.CommandText = @"
-                SELECT COUNT(*) FROM CodingSessions
-                WHERE SessionId = @SessionId";
-                    command.Parameters.AddWithValue("@SessionId", sessionId);
-
-                    var result = (long)command.ExecuteScalar();
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Session ID check completed. SessionId: {sessionId}. Exists: {result > 0}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-
-                    return result > 0;
-                }
-                catch (SQLiteException ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to check session ID. SessionId: {sessionId}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    return false;
-
-                }
-            }
+                var result = (long)command.ExecuteScalar();
+                return result > 0;
+            }, nameof(CheckSessionIdExist), true);
         }
     }
 }

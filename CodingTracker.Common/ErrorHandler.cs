@@ -15,7 +15,7 @@ namespace CodingTracker.Common.ErrorHandlers
     public class ErrorHandler : IErrorHandler
     {
         private readonly IApplicationLogger _appLogger;
-         
+
 
         public ErrorHandler(IApplicationLogger applogger)
         {
@@ -38,7 +38,7 @@ namespace CodingTracker.Common.ErrorHandlers
             {
                 stopwatch.Stop();
                 _appLogger.Error($"Invalid operation in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                throw; 
+                throw;
             }
             catch (SQLiteException ex) when (isDatabaseOperation)
             {
@@ -79,7 +79,7 @@ namespace CodingTracker.Common.ErrorHandlers
             {
                 stopwatch.Stop();
                 _appLogger.Error($"Invalid operation in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                throw; 
+                throw;
             }
             catch (SQLiteException ex) when (isDatabaseOperation)
             {
@@ -106,5 +106,43 @@ namespace CodingTracker.Common.ErrorHandlers
 
             return result; // Return the result of the function execution
         }
+
+        public void HandleErrors(Action action, string methodName)
+        {
+            try
+            {
+                action();
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Invalid operation in {methodName}: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in {methodName}: {ex.Message}");
+                throw;
+            }
+        }
+
+
+        public void HandleErrorsWithSql(Action action, string methodName)
+        {
+            try
+            {
+                action();
+            }
+            catch (SQLiteException ex)
+            {
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in {methodName} (DB Operation): {ex.Message}");
+                throw;
+            }
+        }
     }
 }
+   

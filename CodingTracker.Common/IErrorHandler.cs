@@ -10,5 +10,6 @@ namespace CodingTracker.Common.IErrorHandlers
     public interface IErrorHandler
     {
         void CatchErrorsAndLogWithStopwatch(Action action, string methodName, bool isDatabaseOperation = false);
+        T CatchErrorsAndLogWithStopwatch<T>(Func<T> function, string methodName, bool isDatabaseOperation = false);
     }
 }

@@ -2,7 +2,6 @@
 using CodingTracker.View;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTrackerSolution;
 using System.Diagnostics;
 using CodingTracker.View.IFormFactories;
 
@@ -72,6 +71,11 @@ namespace CodingTracker.View.FormFactories
         public CreateAccountPage CreateAccountPage() 
         {
             return CreateForm<CreateAccountPage>(nameof(CreateAccountPage));    
+        }
+
+        public CodingSessionTimer CreateCodingSessionTimer()
+        {
+            return CreateForm<CodingSessionTimer>(nameof(CreateCodingSessionTimer));
         }
     }
 }

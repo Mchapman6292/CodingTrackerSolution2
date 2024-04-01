@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IPanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
+using System.Drawing;
 
 namespace CodingTracker.Business.PanelColorControls
 { 
@@ -14,12 +15,6 @@ namespace CodingTracker.Business.PanelColorControls
 {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
-        public enum SessionColor
-        {
-            Red,
-            Yellow,
-            Green
-        }
 
 
         public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler) 
@@ -28,29 +23,48 @@ namespace CodingTracker.Business.PanelColorControls
             _errorHandler = errorHandler;
         }
 
-        public SessionColor DetermineSessionColor(TimeSpan sessionDuration)
+        public SessionColor DetermineSessionColor(int sessionDurationMinutes)
         {
-            SessionColor resultColor = SessionColor.Red; // Default color
-
-            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+            if (sessionDurationMinutes <= 0)
             {
-                // Your session color determination logic
-                if (sessionDuration < TimeSpan.FromHours(1))
-                {
-                    resultColor = SessionColor.Red;
-                }
-                else if (sessionDuration < TimeSpan.FromHours(2))
-                {
-                    resultColor = SessionColor.Yellow;
-                }
-                else
-                {
-                    resultColor = SessionColor.Green;
-                }
+                return SessionColor.Grey; // 0 minutes
+            }
+            else if (sessionDurationMinutes < 60)
+            {
+                return SessionColor.RedGrey; // Less than 60 minutes
+            }
+            else if (sessionDurationMinutes < 120) // 1 to less than 2 hours
+            {
+                return SessionColor.Red;
+            }
+            else if (sessionDurationMinutes < 180) // 2 to less than 3 hours
+            {
+                return SessionColor.Yellow;
+            }
+            else // 3 hours and more
+            {
+                return SessionColor.Green;
+            }
+        }
 
-            }, nameof(DetermineSessionColor));
-
-            return resultColor;
+        public Color GetColorFromSessionColor(SessionColor color)
+        {
+            switch (color)
+            {
+                case SessionColor.Grey:
+                    return Color.Gray;
+                case SessionColor.RedGrey:
+                    return Color.FromArgb(255, 128, 128); // RGB for red/grey. 
+                case SessionColor.Red:
+                    return Color.Red;
+                case SessionColor.Yellow:
+                    return Color.Yellow;
+                case SessionColor.Green:
+                    return Color.Green;
+                default:
+                    return Color.Gray; // Default color
+            }
         }
     }
 }
+
