@@ -32,7 +32,7 @@ namespace CodingTracker.Data.CredentialManagers
 
                 string hashedPassword = HashPassword(password);
                 DateTime accountCreationDate = DateTime.UtcNow;
-                _appLogger.Debug($"Password hashed for {username}. TraceID: {activity.TraceId}, AccountCreationDate: {accountCreationDate}");
+                _appLogger.Debug($"PasswordHash hashed for {username}. TraceID: {activity.TraceId}, AccountCreationDate: {accountCreationDate}");
 
                 _databaseManager.ExecuteCRUD(connection =>
                 {
@@ -170,7 +170,7 @@ namespace CodingTracker.Data.CredentialManagers
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         int affectedRows = command.ExecuteNonQuery();
                         stopwatch.Stop();
-                        _appLogger.Info($"Password updated successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        _appLogger.Info($"PasswordHash updated successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
                     catch (SQLiteException ex)
                     {
@@ -237,7 +237,7 @@ namespace CodingTracker.Data.CredentialManagers
             }
             catch (ArgumentNullException ex)
             {
-                _appLogger.Error("Password cannot be null.", ex);
+                _appLogger.Error("PasswordHash cannot be null.", ex);
                 throw;
             }
             catch (ObjectDisposedException ex)

@@ -167,7 +167,8 @@ namespace CodingTracker.Data.DatabaseManagers
             CREATE TABLE IF NOT EXISTS UserCredentials (
                 UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT NOT NULL UNIQUE,
-                PasswordHash TEXT NOT NULL
+                PasswordHash TEXT NOT NULL,
+                LastLogin DATETIME NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS CodingSessions (
@@ -204,12 +205,13 @@ namespace CodingTracker.Data.DatabaseManagers
                     command.CommandText = "DROP TABLE IF EXISTS UserCredentials;";
                     command.ExecuteNonQuery();
 
-                    // Recreate the table with the new schema
+                    // Recreate the table with the DATETIME type for date fields
                     command.CommandText = @"
                 CREATE TABLE UserCredentials (
                     UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL
+                    PasswordHash TEXT NOT NULL,
+                    LastLogin DATETIME  -- Changed to DATETIME for consistency
                 );";
                     command.ExecuteNonQuery();
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.UserCredentialDTOs;
 
 namespace CodingTracker.Common.IDatabaseSessionReads
 {
@@ -12,7 +13,10 @@ namespace CodingTracker.Common.IDatabaseSessionReads
     {
         List<int> ReadSessionDurationMinutes(int numberOfDays);
 
-        List<CodingSessionDTO> ViewAllSession(bool partialView = false);
+        List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
+        
+
+            List<CodingSessionDTO> ViewAllSession(bool partialView = false);
         List<CodingSessionDTO> ViewSpecific(string chosenDate);
         List<CodingSessionDTO> ViewRecentSession(int numberOfSessions);
 

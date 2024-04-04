@@ -73,6 +73,12 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
             }
         }
 
+        public void InitializeAndStartTimer(int minutes, int seconds = 0)
+        {
+            SetCountDownTimer(minutes, seconds);
+            StartCountDownTimer();
+        }
+
         public void CheckTimeCountDownTimer()
         {
             var methodStopwatch = Stopwatch.StartNew();

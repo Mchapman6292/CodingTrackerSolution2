@@ -4,6 +4,7 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.IFormControllers;
 using CodingTracker.View.IFormSwitchers;
 using CodingTracker.Common.ILoginManagers;
+using CodingTracker.Common.IDatabaseSessionReads;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -13,6 +14,8 @@ using System.Diagnostics;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Data.CredentialManagers;
 using System.Drawing.Drawing2D;
+using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.UserCredentialDTOs;
 
 namespace CodingTracker.View
 {
@@ -24,10 +27,12 @@ namespace CodingTracker.View
         private readonly ICredentialManager _credentialManager;
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
+        private readonly IDatabaseSessionRead _databaseSessionRead;
+        private readonly IDatabaseManager _databaseManager;
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher)
+        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager)
         {
             _loginManager = loginManager;
             _appControl = appControl;
@@ -38,6 +43,8 @@ namespace CodingTracker.View
             InitializeComponent();
             InitializeVLCPlayer();
             _formSwitcher = formSwitcher;
+            LoadSavedCredentials();
+            _databaseManager = databaseManager;
         }
 
 
@@ -103,6 +110,32 @@ namespace CodingTracker.View
         }
 
 
+        private void LoadSavedCredentials()
+        {
+            try
+            {
+                var rememberMe = Properties.Settings.Default.RememberMe;
+                if (rememberMe)
+                {
+                    var credentials = _databaseSessionRead.ReadUserCredentials(true);
+                    if (credentials != null && credentials.Any())
+                    {
+                        var credential = credentials.First();
+                        loginPageUsernameTextbox.Text = credential.Username;
+                        LoginPagePasswordTextbox.Text = credential.PasswordHash; 
+                        LoginPageRememberMeToggle.Checked = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"Error loading saved credentials: {ex.Message}");
+            }
+        }
+
+
+
+
         private void loginPageLoginButton_Click(object sender, EventArgs e)
         {
             string username = loginPageUsernameTextbox.Text;
@@ -160,7 +193,19 @@ namespace CodingTracker.View
 
         private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
         {
-           
+            _databaseManager.UpdateUserCredentialsTable();
+        }
+
+        private void LoginPageRememberMeToggle_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.RememberMe = LoginPageRememberMeToggle.Checked;
+            Properties.Settings.Default.Save();
+        }
+    
+
+        private void loginPageUsernameTextbox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

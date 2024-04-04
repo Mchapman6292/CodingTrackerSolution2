@@ -14,7 +14,7 @@ namespace CodingTracker.Common.IUserCredentialDTOs
     {
         int UserId { get;  set; }
         string Username { get;  set; }
-        string Password { get;  set; }
+        string PasswordHash { get;  set; }
 
         
 

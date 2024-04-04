@@ -8,5 +8,8 @@
     <Setting Name="VLCPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\Users\mchap\source\repos\CodingTrackerSolutionClone2\CodingTracker.View\FormMedia\PcScreenPixelArt.mp4</Value>
     </Setting>
+    <Setting Name="RememberMe" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

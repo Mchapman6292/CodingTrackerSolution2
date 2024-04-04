@@ -9,15 +9,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CodingTracker.Common.ICodingSessions;
+using CodingTracker.Common.IErrorHandlers;
+using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.IFormControllers;
 
 namespace CodingTracker.View
 {
     public partial class CodingSessionTimer : Form
     {
         private readonly IApplicationLogger _appLogger;
-        public CodingSessionTimer(IApplicationLogger appLogger)
+        private readonly ICodingSession _codingSesison;
+        private readonly IErrorHandler _errorHandler;
+        private readonly IFormSwitcher _formSwitcher;
+        private readonly IFormController _formController;
+        public CodingSessionTimer(IApplicationLogger appLogger, ICodingSession codingSession)
         {
             _appLogger = appLogger;
+            _codingSesison = codingSession;
             InitializeComponent();
         }
 
@@ -47,22 +56,15 @@ namespace CodingTracker.View
 
         private void HandleCountDownFinished()
         {
-            var methodStopwatch = Stopwatch.StartNew();
-            try
-            {
-                _appLogger.Debug("Handling countdown finished.");
+            throw new NotImplementedException();
+        }
 
-                // Handle the completion of the countdown, e.g.,
-                // Show a message, disable/enable controls, etc.
+        private void CodingTimerPageEndSessionButton_Click(object sender, EventArgs e)
+        {
+            _codingSesison.EndSession();
+            _formController.CloseCurrentForm();
+            _formSwitcher.SwitchToMainPage();
 
-                methodStopwatch.Stop();
-                _appLogger.Info($"Handled countdown finished. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms.");
-            }
-            catch (Exception ex)
-            {
-                methodStopwatch.Stop();
-                _appLogger.Error($"An error occurred while handling countdown finished. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. Error: {ex.Message}", ex);
-            }
         }
     }
 }

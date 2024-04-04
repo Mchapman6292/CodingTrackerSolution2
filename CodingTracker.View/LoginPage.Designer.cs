@@ -139,6 +139,7 @@ namespace CodingTracker.View
             loginPageUsernameTextbox.ShadowDecoration.CustomizableEdges = customizableEdges2;
             loginPageUsernameTextbox.Size = new Size(200, 36);
             loginPageUsernameTextbox.TabIndex = 15;
+            loginPageUsernameTextbox.TextChanged += loginPageUsernameTextbox_TextChanged;
             // 
             // LoginPagePasswordTextbox
             // 
@@ -159,7 +160,7 @@ namespace CodingTracker.View
             LoginPagePasswordTextbox.Name = "LoginPagePasswordTextbox";
             LoginPagePasswordTextbox.PasswordChar = '●';
             LoginPagePasswordTextbox.PlaceholderForeColor = Color.Azure;
-            LoginPagePasswordTextbox.PlaceholderText = "Password";
+            LoginPagePasswordTextbox.PlaceholderText = "PasswordHash";
             LoginPagePasswordTextbox.SelectedText = "";
             LoginPagePasswordTextbox.ShadowDecoration.CustomizableEdges = customizableEdges4;
             LoginPagePasswordTextbox.Size = new Size(200, 36);
@@ -183,6 +184,7 @@ namespace CodingTracker.View
             LoginPageRememberMeToggle.UncheckedState.FillColor = Color.FromArgb(35, 34, 50);
             LoginPageRememberMeToggle.UncheckedState.InnerBorderColor = Color.White;
             LoginPageRememberMeToggle.UncheckedState.InnerColor = Color.FromArgb(234, 153, 149);
+            LoginPageRememberMeToggle.CheckedChanged += LoginPageRememberMeToggle_CheckedChanged;
             // 
             // loginPageLoginButton
             // 
@@ -247,7 +249,7 @@ namespace CodingTracker.View
             LoginPageForgotPasswordButton.ShadowDecoration.CustomizableEdges = customizableEdges12;
             LoginPageForgotPasswordButton.Size = new Size(134, 23);
             LoginPageForgotPasswordButton.TabIndex = 20;
-            LoginPageForgotPasswordButton.Text = "Forgot Password?";
+            LoginPageForgotPasswordButton.Text = "Forgot PasswordHash?";
             LoginPageForgotPasswordButton.Click += LoginPageForgotPasswordButton_Click;
             // 
             // LoginPageMediaPanel

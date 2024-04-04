@@ -13,6 +13,8 @@ namespace CodingTracker.Common.ISessionGoalCountDownTimers
 
         void CheckTimeCountDownTimer();
 
+        void InitializeAndStartTimer(int minutes, int seconds = 0);
+
         void StopCountDownTimer();
         void Reset();
 

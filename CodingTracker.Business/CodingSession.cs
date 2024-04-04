@@ -52,11 +52,10 @@ namespace CodingTracker.Business.CodingSessions
             return _currentSessionDTO;
         }
 
-    public void StartSession(int userId)
+    public void StartSession()
     {
         _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
         {
-            UserId = userId; 
             DateTime startTime = DateTime.Now;
 
             if (IsStopWatchEnabled)
@@ -71,7 +70,7 @@ namespace CodingTracker.Business.CodingSessions
                 StartDate = startTime.Date 
             };
 
-            _appLogger.Info($"Session started for UserId: {UserId}, StartTime: {startTime}");
+            _appLogger.Info($"Session started, StartTime: {startTime}");
         }, nameof(StartSession));
     }
     public void EndSession()

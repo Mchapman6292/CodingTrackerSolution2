@@ -59,6 +59,7 @@ using CodingTracker.Common.IDatabaseSessionUpdates;
 /// Centralize errorboxmessage logic.
 /// Add tests to ensure that the labels and panel days correspond.
 /// Change CatchErrorsAndLogWithStopwatch so that it does not call the method itself. 
+/// Logic for remember me to read stored password from sql lite db/other
 
 namespace CodingTracker.View.Program
 {
@@ -102,7 +103,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<ILoginManager, LoginManager>()
-                    .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
+                    .AddTransient<IUserCredentialDTO, UserCredentialDTO>()
                     .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<IFormFactory, FormFactory>()
@@ -116,11 +117,11 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddTransient<LoginPage>()
-                    .AddSingleton<MainPage>()
-                    .AddSingleton<CodingSessionPage>()
-                    .AddSingleton<EditSessionPage>()
-                    .AddSingleton<ViewSessionsPage>()
-                    .AddSingleton<CreateAccountPage>();
+                    .AddTransient<MainPage>()
+                    .AddTransient<CodingSessionPage>()
+                    .AddTransient<EditSessionPage>()
+                    .AddTransient<ViewSessionsPage>()
+                    .AddTransient<CreateAccountPage>();
 
             var startConfiguration = services.BuildServiceProvider()
                                              .GetRequiredService<IStartConfiguration>();
