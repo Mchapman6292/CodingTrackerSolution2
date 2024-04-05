@@ -73,9 +73,9 @@ namespace CodingTracker.View.FormFactories
             return CreateForm<CreateAccountPage>(nameof(CreateAccountPage));    
         }
 
-        public CodingSessionTimer CreateCodingSessionTimer()
+        public CodingSessionTimerForm CreateCodingSessionTimer()
         {
-            return CreateForm<CodingSessionTimer>(nameof(CreateCodingSessionTimer));
+            return CreateForm<CodingSessionTimerForm>(nameof(CreateCodingSessionTimer));
         }
     }
 }

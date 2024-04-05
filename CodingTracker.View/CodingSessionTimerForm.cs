@@ -16,14 +16,14 @@ using CodingTracker.View.IFormControllers;
 
 namespace CodingTracker.View
 {
-    public partial class CodingSessionTimer : Form
+    public partial class CodingSessionTimerForm : Form
     {
         private readonly IApplicationLogger _appLogger;
         private readonly ICodingSession _codingSesison;
         private readonly IErrorHandler _errorHandler;
         private readonly IFormSwitcher _formSwitcher;
         private readonly IFormController _formController;
-        public CodingSessionTimer(IApplicationLogger appLogger, ICodingSession codingSession)
+        public CodingSessionTimerForm(IApplicationLogger appLogger, ICodingSession codingSession)
         {
             _appLogger = appLogger;
             _codingSesison = codingSession;

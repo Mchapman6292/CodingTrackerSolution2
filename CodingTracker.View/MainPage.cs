@@ -45,22 +45,26 @@ namespace CodingTracker.View
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
         {
-            _formSwitcher.SwitchToMainPage();
+            this.Hide();
+            _formSwitcher.SwitchToCodingSessionPage();
         }
 
 
         private void MainPageEditSessionsButton_Click(object sender, EventArgs e)
         {
+            this.Hide();
             _formSwitcher.SwitchToEditSessionPage();
         }
 
         private void MainPageViewSessionsButton_Click(object sender, EventArgs e)
         {
+            this.Hide();
             _formSwitcher.SwitchToViewSessionsPage();
         }
 
         private void MainPageSettingsButton_Click(object sender, EventArgs e)
         {
+            this.Hide();
             _formSwitcher.SwitchToSettingsPage();
         }
 

@@ -52,7 +52,6 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                             DurationMinutes, 
                             CodingGoalHours,
                             TimeToGoalMins,
-                            SessionNotes
                         ) 
                         VALUES 
                         (
@@ -64,7 +63,6 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                             @DurationMinutes, 
                             @CodingGoalHours,
                             @TimeToGoalMins,
-                            @SessionNotes
                         )";
 
                     command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);

@@ -14,7 +14,6 @@ using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IStartConfigurations;
-using CodingTracker.Common.IUserCredentialDTOs;
 using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.UtilityServices;
@@ -48,6 +47,8 @@ using CodingTracker.Data.DatabaseSessionReads;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Data.DatabaseSessionUpdates;
 using CodingTracker.Common.IDatabaseSessionUpdates;
+using CodingTracker.Business.CodingSessionTimers;
+using CodingTracker.Common.ICodingSessionTimers;
 
 /// To do
 /// Change get validDate & Time inputvalidator
@@ -103,19 +104,19 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<ILoginManager, LoginManager>()
-                    .AddTransient<IUserCredentialDTO, UserCredentialDTO>()
                     .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
                     .AddSingleton<ICodingGoal, CodingGoal>()
                     .AddSingleton<IFormController, FormController>()
-                    .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimer>()
+                    .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimerDisplay>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
                     .AddSingleton<IPanelColorControl, PanelColorControl>()
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
+                    .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()

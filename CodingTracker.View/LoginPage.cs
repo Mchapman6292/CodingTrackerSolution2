@@ -32,19 +32,25 @@ namespace CodingTracker.View
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager)
+        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
         {
             _loginManager = loginManager;
             _appControl = appControl;
             _appLogger = applogger;
             _credentialManager = credentialManager;
             _formController = formController;
+            _databaseSessionRead = databaseSessionRead;
+            _formSwitcher = formSwitcher;
+            _databaseManager = databaseManager;
             this.FormBorderStyle = FormBorderStyle.None;
             InitializeComponent();
             InitializeVLCPlayer();
-            _formSwitcher = formSwitcher;
+            loginPageUsernameTextbox.Enter += LoginPagePasswordTextbox_Enter;
+            loginPageUsernameTextbox.Leave += LoginPageUsernameTextbox_Leave;
+            LoginPagePasswordTextbox.Enter += LoginPagePasswordTextbox_Enter;
+            LoginPagePasswordTextbox.Leave += LoginPagePasswordTextbox_Leave;
+            LoginPageRememberMeToggle.Checked = Properties.Settings.Default.RememberMe;
             LoadSavedCredentials();
-            _databaseManager = databaseManager;
         }
 
 
@@ -90,7 +96,7 @@ namespace CodingTracker.View
             LoginPageMediaPanel.Controls.Add(_videoView);
             _videoView.BringToFront();
 
-            string videoFilePath = CodingTracker.View.Properties.Settings.Default.VLCPath;
+            string videoFilePath = Properties.Settings.Default.VLCPath;
             if (File.Exists(videoFilePath))
             {
                 var media = new Media(_libVLC, new Uri(videoFilePath));
@@ -114,15 +120,13 @@ namespace CodingTracker.View
         {
             try
             {
-                var rememberMe = Properties.Settings.Default.RememberMe;
-                if (rememberMe)
+
+                if (Properties.Settings.Default.RememberMe)
                 {
-                    var credentials = _databaseSessionRead.ReadUserCredentials(true);
-                    if (credentials != null && credentials.Any())
+                    var lastUsername = Properties.Settings.Default.LastUsername;
+                    if (!string.IsNullOrEmpty(lastUsername))
                     {
-                        var credential = credentials.First();
-                        loginPageUsernameTextbox.Text = credential.Username;
-                        LoginPagePasswordTextbox.Text = credential.PasswordHash; 
+                        loginPageUsernameTextbox.Text = lastUsername;
                         LoginPageRememberMeToggle.Checked = true;
                     }
                 }
@@ -145,8 +149,15 @@ namespace CodingTracker.View
 
             if (loginCredentials != null)
             {
+                if (LoginPageRememberMeToggle.Checked)
+                {
+                    Properties.Settings.Default.LastUsername = username;
+                    Properties.Settings.Default.Save();
+                }
+
+                this.Hide(); 
                 _formSwitcher.SwitchToMainPage();
-                _appLogger.Info("User logged in success.");
+                _appLogger.Info("User logged in successfully.");
             }
             else
             {
@@ -201,11 +212,54 @@ namespace CodingTracker.View
             Properties.Settings.Default.RememberMe = LoginPageRememberMeToggle.Checked;
             Properties.Settings.Default.Save();
         }
-    
+
+
 
         private void loginPageUsernameTextbox_TextChanged(object sender, EventArgs e)
         {
 
         }
+
+
+        private void InitializePlaceholderText()
+        {
+
+            LoginPagePasswordTextbox.Text = "Password";
+            LoginPagePasswordTextbox.ForeColor = Color.Gray;
+            LoginPagePasswordTextbox.PasswordChar = '\0';
+        }
+
+        private void LoginPagePasswordTextbox_Enter(object sender, EventArgs e)
+        {
+            if (LoginPagePasswordTextbox.Text == "Password")
+            {
+                LoginPagePasswordTextbox.Text = "";
+                LoginPagePasswordTextbox.ForeColor = Color.Black; // Or whatever your default text color is
+                LoginPagePasswordTextbox.PasswordChar = '●'; // Set this to your desired password character
+            }
+        }
+
+
+
+        private void LoginPageUsernameTextbox_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(loginPageUsernameTextbox.Text))
+            {
+                loginPageUsernameTextbox.Text = "Username";
+                loginPageUsernameTextbox.ForeColor = Color.White;
+            }
+        }
+
+        private void LoginPagePasswordTextbox_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(LoginPagePasswordTextbox.Text))
+            {
+                LoginPagePasswordTextbox.Text = "Password";
+                LoginPagePasswordTextbox.ForeColor = Color.Gray;
+                LoginPagePasswordTextbox.PasswordChar = '\0'; // Clear the PasswordChar property
+            }
+        }
     }
 }
+
+

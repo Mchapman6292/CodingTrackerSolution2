@@ -36,7 +36,8 @@ namespace CodingTracker.View
 
         private void CodingSessionPageStartSessionButton_Click(object sender, EventArgs e)
         {
-            _codingSession.StartSession();
+            this.Hide();
+            _formSwitcher.SwitchToCodingSessionTimer();
 
         }
 
