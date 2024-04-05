@@ -179,8 +179,6 @@ namespace CodingTracker.Data.DatabaseManagers
                 StartDate DATETIME NOT NULL,
                 EndDate DATETIME,
                 DurationMinutes INTEGER,
-                CodingGoalHours INTEGER,
-                TimeToGoalMinutes INTEGER,
                 FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
             );";
 
@@ -218,7 +216,7 @@ namespace CodingTracker.Data.DatabaseManagers
             }, nameof(UpdateUserCredentialsTable), true);
         }
 
-        public bool CheckSessionIdExist(int sessionId)
+        public bool CheckSessionIdExist(int sessionId) // Needed?
         {
             return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {

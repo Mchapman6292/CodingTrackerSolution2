@@ -10,17 +10,11 @@ namespace CodingTracker.Common.ICodingSessions
     public interface ICodingSession
     {
         CodingSessionDTO GetCurrentSessionDTO();
-        void StartCodingSessionTimer();
-
-        void EndCodingSessionTimer();
         void StartSession();
         void EndSession();
-        void SetSessionEndTimeAndDate();
+        void SetSessionTimeAndDate();
         bool CheckIfCodingSessionActive();
-        void CalculateDurationMinutes();
-        bool CheckBothDurationCalculations();
-        void CalculateTimeToGoal();
-
+        int CalculateDurationMinutes();
         List<DateTime> GetDatesPrevious28days();
 
 

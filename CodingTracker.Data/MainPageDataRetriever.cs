@@ -40,7 +40,7 @@ namespace CodingTracker.Data.MainPageDataRetrievers
 
                         command.CommandText = @"
                     SELECT 
-                        DurationMinutes, TimeToGoalMinutes
+                        DurationMinutes
                     FROM 
                         CodingSessions
                     WHERE 
@@ -52,8 +52,7 @@ namespace CodingTracker.Data.MainPageDataRetrievers
                         using var reader = command.ExecuteReader();
                         while (reader.Read())
                         {
-                            // For demonstration, this logs the DurationMinutes and TimeToGoalMinutes for each session
-                            _appLogger.Info($"DurationMinutes: {reader["DurationMinutes"]}, TimeToGoalMinutes: {reader["TimeToGoalMinutes"]}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                            _appLogger.Info($"DurationMinutes: {reader["DurationMinutes"]}, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                         }
                     });
 

@@ -22,11 +22,10 @@ namespace CodingTracker.Data.DatabaseSessionInserts
 
 
 
-        public DatabaseSessionInsert(IDatabaseManager databaseManager, IApplicationLogger appLogger, CodingSessionDTO codingSessionDTO)
+        public DatabaseSessionInsert(IDatabaseManager databaseManager, IApplicationLogger appLogger)
         {
             _databaseManager = databaseManager;
             _appLogger = appLogger;
-            _codingSessionDTO = codingSessionDTO;
         }
 
 
@@ -50,8 +49,6 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                             StartDate,
                             EndDate,
                             DurationMinutes, 
-                            CodingGoalHours,
-                            TimeToGoalMins,
                         ) 
                         VALUES 
                         (
@@ -61,8 +58,7 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                             @StartDate,
                             @EndDate,
                             @DurationMinutes, 
-                            @CodingGoalHours,
-                            @TimeToGoalMins,
+
                         )";
 
                     command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
@@ -71,8 +67,7 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                     command.Parameters.AddWithValue("@StartDate", _codingSessionDTO.StartDate.HasValue ? _codingSessionDTO.StartDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
                     command.Parameters.AddWithValue("@EndDate", _codingSessionDTO.EndDate.HasValue ? _codingSessionDTO.EndDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
                     command.Parameters.AddWithValue("@DurationMinutes", _codingSessionDTO.DurationMinutes);
-                    command.Parameters.AddWithValue("@CodingGoalHours", _codingSessionDTO.CodingGoalHours);
-                    command.Parameters.AddWithValue("@TimeToGoalMins", _codingSessionDTO.TimeToGoalMinutes);
+
 
                     try
                     {
