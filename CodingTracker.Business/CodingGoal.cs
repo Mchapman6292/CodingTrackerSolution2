@@ -28,7 +28,7 @@ namespace CodingTracker.Business.CodingGoals
                     TimeToGoalMinutes = CodingGoalHours * 60;
                     methodStopwatch.Stop();
 
-                    _appLogger.Info($"Coding goal set. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}, CodingGoalHours: {CodingGoalHours}, TimeToGoalMinutes: {TimeToGoalMinutes}");
+                    _appLogger.Info($"Coding goal set. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}, CodingGoalHours: {CodingGoalHours}.");
                 }
                 catch (Exception ex)
                 {

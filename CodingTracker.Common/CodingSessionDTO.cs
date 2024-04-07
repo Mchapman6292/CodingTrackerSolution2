@@ -16,9 +16,6 @@ namespace CodingTracker.Common.CodingSessionDTOs
         public DateTime? EndDate { get; set; }
         public int? DurationMinutes { get; set; }
 
-        public int? CodingGoalHours { get; set; }
-        
-        public int TimeToGoalMinutes {  get; set; }
 
     }
 }

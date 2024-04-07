@@ -88,7 +88,7 @@
             CreateAccountPasswordTextbox.Name = "CreateAccountPasswordTextbox";
             CreateAccountPasswordTextbox.PasswordChar = '\0';
             CreateAccountPasswordTextbox.PlaceholderForeColor = Color.Azure;
-            CreateAccountPasswordTextbox.PlaceholderText = "Password";
+            CreateAccountPasswordTextbox.PlaceholderText = "PasswordHash";
             CreateAccountPasswordTextbox.SelectedText = "";
             CreateAccountPasswordTextbox.ShadowDecoration.CustomizableEdges = customizableEdges12;
             CreateAccountPasswordTextbox.Size = new Size(200, 36);

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Text;
 using CodingTracker.Common.InputValidationResults;
 using System.ComponentModel.DataAnnotations;
+using CodingTracker.Common.IErrorHandlers;
 
 
 
@@ -20,11 +21,13 @@ namespace CodingTracker.Common.InputValidators
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IInputValidationResult _validResult;
+        private readonly IErrorHandler _errorHandler;
 
-        public InputValidator(IApplicationLogger appLogger, IInputValidationResult validResult)
+        public InputValidator(IApplicationLogger appLogger, IInputValidationResult validResult, IErrorHandler errorHandler)
         {
             _appLogger = appLogger;
             _validResult = validResult;
+            _errorHandler = errorHandler;
         }
 
         public InputValidationResult ValidateUsername(string username) // Username requirements = Less than 15 chars long, begins with capital letter & not empty/no whitespaces.
@@ -69,26 +72,26 @@ namespace CodingTracker.Common.InputValidators
 
                 if (string.IsNullOrWhiteSpace(password))
                 {
-                    result.AddErrorMessage("Password cannot be empty or whitespace.");
+                    result.AddErrorMessage("PasswordHash cannot be empty or whitespace.");
                 }
 
                 if (password.Length > 15)
                 {
-                    result.AddErrorMessage("Password must be 15 characters or less.");
+                    result.AddErrorMessage("PasswordHash must be 15 characters or less.");
                 }
 
                 if (!password.Any(char.IsUpper))
                 {
-                    result.AddErrorMessage("Password must contain at least one uppercase letter.");
+                    result.AddErrorMessage("PasswordHash must contain at least one uppercase letter.");
                 }
 
                 if (!new Regex("[^a-zA-Z0-9]").IsMatch(password))
                 {
-                    result.AddErrorMessage("Password must contain at least one special character.");
+                    result.AddErrorMessage("PasswordHash must contain at least one special character.");
                 }
 
                 stopwatch.Stop();
-                _appLogger.Info($"Password validation completed. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                _appLogger.Info($"PasswordHash validation completed. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
             }
 
             return result;
@@ -108,12 +111,36 @@ namespace CodingTracker.Common.InputValidators
 
         public bool IsValidTimeFormatHHMM(string input)
         {
-            // Matches to format of HH:mm
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return false;
+            }
+
             string pattern = @"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
             return Regex.IsMatch(input, pattern);
         }
 
-        public bool TryParseTime(string input, out TimeSpan timeSpan)
+        public int? ParseHHMMStringInputToInt(string input)
+        {
+            return _errorHandler.CatchErrorsAndLogWithStopwatch<int?>(() =>
+            {
+                if (IsValidTimeFormatHHMM(input))
+                {
+                    var timeParts = input.Split(':');
+                    int hours = int.Parse(timeParts[0]);
+                    int minutes = int.Parse(timeParts[1]);
+
+                    return hours * 60 + minutes;
+                }
+                return null;
+            }, nameof(ParseHHMMStringInputToInt));
+        }
+
+
+
+
+
+        public bool TryParseTime(string input, out TimeSpan timeSpan) // probably not needed.
         {
             timeSpan = default;
 

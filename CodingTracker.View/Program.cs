@@ -14,7 +14,6 @@ using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IStartConfigurations;
-using CodingTracker.Common.IUserCredentialDTOs;
 using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.UtilityServices;
@@ -48,6 +47,10 @@ using CodingTracker.Data.DatabaseSessionReads;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Data.DatabaseSessionUpdates;
 using CodingTracker.Common.IDatabaseSessionUpdates;
+using CodingTracker.Business.CodingSessionTimers;
+using CodingTracker.Common.ICodingSessionTimers;
+using CodingTracker.Common.CodingSessionDTOProviders;
+using CodingTracker.Common.ICodingSessionDTOProviders;
 
 /// To do
 /// Change get validDate & Time inputvalidator
@@ -59,6 +62,7 @@ using CodingTracker.Common.IDatabaseSessionUpdates;
 /// Centralize errorboxmessage logic.
 /// Add tests to ensure that the labels and panel days correspond.
 /// Change CatchErrorsAndLogWithStopwatch so that it does not call the method itself. 
+/// Logic for remember me to read stored password from sql lite db/other
 
 namespace CodingTracker.View.Program
 {
@@ -102,25 +106,26 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<ILoginManager, LoginManager>()
-                    .AddSingleton<IUserCredentialDTO, UserCredentialDTO>()
                     .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
                     .AddSingleton<ICodingGoal, CodingGoal>()
                     .AddSingleton<IFormController, FormController>()
-                    .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimer>()
+                    .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimerDisplay>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
                     .AddSingleton<IPanelColorControl, PanelColorControl>()
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
+                    .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
+                    .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddTransient<LoginPage>()
-                    .AddSingleton<MainPage>()
-                    .AddSingleton<CodingSessionPage>()
-                    .AddSingleton<EditSessionPage>()
-                    .AddSingleton<ViewSessionsPage>()
-                    .AddSingleton<CreateAccountPage>();
+                    .AddTransient<MainPage>()
+                    .AddTransient<CodingSessionPage>()
+                    .AddTransient<EditSessionPage>()
+                    .AddTransient<ViewSessionsPage>()
+                    .AddTransient<CreateAccountPage>();
 
             var startConfiguration = services.BuildServiceProvider()
                                              .GetRequiredService<IStartConfiguration>();

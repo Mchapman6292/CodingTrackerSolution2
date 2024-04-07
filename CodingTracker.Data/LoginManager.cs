@@ -27,6 +27,7 @@ namespace CodingTracker.Data.LoginManagers
 
         public UserCredentialDTO ValidateLogin(string username, string password)
         {
+            var lastLogin = string.Empty;
             using (var activity = new Activity(nameof(ValidateLogin)).Start())
             {
                 _appLogger.Info($"Starting {nameof(ValidateLogin)}. TraceID: {activity.TraceId}, Username: {username}");
@@ -36,7 +37,7 @@ namespace CodingTracker.Data.LoginManagers
 
                     _appLogger.Debug($"Hashing password for {username}. TraceID: {activity.TraceId}");
                     var hashedPassword = _credentialStorage.HashPassword(password);
-                    _appLogger.Debug($"Password hashed for {username}. TraceID: {activity.TraceId}");
+                    _appLogger.Debug($"PasswordHash hashed for {username}. TraceID: {activity.TraceId}");
 
                     UserCredentialDTO userCredential = null;
 
@@ -45,12 +46,17 @@ namespace CodingTracker.Data.LoginManagers
                         using var command = connection.CreateCommand();
                         command.CommandText = @"
                 SELECT 
-                        UserId, Username, PasswordHash 
+                        UserId, 
+                        Username, 
+                        PasswordHash,
+                        LastLogin
                 FROM 
-                        UserCredentials 
+                        UserCredentials
                 WHERE 
                         Username = @Username";
                         command.Parameters.AddWithValue("@Username", username);
+                        command.Parameters.AddWithValue("@PasswordHash", password);
+                        command.Parameters.AddWithValue("@LastLogin", lastLogin);
 
                         _appLogger.Debug($"Executing database query for {username}. TraceID: {activity.TraceId}");
                         using var reader = command.ExecuteReader();
@@ -61,18 +67,18 @@ namespace CodingTracker.Data.LoginManagers
                             var storedHash = reader["PasswordHash"].ToString();
                             if (hashedPassword == storedHash)
                             {
-                                _appLogger.Debug($"Password match for {username}. TraceID: {activity.TraceId}");
+                                _appLogger.Debug($"PasswordHash match for {username}. TraceID: {activity.TraceId}");
 
                                 userCredential = new UserCredentialDTO
                                 {
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     Username = reader["Username"].ToString(),
-                                    Password = password
+                                    PasswordHash = password
                                 };
                             }
                             else
                             {
-                                _appLogger.Info($"Password mismatch for {username}. TraceID: {activity.TraceId}");
+                                _appLogger.Info($"PasswordHash mismatch for {username}. TraceID: {activity.TraceId}");
                             }
                         }
                         else
@@ -130,11 +136,11 @@ namespace CodingTracker.Data.LoginManagers
 
                         if (rowsAffected == 0)
                         {
-                            _appLogger.Warning($"No user found with username {username}. Password reset failed. TraceID: {activity.TraceId}");
+                            _appLogger.Warning($"No user found with username {username}. PasswordHash reset failed. TraceID: {activity.TraceId}");
                         }
                         else
                         {
-                            _appLogger.Info($"Password for user {username} has been successfully reset. Rows affected: {rowsAffected}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                            _appLogger.Info($"PasswordHash for user {username} has been successfully reset. Rows affected: {rowsAffected}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                         }
                     });
                     stopwatch.Stop();

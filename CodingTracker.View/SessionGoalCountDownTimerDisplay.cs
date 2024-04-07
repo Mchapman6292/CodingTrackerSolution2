@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace CodingTracker.View.SessionGoalCountDownTimers
 {
-    public class SessionGoalCountDownTimer : IDisposable, ISessionGoalCountDownTimer
+    public class SessionGoalCountDownTimerDisplay : IDisposable, ISessionGoalCountDownTimer
     {
         private readonly IApplicationLogger _appLogger;
         private readonly Stopwatch _stopwatch = new Stopwatch();
@@ -17,7 +17,7 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
 
         public bool IsRunning => _stopwatch.IsRunning;
 
-        public SessionGoalCountDownTimer(IApplicationLogger appLogger)
+        public SessionGoalCountDownTimerDisplay(IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
             _timer = new System.Windows.Forms.Timer();
@@ -71,6 +71,12 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
                     _appLogger.Warning($"Timer start requested but maxTime is zero. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
             }
+        }
+
+        public void InitializeAndStartTimer(int minutes, int seconds = 0)
+        {
+            SetCountDownTimer(minutes, seconds);
+            StartCountDownTimer();
         }
 
         public void CheckTimeCountDownTimer()

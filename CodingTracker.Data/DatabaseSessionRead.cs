@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using CodingTracker.Common.IErrorHandlers;
 
 
 // To do 
@@ -20,13 +21,15 @@ namespace CodingTracker.Data.DatabaseSessionReads
         private readonly IDatabaseManager _databaseManager;
         private readonly IApplicationLogger _appLogger;
         private readonly CodingSessionDTO _codingSessionDTO;
+        private readonly IErrorHandler _errorHandler;
 
 
 
-        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger)
+        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler)
         {
             _databaseManager = databaseManager;
             _appLogger = appLogger;
+            _errorHandler = errorHandler;
         }
 
 
@@ -73,39 +76,54 @@ namespace CodingTracker.Data.DatabaseSessionReads
             }
         }
 
-        public List<dynamic> ReadAllUserCredentials()
+        public List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn)
         {
-            using (var activity = new Activity(nameof(ReadAllUserCredentials)).Start())
+            using (var activity = new Activity(nameof(ReadUserCredentials)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(ReadAllUserCredentials)}. TraceID: {activity.TraceId}");
+                _appLogger.Debug($"Starting {nameof(ReadUserCredentials)}. TraceID: {activity.TraceId}");
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                List<dynamic> userCredentialsList = new List<dynamic>();
+                List<UserCredentialDTO> userCredentialsList = new List<UserCredentialDTO>();
 
                 try
                 {
                     _databaseManager.ExecuteCRUD(connection =>
                     {
-                        using var command = new SQLiteCommand(@"
-                    SELECT UserId, Username, PasswordHash FROM UserCredentials", connection);
+                        using var command = connection.CreateCommand();
+
+                        if (returnLastLoggedIn)
+                        {
+                            command.CommandText = @"
+                        SELECT UserId, Username, PasswordHash, LastLogin
+                        FROM UserCredentials 
+                        ORDER BY LastLogin DESC 
+                        LIMIT 1";
+                        }
+                        else
+                        {
+                            command.CommandText = @"
+                        SELECT UserId, Username, PasswordHash, LastLogin
+                        FROM UserCredentials";
+                        }
 
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                var userCredentials = new
+                                var userCredential = new UserCredentialDTO
                                 {
                                     UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
                                     Username = reader.GetString(reader.GetOrdinal("Username")),
-                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
+                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                    LastLogin = reader.GetDateTime(reader.GetOrdinal("LastLogin")) 
                                 };
-                                userCredentialsList.Add(userCredentials);
+                                userCredentialsList.Add(userCredential);
                             }
                         }
                     });
 
                     stopwatch.Stop();
-                    _appLogger.Info($"Successfully read all user credentials. Count: {userCredentialsList.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Info($"Successfully read user credentials. Count: {userCredentialsList.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -117,6 +135,59 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 return userCredentialsList;
             }
         }
+
+        public int GetUserIdWithMostRecentLogin()
+        {
+            using (var activity = new Activity(nameof(GetUserIdWithMostRecentLogin)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetUserIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+
+                int userId = 0;
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                try
+                {
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                SELECT UserId 
+                FROM UserCredentials 
+                WHERE LastLogin IS NOT NULL 
+                ORDER BY LastLogin DESC 
+                LIMIT 1", connection);
+
+                        // Execute the command and retrieve the UserId
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            userId = Convert.ToInt32(result);
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Successfully retrieved UserId with most recent login. UserId: {userId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (SQLiteException ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to retrieve UserId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An unexpected error occurred while retrieving UserId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    throw;
+                }
+
+                return userId;
+            }
+        }
+
+        public int GetSessionIdWithMostRecentLogin()
+        {
+            throw new NotImplementedException();
+        }
+
 
 
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)

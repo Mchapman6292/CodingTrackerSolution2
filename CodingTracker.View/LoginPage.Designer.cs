@@ -139,6 +139,9 @@ namespace CodingTracker.View
             loginPageUsernameTextbox.ShadowDecoration.CustomizableEdges = customizableEdges2;
             loginPageUsernameTextbox.Size = new Size(200, 36);
             loginPageUsernameTextbox.TabIndex = 15;
+            loginPageUsernameTextbox.TextChanged += loginPageUsernameTextbox_TextChanged;
+            loginPageUsernameTextbox.Enter += LoginPagePasswordTextbox_Enter;
+            loginPageUsernameTextbox.Leave += LoginPageUsernameTextbox_Leave;
             // 
             // LoginPagePasswordTextbox
             // 
@@ -159,12 +162,14 @@ namespace CodingTracker.View
             LoginPagePasswordTextbox.Name = "LoginPagePasswordTextbox";
             LoginPagePasswordTextbox.PasswordChar = '●';
             LoginPagePasswordTextbox.PlaceholderForeColor = Color.Azure;
-            LoginPagePasswordTextbox.PlaceholderText = "Password";
+            LoginPagePasswordTextbox.PlaceholderText = "";
             LoginPagePasswordTextbox.SelectedText = "";
             LoginPagePasswordTextbox.ShadowDecoration.CustomizableEdges = customizableEdges4;
             LoginPagePasswordTextbox.Size = new Size(200, 36);
             LoginPagePasswordTextbox.TabIndex = 16;
             LoginPagePasswordTextbox.UseSystemPasswordChar = true;
+            LoginPagePasswordTextbox.Enter += LoginPagePasswordTextbox_Enter;
+            LoginPagePasswordTextbox.Leave += LoginPagePasswordTextbox_Leave;
             // 
             // LoginPageRememberMeToggle
             // 
@@ -183,6 +188,7 @@ namespace CodingTracker.View
             LoginPageRememberMeToggle.UncheckedState.FillColor = Color.FromArgb(35, 34, 50);
             LoginPageRememberMeToggle.UncheckedState.InnerBorderColor = Color.White;
             LoginPageRememberMeToggle.UncheckedState.InnerColor = Color.FromArgb(234, 153, 149);
+            LoginPageRememberMeToggle.CheckedChanged += LoginPageRememberMeToggle_CheckedChanged;
             // 
             // loginPageLoginButton
             // 
@@ -247,7 +253,7 @@ namespace CodingTracker.View
             LoginPageForgotPasswordButton.ShadowDecoration.CustomizableEdges = customizableEdges12;
             LoginPageForgotPasswordButton.Size = new Size(134, 23);
             LoginPageForgotPasswordButton.TabIndex = 20;
-            LoginPageForgotPasswordButton.Text = "Forgot Password?";
+            LoginPageForgotPasswordButton.Text = "Forgot PasswordHash?";
             LoginPageForgotPasswordButton.Click += LoginPageForgotPasswordButton_Click;
             // 
             // LoginPageMediaPanel
@@ -283,7 +289,7 @@ namespace CodingTracker.View
             guna2ControlBox1.HoverState.FillColor = Color.FromArgb(0, 9, 43);
             guna2ControlBox1.HoverState.IconColor = Color.White;
             guna2ControlBox1.IconColor = Color.White;
-            guna2ControlBox1.Location = new Point(1195, 0);
+            guna2ControlBox1.Location = new Point(1185, 1);
             guna2ControlBox1.Name = "guna2ControlBox1";
             guna2ControlBox1.ShadowDecoration.CustomizableEdges = customizableEdges16;
             guna2ControlBox1.Size = new Size(45, 29);
@@ -344,6 +350,7 @@ namespace CodingTracker.View
             Controls.Add(label1);
             Controls.Add(loginPageErrorTextbox);
             Controls.Add(LoginPageMediaPanel);
+            FormBorderStyle = FormBorderStyle.None;
             Name = "LoginPage";
             WindowState = FormWindowState.Minimized;
             ((System.ComponentModel.ISupportInitialize)LoginPageVLCPLayer).EndInit();

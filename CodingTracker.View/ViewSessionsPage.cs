@@ -15,38 +15,6 @@ namespace CodingTracker.View
         public ViewSessionsPage()
         {
             InitializeComponent();
-
-        }
-
-        private void viewSessionsButton_Click(object sender, EventArgs e)
-        {
-            Point location = new Point(viewSessionsButton.Left, viewSessionsButton.Bottom);
-            filterSessionsMenu.Show(viewSessionsButton, location);
-        }
-
-        private void updateSessionButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
-        {
-
-        }
-
-        private void Previous24Hours_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void viewSessionsButton_DragDrop(object sender, DragEventArgs e)
-        {
-
-        }
-
-        private void cMenuStripWeek_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

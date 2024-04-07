@@ -11,6 +11,7 @@ using CodingTracker.Common.IErrorHandlers;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace CodingTracker.Data.DatabaseManagers
 {
@@ -27,6 +28,7 @@ namespace CodingTracker.Data.DatabaseManagers
 
 
 
+
         public DatabaseManager(IApplicationLogger appLogger, IStartConfiguration startConfiguration, IInputValidator validator, IErrorHandler errorHandler) // Provides the database path for the current user.
         {
             _appLogger = appLogger;
@@ -34,6 +36,7 @@ namespace CodingTracker.Data.DatabaseManagers
             _databasePath = _iStartConfiguration.DatabasePath;
             _connectionString = _iStartConfiguration.ConnectionString;
             _errorHandler = errorHandler;
+            
         }
 
         public static string GetTodayDate() => DateTime.Today.ToString("yyyy-MM-dd");
@@ -167,7 +170,8 @@ namespace CodingTracker.Data.DatabaseManagers
             CREATE TABLE IF NOT EXISTS UserCredentials (
                 UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT NOT NULL UNIQUE,
-                PasswordHash TEXT NOT NULL
+                PasswordHash TEXT NOT NULL,
+                LastLogin DATETIME 
             );
 
             CREATE TABLE IF NOT EXISTS CodingSessions (
@@ -178,9 +182,6 @@ namespace CodingTracker.Data.DatabaseManagers
                 StartDate DATETIME NOT NULL,
                 EndDate DATETIME,
                 DurationMinutes INTEGER,
-                CodingGoalHours INTEGER,
-                TimeToGoalMinutes INTEGER,
-                SessionNotes TEXT,
                 FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
             );";
 
@@ -204,12 +205,12 @@ namespace CodingTracker.Data.DatabaseManagers
                     command.CommandText = "DROP TABLE IF EXISTS UserCredentials;";
                     command.ExecuteNonQuery();
 
-                    // Recreate the table with the new schema
                     command.CommandText = @"
                 CREATE TABLE UserCredentials (
                     UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL
+                    PasswordHash TEXT NOT NULL,
+                    LastLogin DATETIME 
                 );";
                     command.ExecuteNonQuery();
 
@@ -218,7 +219,7 @@ namespace CodingTracker.Data.DatabaseManagers
             }, nameof(UpdateUserCredentialsTable), true);
         }
 
-        public bool CheckSessionIdExist(int sessionId)
+        public bool CheckSessionIdExist(int sessionId) // Needed?
         {
             return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
             {
@@ -232,6 +233,15 @@ namespace CodingTracker.Data.DatabaseManagers
                 var result = (long)command.ExecuteScalar();
                 return result > 0;
             }, nameof(CheckSessionIdExist), true);
+        }
+
+        public int GetUserID()
+        {
+            using (var activity = new Activity(nameof(GetUserID)).Start())
+            {
+
+            }
+
         }
     }
 }
