@@ -14,7 +14,12 @@ namespace CodingTracker.Common.IDatabaseSessionReads
         List<int> ReadSessionDurationMinutes(int numberOfDays);
 
         List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
-        
+
+        int GetUserIdWithMostRecentLogin();
+
+        int GetSessionIdWithMostRecentLogin();
+
+
 
             List<CodingSessionDTO> ViewAllSession(bool partialView = false);
         List<CodingSessionDTO> ViewSpecific(string chosenDate);

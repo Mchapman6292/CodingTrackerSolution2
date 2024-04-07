@@ -136,6 +136,58 @@ namespace CodingTracker.Data.DatabaseSessionReads
             }
         }
 
+        public int GetUserIdWithMostRecentLogin()
+        {
+            using (var activity = new Activity(nameof(GetUserIdWithMostRecentLogin)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetUserIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+
+                int userId = 0;
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                try
+                {
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                SELECT UserId 
+                FROM UserCredentials 
+                WHERE LastLogin IS NOT NULL 
+                ORDER BY LastLogin DESC 
+                LIMIT 1", connection);
+
+                        // Execute the command and retrieve the UserId
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            userId = Convert.ToInt32(result);
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Successfully retrieved UserId with most recent login. UserId: {userId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (SQLiteException ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to retrieve UserId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An unexpected error occurred while retrieving UserId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    throw;
+                }
+
+                return userId;
+            }
+        }
+
+        public int GetSessionIdWithMostRecentLogin()
+        {
+            throw new NotImplementedException();
+        }
+
 
 
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)

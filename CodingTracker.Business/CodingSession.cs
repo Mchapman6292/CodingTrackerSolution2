@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.ICodingGoals;
 using System.Linq.Expressions;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ICodingSessionTimers;
+using CodingTracker.Common.ICodingSessionDTOProviders;
+using CodingTracker.Common.IDatabaseSessionReads;
+
 
 // method to record start & end time
 // logic to hold recorded times & view them
@@ -21,130 +23,122 @@ namespace CodingTracker.Business.CodingSessions
         private readonly ICodingGoal _codingGoal;
         private readonly IErrorHandler _errorHandler;
         private readonly ICodingSessionTimer _sessionTimer;
-
-        private CodingSessionDTO _currentSessionDTO;
- 
-
-        private readonly Stopwatch _stopwatch = new Stopwatch();
-
+        private readonly ICodingSessionDTOManager _sessionDTOManager;
+        private readonly IDatabaseSessionRead _databaseSessionRead;
+        private readonly int _userId;
+        private readonly int _sessionId;
         public bool IsStopWatchEnabled = false;
         private bool isCodingSessionActive = false;
 
 
 
 
-        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer)
+
+        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, int userID, int sessionID)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
             _codingGoal = codingGoal;
             _errorHandler = errorHandler;
             _sessionTimer = sessionTimer;
-
+            _sessionDTOManager = sessionDTOManager;
+            _databaseSessionRead = databaseSessionRead;
+            userID = _databaseSessionRead.GetUserIdWithMostRecentLogin();
+            sessionID = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
         }
-        public CodingSessionDTO GetCurrentSessionDTO()
-        {
-            return _currentSessionDTO;
-        }
-
 
 
         public void StartSession()
         {
-            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
+            var activity = new Activity(nameof(StartSession)).Start();
+            var stopwatch = Stopwatch.StartNew();
+
+            _appLogger.Debug($"Attempting to start a new session. TraceID: {activity.TraceId}");
+
+            bool sessionAlreadyActive = CheckIfCodingSessionActive();
+            if (sessionAlreadyActive)
             {
-                isCodingSessionActive = true;
-               _sessionTimer.StartCodingSessionTimer();
+                _appLogger.Warning($"Cannot start a new session because another session is already active. TraceID: {activity.TraceId}");
+                stopwatch.Stop();
+                activity.Stop();
+                return; // Exit method to prevent starting a new session
+            }
 
-                _currentSessionDTO = new CodingSessionDTO
-                {
-                    UserId =  _currentSessionDTO.UserId,
-                    StartTime = _currentSessionDTO.StartTime,
-                    StartDate = _currentSessionDTO.StartDate 
-                };
+            isCodingSessionActive = true;
+            var sessionDto = _sessionDTOManager.CreateAndReturnCurrentSessionDTO(); 
+            _sessionTimer.StartCodingSessionTimer(); 
 
-                _appLogger.Info($"Session started, StartTime:");
-            }, nameof(StartSession));
+            stopwatch.Stop();
+            _appLogger.Info($"New session started successfully for UserId: {sessionDto.UserId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+            activity.Stop();
         }
 
         public void EndSession()
         {
-            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
-            {
-                isCodingSessionActive = false;
-                _sessionTimer.EndCodingSessionTimer();
-                SetSessionTimeAndDate();
+            var activity = new Activity(nameof(EndSession)).Start();
+            var stopwatch = Stopwatch.StartNew();
 
+            _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
 
-                _currentSessionDTO.DurationMinutes = CalculateDurationMinutes();
+            isCodingSessionActive = false;
 
-                _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, EndTime: {_currentSessionDTO.EndTime}.");
-            }, nameof(EndSession));
-        }
+            _sessionTimer.EndCodingSessionTimer();
+            _sessionDTOManager.SetSessionEndTimeAndDate();
+            _sessionDTOManager.CalculateDurationMinutes();
 
-        public void SetSessionTimeAndDate()
-        {
-            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
-            {
-                DateTime endTime = DateTime.Now;
-                _currentSessionDTO.EndTime = endTime;
-                _currentSessionDTO.EndDate = endTime.Date; 
+            _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, null, null, null, null, null);
 
-                _appLogger.Info($"End time and date set, EndTime: {endTime}, EndDate: {endTime.Date}");
-            }, nameof(SetSessionTimeAndDate));
+            stopwatch.Stop();
+            _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, isCodingSessionActive: {isCodingSessionActive}, Trace ID: {activity.TraceId},  Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+
+            activity.Stop();
         }
 
 
 
         public bool CheckIfCodingSessionActive()
         {
-            return _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
-            {
-                bool isActive = isCodingSessionActive;
-                _appLogger.Info($"Coding session active status: {isActive}");
-                return isActive;
-            }, nameof(CheckIfCodingSessionActive));
+            var activity = new Activity(nameof(CheckIfCodingSessionActive)).Start();
+            var stopwatch = Stopwatch.StartNew();
+
+            _appLogger.Debug($"Checking if session is active. TraceID: {activity.TraceId}");
+
+            bool isActive = isCodingSessionActive;
+
+            stopwatch.Stop();
+            _appLogger.Info($"Coding session active status: {isActive}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+            activity.Stop();
+
+            return isActive;
         }
 
-
-        public int CalculateDurationMinutes()
-        {
-            int durationMins = 0;
-            using (var activity = new Activity(nameof(CalculateDurationMinutes)).Start())
-            {
-                _appLogger.Info($"Calculating duration minutes. TraceID: {activity.TraceId}");
-
-                try
-                {
-                    if (!_currentSessionDTO.StartTime.HasValue || !_currentSessionDTO.EndTime.HasValue)
-                    {
-                        _appLogger.Error("StartCountDownTimer Time or End Time is not set.");
-                    }
-
-                    TimeSpan duration = _currentSessionDTO.EndTime.Value - _currentSessionDTO.StartTime.Value;
-                    durationMins = (int)duration.TotalMinutes;
-
-                    _appLogger.Info($"Duration minutes calculated. TraceID: {activity.TraceId}, DurationMinutes: {_currentSessionDTO.DurationMinutes}");
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(CalculateDurationMinutes)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
-            }
-            return durationMins;
-        }
 
 
 
         public List<DateTime> GetDatesPrevious28days()
         {
+            var activity = new Activity(nameof(GetDatesPrevious28days)).Start();
+            var stopwatch = Stopwatch.StartNew();
+
+            _appLogger.Debug($"Getting dates for the previous 28 days. TraceID: {activity.TraceId}");
+
             List<DateTime> dates = new List<DateTime>();
             DateTime today = DateTime.Today;
+
             for (int i = 1; i <= 28; i++)
             {
                 dates.Add(today.AddDays(-i));
             }
+
+            stopwatch.Stop();
+            _appLogger.Info($"Retrieved dates for the previous 28 days. Count: {dates.Count}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+            activity.Stop();
+
             return dates;
         }
+
     }
 }

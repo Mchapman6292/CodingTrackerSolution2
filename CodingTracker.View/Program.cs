@@ -49,6 +49,8 @@ using CodingTracker.Data.DatabaseSessionUpdates;
 using CodingTracker.Common.IDatabaseSessionUpdates;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
+using CodingTracker.Common.CodingSessionDTOProviders;
+using CodingTracker.Common.ICodingSessionDTOProviders;
 
 /// To do
 /// Change get validDate & Time inputvalidator
@@ -117,6 +119,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
+                    .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()

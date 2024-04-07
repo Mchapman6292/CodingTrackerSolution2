@@ -37,7 +37,24 @@ namespace CodingTracker.Logging.ApplicationLoggers
             }
         }
 
-        // Method overloading, allows mulitple methods with same name but different parameter lists. 
+        public void LogUpdates(string methodName, params (string Name, object Value)[] updates)
+        {
+            using (var activity = new Activity(nameof(LogUpdates)).Start())
+            {
+                var updateEntries = updates
+                    .Where(update => update.Value != null)
+                    .Select(update => $"{update.Name}={update.Value}")
+                    .ToList();
+
+                if (updateEntries.Count > 0)
+                {
+                    string message = $"Updated {methodName}: {string.Join(", ", updateEntries)}. TraceID: {activity.TraceId}";
+                    Info(message);
+                }
+            }
+        }
+
+        // Method overloading, allows multiple methods with same name but different parameter lists. 
         public void Info(string message) => _logger.Information(message); // General information regarding app operations, e.g user login.
         public void Info(string message, params object[] propertyValues) => _logger.Information(message, propertyValues);
         public void Debug(string message) => _logger.Debug(message); // Detailed info used for debugging, e.g loaded X variables from database in 200ms/

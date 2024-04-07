@@ -11,6 +11,7 @@ using CodingTracker.Common.IErrorHandlers;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace CodingTracker.Data.DatabaseManagers
 {
@@ -27,6 +28,7 @@ namespace CodingTracker.Data.DatabaseManagers
 
 
 
+
         public DatabaseManager(IApplicationLogger appLogger, IStartConfiguration startConfiguration, IInputValidator validator, IErrorHandler errorHandler) // Provides the database path for the current user.
         {
             _appLogger = appLogger;
@@ -34,6 +36,7 @@ namespace CodingTracker.Data.DatabaseManagers
             _databasePath = _iStartConfiguration.DatabasePath;
             _connectionString = _iStartConfiguration.ConnectionString;
             _errorHandler = errorHandler;
+            
         }
 
         public static string GetTodayDate() => DateTime.Today.ToString("yyyy-MM-dd");
@@ -230,6 +233,15 @@ namespace CodingTracker.Data.DatabaseManagers
                 var result = (long)command.ExecuteScalar();
                 return result > 0;
             }, nameof(CheckSessionIdExist), true);
+        }
+
+        public int GetUserID()
+        {
+            using (var activity = new Activity(nameof(GetUserID)).Start())
+            {
+
+            }
+
         }
     }
 }
