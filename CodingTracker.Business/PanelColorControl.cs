@@ -10,14 +10,14 @@ using CodingTracker.Common.IErrorHandlers;
 using System.Drawing;
 
 namespace CodingTracker.Business.PanelColorControls
-{ 
-    public class PanelColorControl : IPanelColorControl
 {
+    public class PanelColorControl : IPanelColorControl
+    {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
 
 
-        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler) 
+        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler)
         {
             _appLogger = appLogger;
             _errorHandler = errorHandler;
@@ -25,44 +25,88 @@ namespace CodingTracker.Business.PanelColorControls
 
         public SessionColor DetermineSessionColor(int sessionDurationMinutes)
         {
-            if (sessionDurationMinutes <= 0)
+            var activity = new Activity(nameof(DetermineSessionColor)).Start();
+            var stopwatch = Stopwatch.StartNew();
+
+            try
             {
-                return SessionColor.Grey; // 0 minutes
+                _appLogger.Debug($"Determining session color for duration: {sessionDurationMinutes} minutes. TraceID: {activity.TraceId}");
+
+                SessionColor color;
+                if (sessionDurationMinutes <= 0)
+                {
+                    color = SessionColor.Grey;
+                }
+                else if (sessionDurationMinutes < 60)
+                {
+                    color = SessionColor.RedGrey;
+                }
+                else if (sessionDurationMinutes < 120)
+                {
+                    color = SessionColor.Red;
+                }
+                else if (sessionDurationMinutes < 180)
+                {
+                    color = SessionColor.Yellow;
+                }
+                else
+                {
+                    color = SessionColor.Green;
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"Session color determined: {color}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+
+                return color;
             }
-            else if (sessionDurationMinutes < 60)
+            finally
             {
-                return SessionColor.RedGrey; // Less than 60 minutes
-            }
-            else if (sessionDurationMinutes < 120) // 1 to less than 2 hours
-            {
-                return SessionColor.Red;
-            }
-            else if (sessionDurationMinutes < 180) // 2 to less than 3 hours
-            {
-                return SessionColor.Yellow;
-            }
-            else // 3 hours and more
-            {
-                return SessionColor.Green;
+                stopwatch.Stop();
+                activity.Stop();
             }
         }
 
         public Color GetColorFromSessionColor(SessionColor color)
         {
-            switch (color)
+            var activity = new Activity(nameof(GetColorFromSessionColor)).Start();
+            var stopwatch = Stopwatch.StartNew();
+
+            try
             {
-                case SessionColor.Grey:
-                    return Color.Gray;
-                case SessionColor.RedGrey:
-                    return Color.FromArgb(255, 128, 128); // RGB for red/grey. 
-                case SessionColor.Red:
-                    return Color.Red;
-                case SessionColor.Yellow:
-                    return Color.Yellow;
-                case SessionColor.Green:
-                    return Color.Green;
-                default:
-                    return Color.Gray; // Default color
+                _appLogger.Debug($"Getting color for SessionColor: {color}. TraceID: {activity.TraceId}");
+
+                Color result;
+                switch (color)
+                {
+                    case SessionColor.Grey:
+                        result = Color.Gray;
+                        break;
+                    case SessionColor.RedGrey:
+                        result = Color.FromArgb(255, 128, 128);
+                        break;
+                    case SessionColor.Red:
+                        result = Color.Red;
+                        break;
+                    case SessionColor.Yellow:
+                        result = Color.Yellow;
+                        break;
+                    case SessionColor.Green:
+                        result = Color.Green;
+                        break;
+                    default:
+                        result = Color.Gray;
+                        break;
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"Color determined for SessionColor {color}: {result}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+
+                return result;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                activity.Stop();
             }
         }
     }

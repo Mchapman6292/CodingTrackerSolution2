@@ -45,7 +45,7 @@ namespace CodingTracker.Business.ApplicationControls
 
                     if (_codingSession.CheckIfCodingSessionActive())
                     {
-                        _codingSession.SaveCurrentCodingSession();
+                        _codingSession.EndSession();
                         _appLogger.Info($"Active coding session saved. TraceID: {activity.TraceId}");
                     }
 

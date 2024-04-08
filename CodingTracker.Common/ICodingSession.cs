@@ -11,7 +11,7 @@ namespace CodingTracker.Common.ICodingSessions
     {
         void StartSession();
         void EndSession();
-        bool CheckIfCodingSessionActive()
+        bool CheckIfCodingSessionActive();
         List<DateTime> GetDatesPrevious28days();
 
 

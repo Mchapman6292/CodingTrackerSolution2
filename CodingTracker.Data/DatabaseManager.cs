@@ -226,22 +226,13 @@ namespace CodingTracker.Data.DatabaseManagers
                 OpenConnectionWithRetry();
                 using var command = _connection.CreateCommand();
                 command.CommandText = @"
-            SELECT COUNT(*) FROM CodingSessions
-            WHERE SessionId = @SessionId";
+                    SELECT COUNT(*) FROM CodingSessions
+                    WHERE SessionId = @SessionId";
                 command.Parameters.AddWithValue("@SessionId", sessionId);
 
                 var result = (long)command.ExecuteScalar();
                 return result > 0;
             }, nameof(CheckSessionIdExist), true);
-        }
-
-        public int GetUserID()
-        {
-            using (var activity = new Activity(nameof(GetUserID)).Start())
-            {
-
-            }
-
         }
     }
 }

@@ -67,7 +67,6 @@ namespace CodingTracker.Data.CredentialManagers
                     }
                     catch (Exception ex)
                     {
-                        // Catching general exceptions can help identify other potential issues
                         _appLogger.Error($"An unexpected error occurred while adding credentials for {username}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     }
                 });

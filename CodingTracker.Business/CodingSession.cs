@@ -34,7 +34,7 @@ namespace CodingTracker.Business.CodingSessions
 
 
 
-        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, int userID, int sessionID)
+        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
@@ -43,8 +43,8 @@ namespace CodingTracker.Business.CodingSessions
             _sessionTimer = sessionTimer;
             _sessionDTOManager = sessionDTOManager;
             _databaseSessionRead = databaseSessionRead;
-            userID = _databaseSessionRead.GetUserIdWithMostRecentLogin();
-            sessionID = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
+            _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
+            _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
         }
 
 
@@ -61,7 +61,7 @@ namespace CodingTracker.Business.CodingSessions
                 _appLogger.Warning($"Cannot start a new session because another session is already active. TraceID: {activity.TraceId}");
                 stopwatch.Stop();
                 activity.Stop();
-                return; // Exit method to prevent starting a new session
+                return; 
             }
 
             isCodingSessionActive = true;
