@@ -51,7 +51,7 @@ using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Common.CodingSessionDTOProviders;
 using CodingTracker.Common.ICodingSessionDTOProviders;
-
+using CodingTracker.Common.CodingGoalDTOManagers;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -63,6 +63,7 @@ using CodingTracker.Common.ICodingSessionDTOProviders;
 /// Add tests to ensure that the labels and panel days correspond.
 /// Change CatchErrorsAndLogWithStopwatch so that it does not call the method itself. 
 /// Logic for remember me to read stored password from sql lite db/other
+/// get user id & session id both use most recent login. CHANGE
 
 namespace CodingTracker.View.Program
 {
@@ -120,11 +121,14 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
                     .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
+                    .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()
                     .AddTransient<EditSessionPage>()
                     .AddTransient<ViewSessionsPage>()
+                    .AddTransient<CodingSessionTimerForm>()
+                    .AddTransient<SettingsPage>()
                     .AddTransient<CreateAccountPage>();
 
             var startConfiguration = services.BuildServiceProvider()

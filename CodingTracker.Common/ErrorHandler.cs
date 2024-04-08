@@ -34,17 +34,20 @@ namespace CodingTracker.Common.ErrorHandlers
             {
                 action();
             }
+
             catch (InvalidOperationException ex)
             {
                 stopwatch.Stop();
                 _appLogger.Error($"Invalid operation in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 throw;
             }
+
             catch (SQLiteException ex) when (isDatabaseOperation)
             {
                 stopwatch.Stop();
                 _appLogger.Error($"SQLite error in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
             }
+
             catch (Exception ex)
             {
                 stopwatch.Stop();

@@ -150,13 +150,18 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     _databaseManager.ExecuteCRUD(connection =>
                     {
                         using var command = new SQLiteCommand(@"
-                SELECT UserId 
-                FROM UserCredentials 
-                WHERE LastLogin IS NOT NULL 
-                ORDER BY LastLogin DESC 
-                LIMIT 1", connection);
+                            SELECT
+                                UserId 
+                            FROM
+                                UserCredentials 
+                            WHERE
+                                LastLogin IS NOT NULL 
+                            ORDER
+                                BY LastLogin DESC 
+                            LIMIT 
+                                1",
+                                    connection);
 
-                        // Execute the command and retrieve the UserId
                         object result = command.ExecuteScalar();
                         if (result != null && result != DBNull.Value)
                         {
@@ -170,12 +175,12 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 catch (SQLiteException ex)
                 {
                     stopwatch.Stop();
-                    _appLogger.Error($"Failed to retrieve UserId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Error($" Error retrieving UserId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
                     stopwatch.Stop();
-                    _appLogger.Error($"An unexpected error occurred while retrieving UserId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Error($" Error retrieving UserId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     throw;
                 }
 
@@ -185,9 +190,55 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
         public int GetSessionIdWithMostRecentLogin()
         {
-            throw new NotImplementedException();
-        }
+            using (var activity = new Activity(nameof(GetSessionIdWithMostRecentLogin)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetSessionIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
 
+                int sessionId = 0;
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                try
+                {
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                    SELECT
+                        SessionId 
+                    FROM
+                        CodingSessions 
+                    WHERE
+                        EndTime IS NOT NULL 
+                    ORDER BY
+                        EndTime DESC 
+                    LIMIT
+                        1",
+                            connection);
+
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            sessionId = Convert.ToInt32(result);
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Successfully retrieved SessionId with most recent login. SessionId: {sessionId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (SQLiteException ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($" Error retrieving SessionId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($" Error retrieving SessionId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    throw;
+                }
+
+                return sessionId;
+            }
+        }
 
 
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)

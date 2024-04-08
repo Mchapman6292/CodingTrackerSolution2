@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using CodingTracker.Common.CodingGoalDTOs;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingGoals;
 
@@ -8,8 +9,10 @@ namespace CodingTracker.Business.CodingGoals
     public class CodingGoal : ICodingGoal
     {
         private readonly IApplicationLogger _appLogger;
+
+        private CodingGoalDTO _currentGoalDTO;
         public int? CodingGoalHours { get; set; }
-        public int? TimeToGoalMinutes { get; set; }
+        public int? CodingGoalMins { get; set; }
 
         public CodingGoal(IApplicationLogger appLogger)
         {
@@ -25,7 +28,7 @@ namespace CodingTracker.Business.CodingGoals
                 try
                 {
                     CodingGoalHours = goalHours;
-                    TimeToGoalMinutes = CodingGoalHours * 60;
+                    CodingGoalMins = CodingGoalHours * 60;
                     methodStopwatch.Stop();
 
                     _appLogger.Info($"Coding goal set. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}, CodingGoalHours: {CodingGoalHours}.");
@@ -36,6 +39,19 @@ namespace CodingTracker.Business.CodingGoals
                     _appLogger.Error($"An error occurred during {nameof(SetCodingGoal)}. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                 }
             }
+        }
+
+        public int FormatGoalInputHoursToMins(int goalHours)
+        {
+            var methodStopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(FormatTimeToGoalToHHMM)).Start())
+            {
+                int goalMins = goalHours * 60;
+                methodStopwatch.Stop();
+                _appLogger.Info($"Goal hour converted to mins result = {goalMins}, TraceID: {activity.TraceId},  Execution Time: {methodStopwatch.ElapsedMilliseconds}ms.");
+                return goalMins;
+            }
+
         }
 
         public string FormatTimeToGoalToHHMM(int? timeToGoal)

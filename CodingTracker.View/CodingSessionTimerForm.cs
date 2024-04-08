@@ -41,8 +41,6 @@ namespace CodingTracker.View
             {
                 _appLogger.Debug($"Updating time remaining display to {timeRemaining}.");
 
-                // Update the UI element showing the time remaining, e.g.,
-                // this.TimeRemainingLabel.Text = timeRemaining.ToString(@"hh\:mm\:ss");
 
                 methodStopwatch.Stop();
                 _appLogger.Info($"Updated time remaining display. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms.");
@@ -62,7 +60,7 @@ namespace CodingTracker.View
         private void CodingTimerPageEndSessionButton_Click(object sender, EventArgs e)
         {
             _codingSesison.EndSession();
-            _formController.CloseCurrentForm();
+            this.Hide();
             _formSwitcher.SwitchToMainPage();
 
         }

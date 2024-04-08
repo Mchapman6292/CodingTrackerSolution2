@@ -17,13 +17,13 @@ namespace CodingTracker.Common.CodingSessionDTOProviders
         private int _userId;
         private int _sessionId;
 
-        public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, int userID, int sessionID)
+        public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead)
         {
             _errorHandler = errorHandler;
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
-            userID = _databaseSessionRead.GetUserIdWithMostRecentLogin();
-            sessionID = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
+            _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
+            _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
         }
 
         public CodingSessionDTO CreateCodingSessionDTO() // Creates a new CodingSessionDTO, assigns it to _currentSessionDTO, overwriting any existing session DTO in the provider.
