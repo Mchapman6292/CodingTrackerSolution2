@@ -72,6 +72,7 @@ namespace CodingTracker.View
             _appLogger.Debug($"Starting to confirm session goal with hours: {_goalHours}, minutes: {_goalMinutes}. TraceID: {activity.TraceId}");
 
             var codingGoalDTO = _goalDTOManager.CreateCodingGoalDTO(goalHours, goalMinutes);
+            _goalCountDownTimer.setMaxTime();
 
             stopwatch.Stop();
             _appLogger.Info($"Session goal confirmed and CodingGoalDTO created. Hours: {codingGoalDTO.GoalHours}, Minutes: {codingGoalDTO.GoalMinutes}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");

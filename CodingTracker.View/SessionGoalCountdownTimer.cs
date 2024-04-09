@@ -3,12 +3,17 @@ using CodingTracker.Common.ISessionGoalCountDownTimers;
 using System.Windows.Forms;
 using System;
 using System.Diagnostics;
+using CodingTracker.Business.CodingSessionCountDownTimers;
+using CodingTracker.Common.CodingGoalDTOs;
+using CodingTracker.Common.CodingGoalDTOManagers;
 
 namespace CodingTracker.View.SessionGoalCountDownTimers
 {
-    public class SessionGoalCountDownTimerDisplay : IDisposable, ISessionGoalCountDownTimer
+    public class SessionGoalCountdownTimer : IDisposable, ISessionGoalCountDownTimer
     {
         private readonly IApplicationLogger _appLogger;
+        private readonly ICodingSessionCountDownTimer _sessionCountDownTimer;
+        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private TimeSpan _maxTime;
         private System.Windows.Forms.Timer _timer;
@@ -17,35 +22,22 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
 
         public bool IsRunning => _stopwatch.IsRunning;
 
-        public SessionGoalCountDownTimerDisplay(IApplicationLogger appLogger)
+        public SessionGoalCountdownTimer(IApplicationLogger appLogger, ICodingSessionCountDownTimer sessionCountDownTimer, ICodingGoalDTOManager codingGoalDTOManager)
         {
             _appLogger = appLogger;
             _timer = new System.Windows.Forms.Timer();
+            _timer.Interval = 1000;
             _timer.Tick += Timer_Tick; // Event for timer tick
+            _sessionCountDownTimer = sessionCountDownTimer;
+            _codingGoalDTOManager = codingGoalDTOManager;
         }
-
-        public void Timer_Tick(object sender, EventArgs e)
-        {
-            if (_stopwatch.Elapsed < _maxTime)
-            {
-                TimeChanged?.Invoke(_maxTime - _stopwatch.Elapsed);
-            }
-            else
-            {
-                _timer.Stop();
-                _stopwatch.Stop();
-                CountDownFinished?.Invoke();
-                _appLogger.Info($"Timer countdown finished.");
-            }
-        }
-
 
         public void SetCountDownTimer(int minutes, int seconds = 0)
         {
             var methodStopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(SetCountDownTimer)).Start())
             {
-                _maxTime = TimeSpan.FromSeconds(minutes * 60 + seconds);
+
                 methodStopwatch.Stop();
                 _appLogger.Debug($"Timer set to {_maxTime}. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
             }
@@ -54,13 +46,17 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
         public void StartCountDownTimer()
         {
             var methodStopwatch = Stopwatch.StartNew();
+            TimeSpan maxTime = setMaxTime();
             using (var activity = new Activity(nameof(StartCountDownTimer)).Start())
             {
                 _appLogger.Debug($"Starting timer. TraceID: {activity.TraceId}");
 
                 if (_maxTime > TimeSpan.Zero)
                 {
+                
+
                     _stopwatch.Start();
+                    _timer.Start();
                     CheckTimeCountDownTimer();
                     methodStopwatch.Stop();
                     _appLogger.Debug($"Timer started. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
@@ -68,7 +64,7 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
                 else
                 {
                     methodStopwatch.Stop();
-                    _appLogger.Warning($"Timer start requested but maxTime is zero. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Error($"Timer start requested but maxTime is zero. Execution Time: {methodStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
             }
         }
@@ -78,6 +74,56 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
             SetCountDownTimer(minutes, seconds);
             StartCountDownTimer();
         }
+
+
+        public void Timer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_stopwatch.Elapsed < _maxTime)
+                {
+                    TimeChanged?.Invoke(_maxTime - _stopwatch.Elapsed);
+                }
+                else
+                {
+                    _timer.Stop();
+                    _stopwatch.Stop(); // runs independently of the ui thread and is not affected by freezes in ui etc. 
+                    CountDownFinished?.Invoke();
+                    _appLogger.Info("Timer countdown finished.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"An error occurred during Timer_Tick: {ex.Message}", ex);
+            }
+        }
+
+        private TimeSpan CalculateRemainingTime()
+        {
+            return _maxTime - _stopwatch.Elapsed;
+        }
+
+
+        public TimeSpan setMaxTime()
+        {
+            var currentGoalDTO = _codingGoalDTOManager.GetCurrentCodingGoalDTO();
+            if (currentGoalDTO != null)
+            {
+                _maxTime = ConvertGoalHoursAndMinsToTimeSpan(currentGoalDTO.GoalHours, currentGoalDTO.GoalMinutes);
+            }
+            return _maxTime;
+        }
+
+
+        public TimeSpan ConvertGoalHoursAndMinsToTimeSpan(int goalHours, int goalMins)
+        {
+            TimeSpan goalTimeSpan = new TimeSpan(goalHours, goalMins, 0);
+            return goalTimeSpan;
+        }
+
+
+
+
 
         public void CheckTimeCountDownTimer()
         {

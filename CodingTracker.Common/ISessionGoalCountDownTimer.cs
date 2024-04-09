@@ -12,6 +12,8 @@ namespace CodingTracker.Common.ISessionGoalCountDownTimers
         void StartCountDownTimer();
 
         void CheckTimeCountDownTimer();
+        TimeSpan setMaxTime();
+        TimeSpan ConvertGoalHoursAndMinsToTimeSpan(int goalHours, int goalMins);
 
         void InitializeAndStartTimer(int minutes, int seconds = 0);
 

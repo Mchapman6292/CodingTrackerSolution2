@@ -31,9 +31,6 @@ namespace CodingTracker.Business.CodingSessions
         private bool isCodingSessionActive = false;
 
 
-
-
-
         public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead)
         {
             _inputValidator = validator;
@@ -50,95 +47,90 @@ namespace CodingTracker.Business.CodingSessions
 
         public void StartSession()
         {
-            var activity = new Activity(nameof(StartSession)).Start();
-            var stopwatch = Stopwatch.StartNew();
-
-            _appLogger.Debug($"Attempting to start a new session. TraceID: {activity.TraceId}");
-
-            bool sessionAlreadyActive = CheckIfCodingSessionActive();
-            if (sessionAlreadyActive)
+            using (var activity = new Activity(nameof(StartSession)).Start())
             {
-                _appLogger.Warning($"Cannot start a new session because another session is already active. TraceID: {activity.TraceId}");
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Attempting to start a new session. TraceID: {activity.TraceId}");
+
+                bool sessionAlreadyActive = CheckIfCodingSessionActive();
+                if (sessionAlreadyActive)
+                {
+                    _appLogger.Warning($"Cannot start a new session because another session is already active. TraceID: {activity.TraceId}");
+                    stopwatch.Stop();
+                    return;
+                }
+
+                isCodingSessionActive = true;
+                var sessionDto = _sessionDTOManager.CreateAndReturnCurrentSessionDTO();
+                _sessionTimer.StartCodingSessionTimer();
+
                 stopwatch.Stop();
-                activity.Stop();
-                return; 
+                _appLogger.Info($"New session started successfully for UserId: {sessionDto.UserId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
             }
-
-            isCodingSessionActive = true;
-            var sessionDto = _sessionDTOManager.CreateAndReturnCurrentSessionDTO(); 
-            _sessionTimer.StartCodingSessionTimer(); 
-
-            stopwatch.Stop();
-            _appLogger.Info($"New session started successfully for UserId: {sessionDto.UserId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
-
-            activity.Stop();
         }
 
         public void EndSession()
         {
-            var activity = new Activity(nameof(EndSession)).Start();
-            var stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(EndSession)).Start())
+            {
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
 
-            _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
+                isCodingSessionActive = false;
 
-            isCodingSessionActive = false;
+                _sessionTimer.EndCodingSessionTimer();
+                _sessionDTOManager.SetSessionEndTimeAndDate();
+                _sessionDTOManager.CalculateDurationMinutes();
 
-            _sessionTimer.EndCodingSessionTimer();
-            _sessionDTOManager.SetSessionEndTimeAndDate();
-            _sessionDTOManager.CalculateDurationMinutes();
+                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, null, null, null, null, null);
 
-            _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, null, null, null, null, null);
-
-            stopwatch.Stop();
-            _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, isCodingSessionActive: {isCodingSessionActive}, Trace ID: {activity.TraceId},  Execution Time: {stopwatch.ElapsedMilliseconds}ms");
-
-            activity.Stop();
+                stopwatch.Stop();
+                _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, isCodingSessionActive: {isCodingSessionActive}, Trace ID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+            }
         }
 
 
 
         public bool CheckIfCodingSessionActive()
         {
-            var activity = new Activity(nameof(CheckIfCodingSessionActive)).Start();
-            var stopwatch = Stopwatch.StartNew();
-
-            _appLogger.Debug($"Checking if session is active. TraceID: {activity.TraceId}");
-
-            bool isActive = isCodingSessionActive;
-
-            stopwatch.Stop();
-            _appLogger.Info($"Coding session active status: {isActive}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
-
-            activity.Stop();
-
-            return isActive;
-        }
-
-
-
-
-        public List<DateTime> GetDatesPrevious28days()
-        {
-            var activity = new Activity(nameof(GetDatesPrevious28days)).Start();
-            var stopwatch = Stopwatch.StartNew();
-
-            _appLogger.Debug($"Getting dates for the previous 28 days. TraceID: {activity.TraceId}");
-
-            List<DateTime> dates = new List<DateTime>();
-            DateTime today = DateTime.Today;
-
-            for (int i = 1; i <= 28; i++)
+            using (var activity = new Activity(nameof(CheckIfCodingSessionActive)).Start())
             {
-                dates.Add(today.AddDays(-i));
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Checking if session is active. TraceID: {activity.TraceId}");
+
+                bool isActive = isCodingSessionActive;
+
+                stopwatch.Stop();
+                _appLogger.Info($"Coding session active status: {isActive}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+                return isActive;
             }
-
-            stopwatch.Stop();
-            _appLogger.Info($"Retrieved dates for the previous 28 days. Count: {dates.Count}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
-
-            activity.Stop();
-
-            return dates;
         }
+
+
+
+        public List<DateTime> GetDatesPrevious28days() // Potential mismatch with sql lite db dates?
+        {
+            using (var activity = new Activity(nameof(GetDatesPrevious28days)).Start())
+            {
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Getting dates for the previous 28 days. TraceID: {activity.TraceId}");
+
+                List<DateTime> dates = new List<DateTime>();
+                DateTime today = DateTime.Today;
+
+                for (int i = 1; i <= 28; i++)
+                {
+                    dates.Add(today.AddDays(-i));
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"Retrieved dates for the previous 28 days. Count: {dates.Count}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+                return dates;
+            }
+        }
+
 
     }
 }
