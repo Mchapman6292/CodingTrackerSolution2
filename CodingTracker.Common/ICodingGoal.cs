@@ -9,7 +9,6 @@ namespace CodingTracker.Common.ICodingGoals
     public interface ICodingGoal
     {
         void SetCodingGoal(int goalHours);
-        string FormatTimeToGoalToHHMM(int? timeToGoal);
 
     }
 }

@@ -52,6 +52,7 @@ using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Common.CodingSessionDTOProviders;
 using CodingTracker.Common.ICodingSessionDTOProviders;
 using CodingTracker.Common.CodingGoalDTOManagers;
+using CodingTracker.Business.CodingSessionCountDownTimers;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -113,7 +114,6 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSession, CodingSession>()
                     .AddSingleton<ICodingGoal, CodingGoal>()
                     .AddSingleton<IFormController, FormController>()
-                    .AddSingleton<ISessionGoalCountDownTimer, SessionGoalCountDownTimerDisplay>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
                     .AddSingleton<IPanelColorControl, PanelColorControl>()
@@ -122,6 +122,10 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
                     .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
+                    .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
+
+                    // Transient services.
+                    .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()

@@ -43,24 +43,24 @@ namespace CodingTracker.Common.CodingSessionDTOProviders
 
 
             public CodingSessionDTO GetOrCreateCurrentSessionDTO() // Returns the existing session DTO if available, or creates a new one if not.
-        {
-            using (var activity = new Activity(nameof(GetOrCreateCurrentSessionDTO)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(GetOrCreateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
-
-                if (_currentSessionDTO == null)
+                using (var activity = new Activity(nameof(GetOrCreateCurrentSessionDTO)).Start())
                 {
-                    _appLogger.Info($"No current session DTO found. Creating new one. TraceID: {activity.TraceId}");
-                    CreateCodingSessionDTO();
-                }
-                else
-                {
-                    _appLogger.Info($"Returning existing session DTO. TraceID: {activity.TraceId}");
-                }
+                    _appLogger.Debug($"Starting {nameof(GetOrCreateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
 
-            return _currentSessionDTO;
+                    if (_currentSessionDTO == null)
+                    {
+                        _appLogger.Info($"No current session DTO found. Creating new one. TraceID: {activity.TraceId}");
+                        CreateCodingSessionDTO();
+                    }
+                    else
+                    {
+                        _appLogger.Info($"Returning existing session DTO. TraceID: {activity.TraceId}");
+                    }
+
+                return _currentSessionDTO;
+                }
             }
-        }
 
 
         public CodingSessionDTO CreateAndReturnCurrentSessionDTO() // creates and returns a new session DTO, regardless of whether an existing DTO is present,                                                     
