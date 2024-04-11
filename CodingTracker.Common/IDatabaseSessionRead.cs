@@ -11,7 +11,7 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 {
     public interface IDatabaseSessionRead
     {
-        List<int> ReadSessionDurationMinutes(int numberOfDays);
+        List<int> ReadSessionDurationMinutes(int numberOfDays, bool readAll = false);
 
         List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
 

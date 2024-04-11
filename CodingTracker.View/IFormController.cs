@@ -10,10 +10,10 @@ namespace CodingTracker.View.IFormControllers
 {
     public interface IFormController
     {
-        void HandleAndShowForm(Func<Form> createForm, string methodName, bool closeCurrent = true);
+        void HandleAndShowForm<TForm>(Func<TForm> createForm, string methodName, bool closeCurrent = true) where TForm : Form;
         void ExecutePageAction(Action action, string methodName);
         void CloseCurrentForm();
-        void DisplayForm(Form newForm);
+        void DisplayForm<TForm>(TForm newForm) where TForm : Form;
         void CloseTargetForm(Form targetForm);
     }
 }

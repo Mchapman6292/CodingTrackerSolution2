@@ -15,7 +15,7 @@ using CodingTracker.View.IFormControllers;
 using System.Diagnostics;
 using CodingTracker.View;
 using System.Security.Principal;
-using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.FormSwitchers;
 
 namespace CodingTracker.View
 {

@@ -2,7 +2,7 @@
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.IFormControllers;
-using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.FormSwitchers;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using System;

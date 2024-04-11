@@ -2,11 +2,25 @@
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingSessionDTOs;
 using System.Diagnostics;
-using CodingTracker.Common.ICodingSessionDTOProviders;
 using CodingTracker.Common.IDatabaseSessionReads;
 
-namespace CodingTracker.Common.CodingSessionDTOProviders
+namespace CodingTracker.Common.CodingSessionDTOManagers
 {
+
+    public interface ICodingSessionDTOManager
+    {
+        CodingSessionDTO CreateCodingSessionDTO();
+        CodingSessionDTO GetCurrentSessionDTO();
+        void SetSessionStartTimeAndDate();
+        void SetSessionEndTimeAndDate();
+        int CalculateDurationMinutes();
+        CodingSessionDTO GetOrCreateCurrentSessionDTO();
+        CodingSessionDTO CreateAndReturnCurrentSessionDTO();
+        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, DateTime? startDate = null, DateTime? endDate = null, int? durationMinutes = null);
+    }
+
+
+
     public class CodingSessionDTOManager : ICodingSessionDTOManager
     {
         public CodingSessionDTO _currentSessionDTO;
@@ -26,6 +40,11 @@ namespace CodingTracker.Common.CodingSessionDTOProviders
             _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
         }
 
+        public CodingSessionDTO GetCurrentSessionDTO()
+        {
+            return _currentSessionDTO;
+        }
+
         public CodingSessionDTO CreateCodingSessionDTO() // Creates a new CodingSessionDTO, assigns it to _currentSessionDTO, overwriting any existing session DTO in the provider.
         {
             using (var activity = new Activity(nameof(CreateCodingSessionDTO)).Start())
@@ -40,6 +59,7 @@ namespace CodingTracker.Common.CodingSessionDTOProviders
             }
             return _currentSessionDTO;
         }
+
 
 
             public CodingSessionDTO GetOrCreateCurrentSessionDTO() // Returns the existing session DTO if available, or creates a new one if not.

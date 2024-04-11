@@ -6,8 +6,12 @@ using System.Linq.Expressions;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.ICodingSessionDTOProviders;
 using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Common.CodingGoalDTOManagers;
+using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.CodingSessionDTOManagers;
+using CodingTracker.Common.IDatabaseSessionInserts;
+using CodingTracker.Data.DatabaseSessionInserts;
 
 
 // method to record start & end time
@@ -25,13 +29,15 @@ namespace CodingTracker.Business.CodingSessions
         private readonly ICodingSessionTimer _sessionTimer;
         private readonly ICodingSessionDTOManager _sessionDTOManager;
         private readonly IDatabaseSessionRead _databaseSessionRead;
+        private readonly ICodingGoalDTOManager _goalDTOManager;
+        private readonly IDatabaseSessionInsert _databaseSessionInsert;
         private readonly int _userId;
         private readonly int _sessionId;
         public bool IsStopWatchEnabled = false;
         private bool isCodingSessionActive = false;
 
 
-        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead)
+        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, ICodingGoal codingGoal, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
@@ -42,6 +48,8 @@ namespace CodingTracker.Business.CodingSessions
             _databaseSessionRead = databaseSessionRead;
             _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
             _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
+            _goalDTOManager = goalDTOManager;
+            _databaseSessionInsert = databaseSessionInsert;
         }
 
 
@@ -62,6 +70,7 @@ namespace CodingTracker.Business.CodingSessions
 
                 isCodingSessionActive = true;
                 var sessionDto = _sessionDTOManager.CreateAndReturnCurrentSessionDTO();
+                _sessionDTOManager.SetSessionStartTimeAndDate();
                 _sessionTimer.StartCodingSessionTimer();
 
                 stopwatch.Stop();
@@ -73,6 +82,8 @@ namespace CodingTracker.Business.CodingSessions
         {
             using (var activity = new Activity(nameof(EndSession)).Start())
             {
+              
+               CodingSessionDTO currentSessionDTO = _sessionDTOManager.GetCurrentSessionDTO();
                 var stopwatch = Stopwatch.StartNew();
                 _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
 
@@ -82,7 +93,8 @@ namespace CodingTracker.Business.CodingSessions
                 _sessionDTOManager.SetSessionEndTimeAndDate();
                 _sessionDTOManager.CalculateDurationMinutes();
 
-                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, null, null, null, null, null);
+                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, currentSessionDTO.StartDate, currentSessionDTO.EndDate, currentSessionDTO.DurationMinutes);
+                _databaseSessionInsert.InsertSession();
 
                 stopwatch.Stop();
                 _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, isCodingSessionActive: {isCodingSessionActive}, Trace ID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");

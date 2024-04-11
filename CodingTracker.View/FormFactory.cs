@@ -12,6 +12,7 @@ namespace CodingTracker.View.FormFactories
 
         private IServiceProvider _serviceProvider;
         private IApplicationLogger _appLogger;
+        private MainPage _mainPageInstance;
 
         public  FormFactory(IServiceProvider serviceProvider,IApplicationLogger appLogger)
         {
@@ -45,7 +46,11 @@ namespace CodingTracker.View.FormFactories
 
         public MainPage CreateMainPage()
         {
-            return CreateForm<MainPage>(nameof(CreateMainPage));
+            if (_mainPageInstance == null)
+            {
+                _mainPageInstance = CreateForm<MainPage>(nameof(CreateMainPage));
+            }
+            return _mainPageInstance;
         }
 
         public CodingSessionPage CreateCodingSessionPage()
@@ -61,11 +66,6 @@ namespace CodingTracker.View.FormFactories
         public SettingsPage CreateSettingsPage()
         {
             return CreateForm<SettingsPage>(nameof(CreateSettingsPage));
-        }
-
-        public ViewSessionsPage CreateViewSessionsPage()
-        {
-            return CreateForm<ViewSessionsPage>(nameof(CreateViewSessionsPage));
         }
         
         public CreateAccountPage CreateAccountPage() 

@@ -37,7 +37,6 @@ using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Common.IPanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ErrorHandlers;
-using CodingTracker.View.IFormSwitchers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Data.DatabaseSessionInserts;
 using CodingTracker.Common.IDatabaseSessionInserts;
@@ -49,10 +48,10 @@ using CodingTracker.Data.DatabaseSessionUpdates;
 using CodingTracker.Common.IDatabaseSessionUpdates;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.CodingSessionDTOProviders;
-using CodingTracker.Common.ICodingSessionDTOProviders;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
+using CodingTracker.Business.SessionCalculators;
+using CodingTracker.Common.CodingSessionDTOManagers;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -123,6 +122,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
+                    .AddSingleton<ISessionCalculator, SessionCalculator>()
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
@@ -130,7 +130,6 @@ namespace CodingTracker.View.Program
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()
                     .AddTransient<EditSessionPage>()
-                    .AddTransient<ViewSessionsPage>()
                     .AddTransient<CodingSessionTimerForm>()
                     .AddTransient<SettingsPage>()
                     .AddTransient<CreateAccountPage>();

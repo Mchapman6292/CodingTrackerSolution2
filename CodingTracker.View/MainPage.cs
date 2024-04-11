@@ -6,7 +6,7 @@ using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.View.IFormFactories;
-using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.FormSwitchers;
 
 
 
@@ -38,9 +38,9 @@ namespace CodingTracker.View
             _formSwitcher = formSwitcher;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void MainPage_Load(object sender, EventArgs e)
         {
-
+ 
         }
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
@@ -54,12 +54,6 @@ namespace CodingTracker.View
         {
             this.Hide();
             _formSwitcher.SwitchToEditSessionPage();
-        }
-
-        private void MainPageViewSessionsButton_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-            _formSwitcher.SwitchToViewSessionsPage();
         }
 
         private void MainPageSettingsButton_Click(object sender, EventArgs e)
@@ -81,7 +75,7 @@ namespace CodingTracker.View
             }
         }
 
-        private void UpdateGradientPanels(Panel parentPanel)
+        private void UpDateLast28Days(Panel parentPanel)
         {
             List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
             List<int> sessionDurations = _databaseRead.ReadSessionDurationMinutes(28);

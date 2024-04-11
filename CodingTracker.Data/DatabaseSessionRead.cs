@@ -33,7 +33,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
         }
 
 
-        public List<int> ReadSessionDurationMinutes(int numberOfDays)
+        public List<int> ReadSessionDurationMinutes(int numberOfDays, bool readAll = false)
         {
             using (var activity = new Activity(nameof(ReadSessionDurationMinutes)).Start())
             {
@@ -46,14 +46,28 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 {
                     _databaseManager.ExecuteCRUD(connection =>
                     {
-                        using var command = new SQLiteCommand(@"
-                    SELECT DurationMinutes FROM CodingSessions", connection);
+                        string sqlQuery = @"
+                    SELECT DurationMinutes FROM CodingSessions";
+
+
+                        if (!readAll)
+                        {
+                            sqlQuery += " WHERE EndDate >= datetime('now', @DaysOffset)";
+                        }
+
+                        using var command = new SQLiteCommand(sqlQuery, connection);
+
+                        // Set the parameter for the number of days offset if not reading all records
+                        if (!readAll)
+                        {
+                            command.Parameters.AddWithValue("@DaysOffset", $"-{numberOfDays} days");
+                        }
 
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                if (!reader.IsDBNull(reader.GetOrdinal("DurationMinutes"))) // GetOrdinal finds the index of the "DurationMinutes" column in the result set, used to check if the column value is null.
+                                if (!reader.IsDBNull(reader.GetOrdinal("DurationMinutes")))
                                 {
                                     int durationMinutes = reader.GetInt32(reader.GetOrdinal("DurationMinutes"));
                                     durationMinutesList.Add(durationMinutes);
@@ -244,11 +258,12 @@ namespace CodingTracker.Data.DatabaseSessionReads
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)
         {
             var methodName = nameof(ViewRecentSession);
+            int userId = GetUserIdWithMostRecentLogin();
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
             using (var activity = new Activity(nameof(ViewRecentSession)).Start())
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, UserId: {_codingSessionDTO.UserId}, NumberOfSessions: {numberOfSessions}");
+                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, NumberOfSessions: {numberOfSessions}");
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
@@ -266,7 +281,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     LIMIT 
                         @NumberOfSessions";
 
-                        command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
+                        command.Parameters.AddWithValue("@UserId", userId);
                         command.Parameters.AddWithValue("@NumberOfSessions", numberOfSessions);
 
                         using (var reader = command.ExecuteReader())
