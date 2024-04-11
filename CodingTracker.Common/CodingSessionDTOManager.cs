@@ -16,7 +16,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         int CalculateDurationMinutes();
         CodingSessionDTO GetOrCreateCurrentSessionDTO();
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, DateTime? startDate = null, DateTime? endDate = null, int? durationMinutes = null);
+        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, int? durationMinutes = null);
     }
 
 
@@ -103,9 +103,8 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             {
                 DateTime endTime = DateTime.Now;
                 _currentSessionDTO.EndTime = endTime;
-                _currentSessionDTO.EndDate = endTime.Date;
 
-                _appLogger.Info($"End time and date set, EndTime: {endTime}, EndDate: {endTime.Date}");
+                _appLogger.Info($"End time and date set, EndTime: {endTime}.");
             }, nameof(SetSessionEndTimeAndDate));
         }
 
@@ -115,7 +114,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             {
                 DateTime startTime = DateTime.Now;
                 _currentSessionDTO.StartTime = startTime;
-                _currentSessionDTO.StartDate = startTime.Date;
             }
         }
 
@@ -146,7 +144,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             return durationMins;
         }
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId , DateTime? startTime =null, DateTime? endTime =null, DateTime? startDate =null, DateTime? endDate =null, int? durationMinutes =null)
+        public void UpdateCurrentSessionDTO(int sessionId, int userId , DateTime? startTime =null, DateTime? endTime =null, int? durationMinutes =null)
 
         {
             using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
@@ -156,8 +154,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 _currentSessionDTO.UserId = userId;
                 _currentSessionDTO.StartTime = startTime;
                 _currentSessionDTO.EndTime = endTime;
-                _currentSessionDTO.StartDate = startDate;
-                _currentSessionDTO.EndDate = endDate;
                 _currentSessionDTO.DurationMinutes = durationMinutes;
 
                 _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO),
@@ -165,8 +161,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 ("UserId", (object)userId),
                 ("StartTime", (object)startTime), 
                 ("EndTime", (object?)endTime),    // Nullable DateTime, cast to object?
-                ("StartDate", (object?)startDate),
-                ("EndDate", (object?)endDate),
                 ("DurationMinutes", (object?)durationMinutes));
         }
     }

@@ -171,7 +171,7 @@ namespace CodingTracker.Data.DatabaseManagers
                 UserId INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT NOT NULL UNIQUE,
                 PasswordHash TEXT NOT NULL,
-                LastLogin DATETIME 
+                LastLogin DATETIME
             );
 
             CREATE TABLE IF NOT EXISTS CodingSessions (
@@ -179,8 +179,6 @@ namespace CodingTracker.Data.DatabaseManagers
                 UserId INTEGER NOT NULL,
                 StartTime DATETIME NOT NULL,
                 EndTime DATETIME,
-                StartDate DATETIME NOT NULL,
-                EndDate DATETIME,
                 DurationMinutes INTEGER,
                 FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
             );";

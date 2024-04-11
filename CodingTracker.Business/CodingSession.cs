@@ -93,7 +93,7 @@ namespace CodingTracker.Business.CodingSessions
                 _sessionDTOManager.SetSessionEndTimeAndDate();
                 _sessionDTOManager.CalculateDurationMinutes();
 
-                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, currentSessionDTO.StartDate, currentSessionDTO.EndDate, currentSessionDTO.DurationMinutes);
+                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, currentSessionDTO.DurationMinutes);
                 _databaseSessionInsert.InsertSession();
 
                 stopwatch.Stop();

@@ -30,6 +30,8 @@ namespace CodingTracker.Common.IDatabaseSessionReads
         List<CodingSessionDTO> FilterSessionsByWeek(string date, bool isDescending);
         List<CodingSessionDTO> FilterSessionsByYear(string year, bool isDescending);
 
+        void GetLast28DaysSessions();
+
 
     }
 }

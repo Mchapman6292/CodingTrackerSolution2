@@ -50,9 +50,7 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                         (
                             UserId, 
                             StartTime, 
-                            EndTime, 
-                            StartDate,
-                            EndDate,
+                            EndTime,
                             DurationMinutes
                         ) 
                         VALUES 
@@ -60,8 +58,6 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                             @UserId, 
                             @StartTime, 
                             @EndTime, 
-                            @StartDate,
-                            @EndDate,
                             @DurationMinutes
 
                         )";
@@ -69,8 +65,6 @@ namespace CodingTracker.Data.DatabaseSessionInserts
                     command.Parameters.AddWithValue("@UserId", codingSessionDTO.UserId);
                     command.Parameters.AddWithValue("@StartTime", codingSessionDTO.StartTime);
                     command.Parameters.AddWithValue("@EndTime", codingSessionDTO.EndTime.HasValue ? (object)codingSessionDTO.EndTime.Value : DBNull.Value);
-                    command.Parameters.AddWithValue("@StartDate", codingSessionDTO.StartDate.HasValue ? codingSessionDTO.StartDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
-                    command.Parameters.AddWithValue("@EndDate", codingSessionDTO.EndDate.HasValue ? codingSessionDTO.EndDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
                     command.Parameters.AddWithValue("@DurationMinutes", codingSessionDTO.DurationMinutes);
 
 

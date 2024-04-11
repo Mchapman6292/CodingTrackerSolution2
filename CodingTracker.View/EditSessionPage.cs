@@ -60,8 +60,6 @@ namespace CodingTracker.View
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.UserId;
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.StartTime?.ToString("g");
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.EndTime?.ToString("g");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartDate?.ToString("d");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndDate?.ToString("d");
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[5].Value = session.DurationMinutes;
                     }
 

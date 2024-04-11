@@ -47,17 +47,15 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     _databaseManager.ExecuteCRUD(connection =>
                     {
                         string sqlQuery = @"
-                    SELECT DurationMinutes FROM CodingSessions";
-
+                            SELECT DurationMinutes FROM CodingSessions";
 
                         if (!readAll)
                         {
-                            sqlQuery += " WHERE EndDate >= datetime('now', @DaysOffset)";
+                            sqlQuery += " WHERE StartDate >= datetime('now', @DaysOffset) AND EndDate <= datetime('now')";
                         }
 
                         using var command = new SQLiteCommand(sqlQuery, connection);
 
-                        // Set the parameter for the number of days offset if not reading all records
                         if (!readAll)
                         {
                             command.Parameters.AddWithValue("@DaysOffset", $"-{numberOfDays} days");
@@ -108,17 +106,28 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         if (returnLastLoggedIn)
                         {
                             command.CommandText = @"
-                        SELECT UserId, Username, PasswordHash, LastLogin
-                        FROM UserCredentials 
-                        ORDER BY LastLogin DESC 
-                        LIMIT 1";
+                             SELECT 
+                                    UserId,
+                                    Username,
+                                    PasswordHash,
+                                    LastLogin
+                            FROM
+                                    UserCredentials 
+                            ORDER BY
+                                    LastLogin DESC 
+                            LIMIT 1";
                         }
                         else
                         {
                             command.CommandText = @"
-                        SELECT UserId, Username, PasswordHash, LastLogin
-                        FROM UserCredentials";
-                        }
+                            SELECT 
+                                    UserId, 
+                                    Username,
+                                    PasswordHash, 
+                                    LastLogin
+                            FROM 
+                                    UserCredentials";
+                            }
 
                         using (var reader = command.ExecuteReader())
                         {
@@ -277,7 +286,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     WHERE 
                         UserId = @UserId
                     ORDER BY 
-                        StartDate DESC, StartTime DESC 
+                         StartTime DESC 
                     LIMIT 
                         @NumberOfSessions";
 
@@ -329,14 +338,14 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     _databaseManager.ExecuteCRUD(connection =>
                     {
                         using var command = connection.CreateCommand();
-                        var partialColumns = partialView ? "SessionId, StartTime, EndTime" : "SessionId, StartTime, EndTime"; // Adjusted to match the columns used in the reader logic
+                        var partialColumns = partialView ? "SessionId, StartTime, EndTime" : "SessionId, StartTime, EndTime";
                         command.CommandText = $@"
                     SELECT {partialColumns} FROM 
                         CodingSessions 
                     WHERE 
                         UserId = @UserId 
                     ORDER BY 
-                        StartDate DESC, StartTime DESC";
+                         StartTime DESC";
 
                         command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
 
@@ -439,12 +448,12 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         using var command = connection.CreateCommand();
                         string order = isDescending ? "DESC" : "ASC";
                         command.CommandText = $@"
-                SELECT SessionId, StartTime, EndTime FROM
-                    CodingSessions 
-                WHERE
-                    DATE(StartTime) = DATE(@Date)
-                ORDER BY
-                    StartTime {order}";
+                        SELECT SessionId, StartTime, EndTime FROM
+                            CodingSessions 
+                        WHERE
+                            DATE(StartTime) = DATE(@Date)
+                        ORDER BY
+                            StartTime {order}";
 
                         command.Parameters.AddWithValue("@Date", date);
 
@@ -547,19 +556,19 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     {
                         using var command = connection.CreateCommand();
                         string order = isDescending ? "DESC" : "ASC";
-                        string startDate = $"{year}-01-01";
+                        string yearStartTime = $"{year}-01-01";
                         string endDate = DateTime.Now.Year.ToString() == year ? DateTime.Now.ToString("yyyy-MM-dd") : $"{year}-12-31";
                         command.CommandText = $@"
                         SELECT SessionId, StartTime, EndTime FROM
                             CodingSessions 
                         WHERE
-                            DATE(StartTime) >= DATE(@StartDate)
+                            DATE(StartTime) >= DATE(@yearStartTime)
                         AND 
                             DATE(StartTime) <= DATE(@EndDate)
                         ORDER BY
                             StartTime {order}";
 
-                        command.Parameters.AddWithValue("@StartDate", startDate);
+                        command.Parameters.AddWithValue("@startTime", StartTime);
                         command.Parameters.AddWithValue("@EndDate", endDate);
 
                         using (var reader = command.ExecuteReader())
@@ -587,6 +596,50 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 }
             }
             return codingSessionList;
+        }
+
+
+        public void GetLast28DaysSessions()
+        {
+            using (var activity = new Activity(nameof(GetLast28DaysSessions)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(GetLast28DaysSessions)}. TraceID: {activity.TraceId}");
+                try
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using var command = connection.CreateCommand();
+                        var endTime = DateTime.UtcNow.Date;
+                        var startTime = endTime.AddDays(-28);
+
+                        command.CommandText = @"
+                    SELECT 
+                        DurationMinutes
+                    FROM 
+                        CodingSessions
+                    WHERE 
+                        StartTime >= @StartTime AND StartTime <= @EndTime";
+
+                        command.Parameters.AddWithValue("@StartTime", startTime);
+                        command.Parameters.AddWithValue("@EndTime", endTime);
+
+                        using var reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            _appLogger.Info($"DurationMinutes: {reader["DurationMinutes"]}, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"{nameof(GetLast28DaysSessions)} Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during {nameof(GetLast28DaysSessions)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                }
+            }
         }
     }
 }
