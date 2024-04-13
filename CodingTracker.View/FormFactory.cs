@@ -3,10 +3,23 @@ using CodingTracker.View;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
-using CodingTracker.View.IFormFactories;
+using CodingTracker.View.FormFactories;
 
 namespace CodingTracker.View.FormFactories
 {
+    public interface IFormFactory
+    {
+        T CreateForm<T>(string methodName) where T : class;
+        LoginPage CreateLoginPage();
+        MainPage CreateMainPage();
+        CodingSessionPage CreateCodingSessionPage();
+        EditSessionPage CreateEditSessionPage();
+        SettingsPage CreateSettingsPage();
+        CreateAccountPage CreateAccountPage();
+        CodingSessionTimerForm CreateCodingSessionTimer();
+
+    }
+
     public class FormFactory : IFormFactory
     {
 

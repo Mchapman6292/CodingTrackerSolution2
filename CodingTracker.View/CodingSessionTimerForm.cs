@@ -12,11 +12,11 @@ using System.Windows.Forms;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.View.FormSwitchers;
-using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.CodingGoalDTOs;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
-using CodingTracker.View.IFormFactories;
+using CodingTracker.View.FormFactories;
 namespace CodingTracker.View
 {
     public partial class CodingSessionTimerForm : Form
@@ -124,8 +124,6 @@ namespace CodingTracker.View
         {
             using (var activity = new Activity(nameof(UpdateTimeRemainingDisplay)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(UpdateTimeRemainingDisplay)}. TraceID: {activity.TraceId}, RemainingTime: {timeRemaining}");
-
                 try
                 {
                     Invoke((MethodInvoker)(() =>

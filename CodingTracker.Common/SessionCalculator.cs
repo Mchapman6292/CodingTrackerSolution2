@@ -9,7 +9,7 @@ using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.CodingSessionDTOs;
 
-namespace CodingTracker.Business.SessionCalculators
+namespace CodingTracker.Common.SessionCalculators
 {
     public interface ISessionCalculator
     {
@@ -149,7 +149,6 @@ namespace CodingTracker.Business.SessionCalculators
 
                     TimeSpan duration = currentSessionDTO.EndTime.Value - currentSessionDTO.StartTime.Value;
                     durationSeconds = (int)duration.TotalSeconds;
-                    
 
                     _appLogger.Info($"Duration seconds calculated. TraceID: {activity.TraceId}, DurationSeconds: {durationSeconds}");
                 }

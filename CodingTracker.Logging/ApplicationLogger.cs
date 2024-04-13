@@ -13,10 +13,10 @@ namespace CodingTracker.Logging.ApplicationLoggers
         public ApplicationLogger()
         {
             _logger = new LoggerConfiguration()
-                .MinimumLevel.Information() // Set minimum level to Information
-                .Enrich.FromLogContext() // Enrich logs from the log context
-                .WriteTo.Console() // Log to console
-                .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day) // Log to file, with daily roll-over
+                .MinimumLevel.Debug() 
+                .Enrich.FromLogContext() 
+                .WriteTo.Console() 
+                .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day) 
                 .CreateLogger();
         }
 
@@ -35,6 +35,12 @@ namespace CodingTracker.Logging.ApplicationLoggers
                     throw;
                 }
             }
+        }
+
+        private void LogDatabaseError(Exception ex, string operationName, Stopwatch stopwatch)
+        {
+            stopwatch.Stop();
+            Error($"Error executing {operationName}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {Activity.Current?.TraceId}");
         }
 
         public void LogUpdates(string methodName, params (string Name, object Value)[] updates)

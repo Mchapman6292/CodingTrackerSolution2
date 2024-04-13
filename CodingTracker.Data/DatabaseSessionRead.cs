@@ -3,6 +3,7 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.UserCredentialDTOs;
+using CodingTracker.Common.ICredentialManagers;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
@@ -22,301 +23,218 @@ namespace CodingTracker.Data.DatabaseSessionReads
         private readonly IApplicationLogger _appLogger;
         private readonly CodingSessionDTO _codingSessionDTO;
         private readonly IErrorHandler _errorHandler;
+        private readonly ICredentialManager _credentialManager;
 
 
 
-        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler)
+        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler, ICredentialManager credentialManager)
         {
             _databaseManager = databaseManager;
             _appLogger = appLogger;
             _errorHandler = errorHandler;
+            _credentialManager = credentialManager;
         }
 
 
-        public List<int> ReadSessionDurationMinutes(int numberOfDays, bool readAll = false)
+        public List<int> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false)
         {
-            using (var activity = new Activity(nameof(ReadSessionDurationMinutes)).Start())
+            List<int> durationSecondsList = new List<int>();
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {nameof(ReadSessionDurationMinutes)}. TraceID: {activity.TraceId}");
+                using var command = new SQLiteCommand(connection);
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                List<int> durationMinutesList = new List<int>();
-
-                try
+                if (readAll)
                 {
-                    _databaseManager.ExecuteCRUD(connection =>
+                    command.CommandText = @"
+                    SELECT 
+                            DurationSeconds
+                    FROM
+                            CodingSessions";
+                }
+                else
+                {
+                    command.CommandText = @"
+                    SELECT
+                            DurationSeconds 
+                    FROM
+                            CodingSessions
+                    WHERE
+                            StartDate >= datetime('now', @DaysOffset)
+                    AND
+                            EndDate <= datetime('now')";
+                    command.Parameters.AddWithValue("@DaysOffset", $"-{numberOfDays} days");
+                }
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        string sqlQuery = @"
-                            SELECT DurationMinutes FROM CodingSessions";
-
-                        if (!readAll)
+                        if (!reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
                         {
-                            sqlQuery += " WHERE StartDate >= datetime('now', @DaysOffset) AND EndDate <= datetime('now')";
+                            int durationSeconds = reader.GetInt32(reader.GetOrdinal("DurationSeconds"));
+                            durationSecondsList.Add(durationSeconds);
                         }
-
-                        using var command = new SQLiteCommand(sqlQuery, connection);
-
-                        if (!readAll)
-                        {
-                            command.Parameters.AddWithValue("@DaysOffset", $"-{numberOfDays} days");
-                        }
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                if (!reader.IsDBNull(reader.GetOrdinal("DurationMinutes")))
-                                {
-                                    int durationMinutes = reader.GetInt32(reader.GetOrdinal("DurationMinutes"));
-                                    durationMinutesList.Add(durationMinutes);
-                                }
-                            }
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully read DurationMinutes values. Count: {durationMinutesList.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to read DurationMinutes values. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    throw;
-                }
-
-                return durationMinutesList;
-            }
+            }, nameof(ReadSessionDurationSeconds));
+            return durationSecondsList;
         }
 
         public List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn)
         {
-            using (var activity = new Activity(nameof(ReadUserCredentials)).Start())
+            List<UserCredentialDTO> userCredentialsList = new List<UserCredentialDTO>();
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {nameof(ReadUserCredentials)}. TraceID: {activity.TraceId}");
+                using var command = connection.CreateCommand();
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                List<UserCredentialDTO> userCredentialsList = new List<UserCredentialDTO>();
-
-                try
+                if (returnLastLoggedIn)
                 {
-                    _databaseManager.ExecuteCRUD(connection =>
+                    command.CommandText = @"
+                    SELECT 
+                            UserId,
+                            Username,
+                            PasswordHash,
+                            LastLogin
+                    FROM
+                            UserCredentials 
+                    ORDER BY
+                            LastLogin DESC 
+                    LIMIT 1";
+                }
+                else
+                {
+                   command.CommandText = @"
+                          SELECT 
+                                  UserId, 
+                                  Username,
+                                  PasswordHash, 
+                                  LastLogin
+                          FROM 
+                                  UserCredentials";
+                }
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        using var command = connection.CreateCommand();
-
-                        if (returnLastLoggedIn)
+                        var userCredential = new UserCredentialDTO
                         {
-                            command.CommandText = @"
-                             SELECT 
-                                    UserId,
-                                    Username,
-                                    PasswordHash,
-                                    LastLogin
-                            FROM
-                                    UserCredentials 
-                            ORDER BY
-                                    LastLogin DESC 
-                            LIMIT 1";
-                        }
-                        else
-                        {
-                            command.CommandText = @"
-                            SELECT 
-                                    UserId, 
-                                    Username,
-                                    PasswordHash, 
-                                    LastLogin
-                            FROM 
-                                    UserCredentials";
-                            }
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var userCredential = new UserCredentialDTO
-                                {
-                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
-                                    Username = reader.GetString(reader.GetOrdinal("Username")),
-                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
-                                    LastLogin = reader.GetDateTime(reader.GetOrdinal("LastLogin")) 
-                                };
-                                userCredentialsList.Add(userCredential);
-                            }
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully read user credentials. Count: {userCredentialsList.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                            UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                            Username = reader.GetString(reader.GetOrdinal("Username")),
+                            PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                            LastLogin = reader.GetDateTime(reader.GetOrdinal("LastLogin"))
+                        };
+                        userCredentialsList.Add(userCredential);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to read user credentials. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    throw;
-                }
-
-                return userCredentialsList;
-            }
+            }, nameof(ReadUserCredentials));
+            return userCredentialsList;
         }
 
-        public int GetUserIdWithMostRecentLogin()
+
+        public List<(DateTime Day, int TotalDurationSeconds)> ReadTotalSessionDurationByDay()
         {
-            using (var activity = new Activity(nameof(GetUserIdWithMostRecentLogin)).Start())
+            List<(DateTime Day, int TotalDurationSeconds)> dailyDurations = new List<(DateTime Day, int TotalDurationSeconds)>();
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {nameof(GetUserIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+                using var command = new SQLiteCommand(connection);
 
-                int userId = 0;
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                command.CommandText = @"
+                    SELECT 
+                        date(StartTime) AS SessionDay,
+                        SUM(DurationSeconds) AS TotalDurationSeconds
+                    FROM
+                        CodingSessions
+                    WHERE
+                        date(StartTime) BETWEEN date('now', '-29 days') AND date('now', '-1 day')
+                    GROUP BY
+                        SessionDay
+                    ORDER BY
+                        SessionDay DESC";
 
-                try
+                using (var reader = command.ExecuteReader())
                 {
-                    _databaseManager.ExecuteCRUD(connection =>
+                    while (reader.Read())
                     {
-                        using var command = new SQLiteCommand(@"
-                            SELECT
-                                UserId 
-                            FROM
-                                UserCredentials 
-                            WHERE
-                                LastLogin IS NOT NULL 
-                            ORDER
-                                BY LastLogin DESC 
-                            LIMIT 
-                                1",
-                                    connection);
-
-                        object result = command.ExecuteScalar();
-                        if (result != null && result != DBNull.Value)
-                        {
-                            userId = Convert.ToInt32(result);
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully retrieved UserId with most recent login. UserId: {userId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        DateTime sessionDay = reader.GetDateTime(reader.GetOrdinal("SessionDay"));
+                        int totalDurationSeconds = reader.GetInt32(reader.GetOrdinal("TotalDurationSeconds"));
+                        dailyDurations.Add((sessionDay, totalDurationSeconds));
+                    }
                 }
-                catch (SQLiteException ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($" Error retrieving UserId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($" Error retrieving UserId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    throw;
-                }
+            }, nameof(ReadTotalSessionDurationByDay));
 
-                return userId;
-            }
+            return dailyDurations;
         }
+
 
         public int GetSessionIdWithMostRecentLogin()
         {
-            using (var activity = new Activity(nameof(GetSessionIdWithMostRecentLogin)).Start())
+            int sessionId = 0;
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {nameof(GetSessionIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
-
-                int sessionId = 0;
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
-                {
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using var command = new SQLiteCommand(@"
+                using var command = new SQLiteCommand(@"
                     SELECT
-                        SessionId 
+                            SessionId
                     FROM
-                        CodingSessions 
-                    WHERE
-                        EndTime IS NOT NULL 
+                            CodingSessions
+                    WHERE 
+                            EndTime IS NOT NULL
                     ORDER BY
-                        EndTime DESC 
-                    LIMIT
-                        1",
-                            connection);
+                            EndTime DESC
+                    LIMIT 1",
+                    
+                    connection);
 
-                        object result = command.ExecuteScalar();
-                        if (result != null && result != DBNull.Value)
-                        {
-                            sessionId = Convert.ToInt32(result);
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Successfully retrieved SessionId with most recent login. SessionId: {sessionId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (SQLiteException ex)
+                object result = command.ExecuteScalar(); 
+                if (result != null && result != DBNull.Value)
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($" Error retrieving SessionId with most recent login. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    sessionId = Convert.ToInt32(result);
                 }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($" Error retrieving SessionId with most recent login. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    throw;
-                }
+            }, nameof(GetSessionIdWithMostRecentLogin));
 
-                return sessionId;
-            }
+            return sessionId;
         }
-
 
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)
         {
-            var methodName = nameof(ViewRecentSession);
-            int userId = GetUserIdWithMostRecentLogin();
+            int userId = _credentialManager.GetUserIdWithMostRecentLogin();
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
-            using (var activity = new Activity(nameof(ViewRecentSession)).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, NumberOfSessions: {numberOfSessions}");
+                using var command = new SQLiteCommand(@"
+                    SELECT
+                            SessionId,
+                            StartTime,
+                            EndTime,
+                            DurationSeconds 
+                    FROM
+                            CodingSessions 
+                    WHERE
+                            UserId = @UserId
+                ORDER BY
+                            StartTime DESC 
+                    LIMIT
+                            @NumberOfSessions", connection);
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
+                command.Parameters.AddWithValue("@UserId", userId);
+                command.Parameters.AddWithValue("@NumberOfSessions", numberOfSessions);
+
+                using (var reader = command.ExecuteReader())
                 {
-                    _databaseManager.ExecuteCRUD(connection =>
+                    while (reader.Read())
                     {
-                        using var command = connection.CreateCommand();
-                        command.CommandText = @"
-                    SELECT SessionId, StartTime, EndTime FROM 
-                        CodingSessions 
-                    WHERE 
-                        UserId = @UserId
-                    ORDER BY 
-                         StartTime DESC 
-                    LIMIT 
-                        @NumberOfSessions";
-
-                        command.Parameters.AddWithValue("@UserId", userId);
-                        command.Parameters.AddWithValue("@NumberOfSessions", numberOfSessions);
-
-                        using (var reader = command.ExecuteReader())
+                        var session = new CodingSessionDTO
                         {
-                            while (reader.Read())
-                            {
-                                var session = new CodingSessionDTO
-                                {
-                                    SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                    StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                    EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                };
-                                codingSessionList.Add(session);
-                            }
-                        }
-                    });
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? 0 : reader.GetInt32(reader.GetOrdinal("DurationSeconds"))
+                        };
+                        codingSessionList.Add(session);
+                    }
+                }
+            }, nameof(ViewRecentSession));
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"Viewed recent {numberOfSessions} sessions successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (SQLiteException ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to view recent sessions. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-            }
             return codingSessionList;
         }
 
@@ -325,321 +243,249 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
         public List<CodingSessionDTO> ViewAllSession(bool partialView = false)
         {
-            var methodName = nameof(ViewAllSession);
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
-            using (var activity = new Activity(nameof(ViewAllSession)).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, PartialView: {partialView}");
+                using var command = new SQLiteCommand(@"
+                    SELECT
+                            SessionId,
+                            StartTime, 
+                            EndTime,
+                            DurationSeconds
+                            
+                    FROM
+                            CodingSessions 
+                    WHERE
+                            UserId = @UserId 
+                ORDER BY 
+                            StartTime DESC", 
+                            
+                            connection);
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
+                command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
+
+                using (var reader = command.ExecuteReader())
                 {
-                    _databaseManager.ExecuteCRUD(connection =>
+                    while (reader.Read())
                     {
-                        using var command = connection.CreateCommand();
-                        var partialColumns = partialView ? "SessionId, StartTime, EndTime" : "SessionId, StartTime, EndTime";
-                        command.CommandText = $@"
-                    SELECT {partialColumns} FROM 
-                        CodingSessions 
-                    WHERE 
-                        UserId = @UserId 
-                    ORDER BY 
-                         StartTime DESC";
-
-                        command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
-
-                        using (var reader = command.ExecuteReader())
+                        var session = new CodingSessionDTO
                         {
-                            while (reader.Read())
-                            {
-                                var session = new CodingSessionDTO
-                                {
-                                    SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                    StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                    EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                };
-                                codingSessionList.Add(session);
-                            }
-                        }
-                    });
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.GetInt32(reader.GetOrdinal("DurationSeconds")),
+                        };
+                        codingSessionList.Add(session);
+                    }
+                }
+            }, nameof(ViewAllSession));
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"{methodName} executed successfully. PartialView: {partialView}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute {methodName}. PartialView: {partialView}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-            }
             return codingSessionList;
         }
 
+
         public List<CodingSessionDTO> ViewSpecific(string chosenDate)
         {
-            var methodName = nameof(ViewSpecific);
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
-            using (var activity = new Activity(methodName).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, ChosenDate: {chosenDate}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
-                {
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.CommandText = @"
-                        SELECT SessionId, StartTime, EndTime FROM 
+                using var command = new SQLiteCommand(@"
+                    SELECT
+                            SessionId, 
+                            StartTime, 
+                            EndTime 
+                    FROM 
                             CodingSessions 
-                        WHERE
-                            UserId = @UserId AND Date = @Date
-                        ORDER BY
-                            StartTime DESC";
+                    WHERE 
+                            UserId = @UserId 
+                    AND 
+                            Date = @Date
+                ORDER BY
+                            StartTime DESC", 
+                            
+                            connection);
 
-                            command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
-                            command.Parameters.AddWithValue("@Date", chosenDate);
+                command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
+                command.Parameters.AddWithValue("@Date", chosenDate);
 
-                            using (var reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    var session = new CodingSessionDTO
-                                    {
-                                        SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                        StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                        EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                    };
-                                    codingSessionList.Add(session);
-                                }
-                            }
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{methodName} executed successfully. ChosenDate: {chosenDate}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-                }
-                catch (Exception ex)
+                using (var reader = command.ExecuteReader())
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute {methodName}. ChosenDate: {chosenDate}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    while (reader.Read())
+                    {
+                        var session = new CodingSessionDTO
+                        {
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                        };
+                        codingSessionList.Add(session);
+                    }
                 }
-            }
+            }, nameof(ViewSpecific));
+
             return codingSessionList;
         }
 
         public List<CodingSessionDTO> FilterSessionsByDay(string date, bool isDescending)
         {
-            var methodName = nameof(FilterSessionsByDay);
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
+            string order = isDescending ? "DESC" : "ASC";
 
-            using (var activity = new Activity(methodName).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, Date: {date}, IsDescending: {isDescending}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
-                {
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using var command = connection.CreateCommand();
-                        string order = isDescending ? "DESC" : "ASC";
-                        command.CommandText = $@"
-                        SELECT SessionId, StartTime, EndTime FROM
+                using var command = new SQLiteCommand(@"
+                    SELECT
+                            SessionId, 
+                            StartTime, 
+                            EndTime 
+                    FROM 
                             CodingSessions 
-                        WHERE
+                    WHERE 
                             DATE(StartTime) = DATE(@Date)
-                        ORDER BY
-                            StartTime {order}";
+                ORDER BY
+                            StartTime " + order, connection);
 
-                        command.Parameters.AddWithValue("@Date", date);
+                command.Parameters.AddWithValue("@Date", date);
 
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var session = new CodingSessionDTO
-                                {
-                                    SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                    StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                    EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                };
-                                codingSessionList.Add(session);
-                            }
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{methodName} executed successfully. Date: {date}, IsDescending: {isDescending}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
+                using (var reader = command.ExecuteReader())
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute {methodName}. Date: {date}, IsDescending: {isDescending}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    while (reader.Read())
+                    {
+                        codingSessionList.Add(new CodingSessionDTO
+                        {
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime"))
+                        });
+                    }
                 }
-            }
+            }, nameof(FilterSessionsByDay));
+
             return codingSessionList;
         }
 
         public List<CodingSessionDTO> FilterSessionsByWeek(string date, bool isDescending)
         {
-            var methodName = nameof(FilterSessionsByWeek);
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
+            string order = isDescending ? "DESC" : "ASC";
 
-            using (var activity = new Activity(nameof(FilterSessionsByWeek)).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, Date: {date}, IsDescending: {isDescending}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
-                {
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using var command = connection.CreateCommand();
-                        string order = isDescending ? "DESC" : "ASC";
-                        command.CommandText = $@"
-                        SELECT SessionId, StartTime, EndTime FROM 
+                using var command = new SQLiteCommand(@"
+                    SELECT
+                            SessionId, 
+                            StartTime, 
+                            EndTime 
+                    FROM 
                             CodingSessions 
-                        WHERE 
-                            StartTime('%W', StartTime) = StartTime('%W', @Date) 
-                        AND
-                            StartTime('%Y', StartTime) = StartTime('%Y', @Date) 
-                        AND 
-                            DATE(StartTime) <= DATE(@Date)
-                        ORDER BY StartTime {order}";
+                    WHERE
+                            strftime('%W', StartTime) = strftime('%W', @Date) 
+                    AND 
+                            strftime('%Y', StartTime) = strftime('%Y', @Date)
+                ORDER BY
+                            StartTime " + order, connection);
 
-                        command.Parameters.AddWithValue("@Date", date);
+                command.Parameters.AddWithValue("@Date", date);
 
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var session = new CodingSessionDTO
-                                {
-                                    SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                    StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                    EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                };
-                                codingSessionList.Add(session);
-                            }
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{methodName} executed successfully. Date: {date}, IsDescending: {isDescending}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
+                using (var reader = command.ExecuteReader())
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute {methodName}. Date: {date}, IsDescending: {isDescending}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    while (reader.Read())
+                    {
+                        codingSessionList.Add(new CodingSessionDTO
+                        {
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime"))
+                        });
+                    }
                 }
-            }
+            }, nameof(FilterSessionsByWeek));
+
             return codingSessionList;
         }
 
+
+
         public List<CodingSessionDTO> FilterSessionsByYear(string year, bool isDescending)
         {
-            var methodName = nameof(FilterSessionsByYear);
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
+            string order = isDescending ? "DESC" : "ASC";
+            string yearStartTime = $"{year}-01-01";
+            string yearEndTime = DateTime.Now.Year.ToString() == year ? DateTime.Now.ToString("yyyy-MM-dd") : $"{year}-12-31";
 
-            using (var activity = new Activity(nameof(FilterSessionsByYear)).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, Year: {year}, IsDescending: {isDescending}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
-                {
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using var command = connection.CreateCommand();
-                        string order = isDescending ? "DESC" : "ASC";
-                        string yearStartTime = $"{year}-01-01";
-                        string endDate = DateTime.Now.Year.ToString() == year ? DateTime.Now.ToString("yyyy-MM-dd") : $"{year}-12-31";
-                        command.CommandText = $@"
-                        SELECT SessionId, StartTime, EndTime FROM
+                using var command = new SQLiteCommand(@"
+                    SELECT 
+                            SessionId, 
+                            StartTime, 
+                            EndTime 
+                    FROM 
                             CodingSessions 
-                        WHERE
-                            DATE(StartTime) >= DATE(@yearStartTime)
-                        AND 
-                            DATE(StartTime) <= DATE(@EndDate)
-                        ORDER BY
-                            StartTime {order}";
+                    WHERE
+                            DATE(StartTime) >= DATE(@YearStartTime)
+                    AND
+                            DATE(StartTime) <= DATE(@YearEndTime)
+                ORDER BY
+                            StartTime " 
 
-                        command.Parameters.AddWithValue("@startTime", StartTime);
-                        command.Parameters.AddWithValue("@EndDate", endDate);
+                            + order, connection);
 
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var session = new CodingSessionDTO
-                                {
-                                    SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                    StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                    EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                };
-                                codingSessionList.Add(session);
-                            }
-                        }
-                    });
+                command.Parameters.AddWithValue("@YearStartTime", yearStartTime);
+                command.Parameters.AddWithValue("@YearEndTime", yearEndTime);
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"{methodName} executed successfully. Year: {year}, IsDescending: {isDescending}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
+                using (var reader = command.ExecuteReader())
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute {methodName}. Year: {year}, IsDescending: {isDescending}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    while (reader.Read())
+                    {
+                        codingSessionList.Add(new CodingSessionDTO
+                        {
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime"))
+                        });
+                    }
                 }
-            }
+            }, nameof(FilterSessionsByYear));
+
             return codingSessionList;
         }
 
 
         public void GetLast28DaysSessions()
         {
-            using (var activity = new Activity(nameof(GetLast28DaysSessions)).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Info($"Starting {nameof(GetLast28DaysSessions)}. TraceID: {activity.TraceId}");
-                try
-                {
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using var command = connection.CreateCommand();
-                        var endTime = DateTime.UtcNow.Date;
-                        var startTime = endTime.AddDays(-28);
-
-                        command.CommandText = @"
+                using var command = new SQLiteCommand(@"
                     SELECT 
-                        DurationMinutes
+                            StartTime, 
+                            DurationSeconds
                     FROM 
-                        CodingSessions
+                            CodingSessions
                     WHERE 
-                        StartTime >= @StartTime AND StartTime <= @EndTime";
+                            StartTime >= @StartTime
+                    AND 
+                            StartTime <= @EndTime",
+                    connection);
 
-                        command.Parameters.AddWithValue("@StartTime", startTime);
-                        command.Parameters.AddWithValue("@EndTime", endTime);
+                var endTime = DateTime.UtcNow.Date;
+                var startTime = endTime.AddDays(-28);
 
-                        using var reader = command.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            _appLogger.Info($"DurationMinutes: {reader["DurationMinutes"]}, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                        }
-                    });
+                command.Parameters.AddWithValue("@StartTime", startTime);
+                command.Parameters.AddWithValue("@EndTime", endTime);
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"{nameof(GetLast28DaysSessions)} Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
+                using (var reader = command.ExecuteReader())
                 {
-                    _appLogger.Error($"An error occurred during {nameof(GetLast28DaysSessions)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    while (reader.Read())
+                    {
+                        var durationSeconds = reader["DurationSeconds"];
+                        var sessionTime = reader["StartTime"];
+                        _appLogger.Info($"Session at {sessionTime} - Duration: {durationSeconds} seconds.");
+                    }
                 }
-            }
+            }, nameof(GetLast28DaysSessions));
         }
     }
 }

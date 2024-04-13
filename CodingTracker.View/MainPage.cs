@@ -1,12 +1,12 @@
 ﻿using System.Data;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.IFormControllers;
-using CodingTracker.Common.IPanelColorControls;
+using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.ICodingSessions;
-using CodingTracker.View.IFormFactories;
+using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
+using CodingTracker.Business.PanelColorControls;
 
 
 
@@ -18,7 +18,6 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
-        private readonly IPanelColorControl _colorControl;
         private readonly IDatabaseSessionRead _databaseRead;
         private readonly ICodingSession _codingSession;
         private readonly IFormFactory _formFactory;
@@ -78,7 +77,7 @@ namespace CodingTracker.View
         private void UpDateLast28Days(Panel parentPanel)
         {
             List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-            List<int> sessionDurations = _databaseRead.ReadSessionDurationMinutes(28);
+            List<int> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
 
             var labels = parentPanel.Controls.OfType<Label>().ToList();
             for (int i = 0; i < last28Days.Count && i < labels.Count; i++)

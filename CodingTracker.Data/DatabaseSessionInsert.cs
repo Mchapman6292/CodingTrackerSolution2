@@ -36,52 +36,35 @@ namespace CodingTracker.Data.DatabaseSessionInserts
         public void InsertSession()
         {
             CodingSessionDTO codingSessionDTO = _codingSessionDTOManager.GetCurrentSessionDTO();
-            using (var activity = new Activity(nameof(InsertSession)).Start())
+
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {nameof(InsertSession)}. TraceID: {activity.TraceId}, UserId: {codingSessionDTO.UserId}");
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+                    INSERT INTO CodingSessions 
+                    (
+                        UserId, 
+                        StartTime, 
+                        EndTime,
+                        DurationSeconds
+                    ) 
+                    VALUES 
+                    (
+                        @UserId, 
+                        @StartTime, 
+                        @EndTime, 
+                        @DurationSeconds
+                    )";
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                command.Parameters.AddWithValue("@UserId", codingSessionDTO.UserId);
+                command.Parameters.AddWithValue("@StartTime", codingSessionDTO.StartTime);
+                command.Parameters.AddWithValue("@EndTime", codingSessionDTO.EndTime.HasValue ? (object)codingSessionDTO.EndTime.Value : DBNull.Value);
+                command.Parameters.AddWithValue("@DurationSeconds", codingSessionDTO.DurationSeconds);
 
-                _databaseManager.ExecuteCRUD(connection =>
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = @"
-                        INSERT INTO CodingSessions 
-                        (
-                            UserId, 
-                            StartTime, 
-                            EndTime,
-                            DurationMinutes
-                        ) 
-                        VALUES 
-                        (
-                            @UserId, 
-                            @StartTime, 
-                            @EndTime, 
-                            @DurationMinutes
+                command.ExecuteNonQuery();
 
-                        )";
-
-                    command.Parameters.AddWithValue("@UserId", codingSessionDTO.UserId);
-                    command.Parameters.AddWithValue("@StartTime", codingSessionDTO.StartTime);
-                    command.Parameters.AddWithValue("@EndTime", codingSessionDTO.EndTime.HasValue ? (object)codingSessionDTO.EndTime.Value : DBNull.Value);
-                    command.Parameters.AddWithValue("@DurationMinutes", codingSessionDTO.DurationMinutes);
-
-
-                    try
-                    {
-                        int affectedRows = command.ExecuteNonQuery();
-                        stopwatch.Stop();
-                        _appLogger.Info($"Session inserted successfully for UserId: {codingSessionDTO.UserId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    }
-                    catch (SQLiteException ex)
-                    {
-                        stopwatch.Stop();
-                        _appLogger.Error($"Failed to insert session for UserId: {codingSessionDTO.UserId}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                        Console.WriteLine("Failed to insert session");
-                    }
-                });
-            }
+                _appLogger.Debug($"Session inserted successfully User ID: {codingSessionDTO.UserId}, StartTime: {codingSessionDTO.StartTime}, EndTime: {codingSessionDTO.EndTime}, DurationSeconds: {codingSessionDTO.DurationSeconds}");
+            }, nameof(InsertSession));
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IDatabaseSessionReads;
@@ -204,7 +204,7 @@ namespace CodingTracker.View
 
         private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
         {
-            _databaseManager.UpdateUserCredentialsTable();
+            _databaseManager.UpdateCodingSessionsTable();
         }
 
         private void LoginPageRememberMeToggle_CheckedChanged(object sender, EventArgs e)

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.View.FormSwitchers;
-using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
@@ -49,7 +49,7 @@ namespace CodingTracker.View
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
-                    int numberOfSessions = 10;
+                    int numberOfSessions = 20;
                     var sessions = _databaseSessionRead.ViewRecentSession(numberOfSessions);
 
                     EditSessionPageDataGridView.Rows.Clear();
@@ -60,11 +60,13 @@ namespace CodingTracker.View
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.UserId;
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.StartTime?.ToString("g");
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.EndTime?.ToString("g");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[5].Value = session.DurationMinutes;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.DurationSeconds;
+
+                        _appLogger.Debug($"Added session to DataGridView: UserID={session.UserId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
                     }
 
                     stopwatch.Stop();
-                    _appLogger.Info($"Loaded sessions into DataGridView successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Info($"Loaded sessions into DataGridView successfully. Total sessions loaded: {sessions.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -88,6 +90,12 @@ namespace CodingTracker.View
         private void EditSessionPageEditSessionButton_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void EditSessionPageBackButton_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            _formSwitcher.SwitchToMainPage();
         }
     }
 }

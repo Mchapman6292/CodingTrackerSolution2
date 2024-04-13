@@ -1,5 +1,5 @@
-﻿using CodingTracker.View.IFormControllers;
-using CodingTracker.View.IFormFactories;
+﻿using CodingTracker.View.FormControllers;
+using CodingTracker.View.FormFactories;
 
 namespace CodingTracker.View.FormSwitchers
 {

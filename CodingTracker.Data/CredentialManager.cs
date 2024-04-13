@@ -251,6 +251,35 @@ namespace CodingTracker.Data.CredentialManagers
             }
         }
 
+
+        public int GetUserIdWithMostRecentLogin()
+        {
+            int userId = 0;
+            _databaseManager.ExecuteDatabaseOperation(connection =>
+            {
+                using var command = new SQLiteCommand(@"
+                    SELECT 
+                            UserId
+                    FROM
+                            UserCredentials
+                    WHERE
+                            LastLogin IS NOT NULL
+                ORDER BY
+                            LastLogin DESC
+                    LIMIT
+                            1",
+                                connection);
+
+                object result = command.ExecuteScalar(); // used for returning only a single result set.
+                if (result != null && result != DBNull.Value)
+                {
+                    userId = Convert.ToInt32(result);
+                }
+            }, nameof(GetUserIdWithMostRecentLogin));
+
+            return userId;
+        }
+
         public UserCredentialDTO GetCredentialById(int userId)//needed?
         {
             throw new NotImplementedException(" not implemented.");

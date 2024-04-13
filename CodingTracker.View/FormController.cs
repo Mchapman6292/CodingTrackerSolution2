@@ -1,10 +1,19 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.View.IFormControllers;
-using CodingTracker.View.IFormFactories;
+using CodingTracker.View.FormControllers;
+using CodingTracker.View.FormFactories;
 
 namespace CodingTracker.View.FormControllers
 {
+
+    public interface IFormController
+    {
+        void HandleAndShowForm<TForm>(Func<TForm> createForm, string methodName, bool closeCurrent = true) where TForm : Form;
+        void ExecutePageAction(Action action, string methodName);
+        void CloseCurrentForm();
+        void DisplayForm<TForm>(TForm newForm) where TForm : Form;
+        void CloseTargetForm(Form targetForm);
+    }
     public class FormController : IFormController
     {
         private readonly IApplicationLogger _appLogger;

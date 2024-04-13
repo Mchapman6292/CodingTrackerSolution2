@@ -11,11 +11,13 @@ namespace CodingTracker.Common.IDatabaseManagers
     {
         
         void EnsureDatabaseForUser();
+        void ExecuteDatabaseOperation(Action<SQLiteConnection> operation, string operationName);
         void CreateTableIfNotExists();
         void OpenConnectionWithRetry();
         void CloseDatabaseConnection();
         void ExecuteCRUD(Action<SQLiteConnection> action);
         bool CheckSessionIdExist(int sessionId);
         void UpdateUserCredentialsTable();
+        void UpdateCodingSessionsTable();
     }
 }

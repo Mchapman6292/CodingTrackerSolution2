@@ -1,6 +1,7 @@
 ﻿using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.ICredentialManagers;
 using System.Diagnostics;
 using CodingTracker.Common.IDatabaseSessionReads;
 
@@ -11,12 +12,11 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
     {
         CodingSessionDTO CreateCodingSessionDTO();
         CodingSessionDTO GetCurrentSessionDTO();
-        void SetSessionStartTimeAndDate();
-        void SetSessionEndTimeAndDate();
-        int CalculateDurationMinutes();
+        void SetSessionStartTime();
+        void SetSessionEndTime();
         CodingSessionDTO GetOrCreateCurrentSessionDTO();
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, int? durationMinutes = null);
+        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, int? durationSeconds = null);
     }
 
 
@@ -28,16 +28,20 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         private readonly IErrorHandler _errorHandler;
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseSessionRead _databaseSessionRead;
+        private readonly ICredentialManager _credentialManager;
+
         private int _userId;
         private int _sessionId;
 
-        public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead)
+        public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, ICredentialManager credentialManager)
         {
             _errorHandler = errorHandler;
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
-            _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
+            _credentialManager = credentialManager;
+            _userId = _credentialManager.GetUserIdWithMostRecentLogin();
             _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
+
         }
 
         public CodingSessionDTO GetCurrentSessionDTO()
@@ -62,25 +66,25 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-            public CodingSessionDTO GetOrCreateCurrentSessionDTO() // Returns the existing session DTO if available, or creates a new one if not.
+        public CodingSessionDTO GetOrCreateCurrentSessionDTO() // Returns the existing session DTO if available, or creates a new one if not.
+        {
+            using (var activity = new Activity(nameof(GetOrCreateCurrentSessionDTO)).Start())
             {
-                using (var activity = new Activity(nameof(GetOrCreateCurrentSessionDTO)).Start())
-                {
-                    _appLogger.Debug($"Starting {nameof(GetOrCreateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
+                _appLogger.Debug($"Starting {nameof(GetOrCreateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
 
-                    if (_currentSessionDTO == null)
-                    {
-                        _appLogger.Info($"No current session DTO found. Creating new one. TraceID: {activity.TraceId}");
-                        CreateCodingSessionDTO();
-                    }
-                    else
-                    {
-                        _appLogger.Info($"Returning existing session DTO. TraceID: {activity.TraceId}");
-                    }
+                if (_currentSessionDTO == null)
+                {
+                    _appLogger.Info($"No current session DTO found. Creating new one. TraceID: {activity.TraceId}");
+                    CreateCodingSessionDTO();
+                }
+                else
+                {
+                    _appLogger.Info($"Returning existing session DTO. TraceID: {activity.TraceId}");
+                }
 
                 return _currentSessionDTO;
-                }
             }
+        }
 
 
         public CodingSessionDTO CreateAndReturnCurrentSessionDTO() // creates and returns a new session DTO, regardless of whether an existing DTO is present,                                                     
@@ -97,71 +101,89 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             }
         }
 
-        public void SetSessionEndTimeAndDate()
-        {
-            _errorHandler.CatchErrorsAndLogWithStopwatch(() =>
-            {
-                DateTime endTime = DateTime.Now;
-                _currentSessionDTO.EndTime = endTime;
 
-                _appLogger.Info($"End time and date set, EndTime: {endTime}.");
-            }, nameof(SetSessionEndTimeAndDate));
-        }
-
-        public void SetSessionStartTimeAndDate()
+        public void SetSessionStartTime()
         {
-            using (var activity = new Activity(nameof(SetSessionStartTimeAndDate)).Start())
+            using (var activity = new Activity(nameof(SetSessionStartTime)).Start())
             {
-                DateTime startTime = DateTime.Now;
-                _currentSessionDTO.StartTime = startTime;
-            }
-        }
-
-        public int CalculateDurationMinutes()
-        {
-            int durationMins = 0;
-            using (var activity = new Activity(nameof(CalculateDurationMinutes)).Start())
-            {
-                _appLogger.Info($"Calculating duration minutes. TraceID: {activity.TraceId}");
+                _appLogger.Info($"Starting {nameof(SetSessionStartTime)}. TraceID: {activity.TraceId}");
 
                 try
                 {
-                    if (!_currentSessionDTO.StartTime.HasValue || !_currentSessionDTO.EndTime.HasValue)
-                    {
-                        _appLogger.Error("start Time or End Time is not set.");
-                    }
+                    DateTime startTime = DateTime.Now;
+                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, startTime: startTime);
 
-                    TimeSpan duration = _currentSessionDTO.EndTime.Value - _currentSessionDTO.StartTime.Value;
-                    durationMins = (int)duration.TotalMinutes;
-
-                    _appLogger.Info($"Duration minutes calculated. TraceID: {activity.TraceId}, DurationMinutes: {_currentSessionDTO.DurationMinutes}");
+                    _appLogger.Info($"Start time set through UpdateCurrentSessionDTO, StartTime: {startTime}. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
-                    _appLogger.Error($"An error occurred during {nameof(CalculateDurationMinutes)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    _appLogger.Error($"An error occurred during {nameof(SetSessionStartTime)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                 }
             }
-            return durationMins;
         }
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId , DateTime? startTime =null, DateTime? endTime =null, int? durationMinutes =null)
 
+        public void SetSessionEndTime()
+        {
+            using (var activity = new Activity(nameof(SetSessionEndTime)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(SetSessionEndTime)}. TraceID: {activity.TraceId}");
+
+                try
+                {
+                    DateTime endTime = DateTime.Now;
+
+                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, endTime: endTime);
+
+                    _appLogger.Info($"End time set through UpdateCurrentSessionDTO, EndTime: {endTime}. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during {nameof(SetSessionEndTime)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                }
+            }
+        }
+
+
+        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, int? durationSeconds = null)
         {
             using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(UpdateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
 
+                if (_currentSessionDTO == null)
+                {
+                    _appLogger.Info("No current session DTO found. Creating new one.");
+                    _currentSessionDTO = CreateCodingSessionDTO();
+                }
 
                 _currentSessionDTO.SessionId = sessionId;
                 _currentSessionDTO.UserId = userId;
-                _currentSessionDTO.StartTime = startTime;
-                _currentSessionDTO.EndTime = endTime;
-                _currentSessionDTO.DurationMinutes = durationMinutes;
 
-                _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO),
-                ("SessionId", (object)sessionId),
-                ("UserId", (object)userId),
-                ("StartTime", (object)startTime), 
-                ("EndTime", (object?)endTime),    // Nullable DateTime, cast to object?
-                ("DurationMinutes", (object?)durationMinutes));
+                if (startTime.HasValue)
+                {
+                    _currentSessionDTO.StartTime = startTime.Value;
+                }
+                if (endTime.HasValue)
+                {
+                    _currentSessionDTO.EndTime = endTime.Value;
+                }
+                if (durationSeconds.HasValue)
+                {
+                    _currentSessionDTO.DurationSeconds = durationSeconds.Value;
+                }
+
+                List<(string Name, object Value)> updates = new List<(string Name, object Value)>();
+                updates.Add(("SessionId", (object)sessionId));
+                updates.Add(("UserId", (object)userId));
+                if (startTime.HasValue) updates.Add(("StartTime", (object)startTime));
+                if (endTime.HasValue) updates.Add(("EndTime", (object)endTime));
+                if (durationSeconds.HasValue) updates.Add(("DurationSeconds", (object)durationSeconds));
+
+                _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO), updates.ToArray());
+
+                _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. TraceID: {activity.TraceId}");
+            }
         }
     }
 }
