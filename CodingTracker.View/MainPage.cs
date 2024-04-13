@@ -1,12 +1,12 @@
 ﻿using System.Data;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.IFormControllers;
-using CodingTracker.Common.IPanelColorControls;
+using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.ICodingSessions;
-using CodingTracker.View.IFormFactories;
-using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.FormFactories;
+using CodingTracker.View.FormSwitchers;
+using CodingTracker.Business.PanelColorControls;
 
 
 
@@ -18,7 +18,6 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
-        private readonly IPanelColorControl _colorControl;
         private readonly IDatabaseSessionRead _databaseRead;
         private readonly ICodingSession _codingSession;
         private readonly IFormFactory _formFactory;
@@ -38,9 +37,9 @@ namespace CodingTracker.View
             _formSwitcher = formSwitcher;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void MainPage_Load(object sender, EventArgs e)
         {
-
+ 
         }
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
@@ -54,12 +53,6 @@ namespace CodingTracker.View
         {
             this.Hide();
             _formSwitcher.SwitchToEditSessionPage();
-        }
-
-        private void MainPageViewSessionsButton_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-            _formSwitcher.SwitchToViewSessionsPage();
         }
 
         private void MainPageSettingsButton_Click(object sender, EventArgs e)
@@ -81,10 +74,10 @@ namespace CodingTracker.View
             }
         }
 
-        private void UpdateGradientPanels(Panel parentPanel)
+        private void UpDateLast28Days(Panel parentPanel)
         {
             List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-            List<int> sessionDurations = _databaseRead.ReadSessionDurationMinutes(28);
+            List<int> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
 
             var labels = parentPanel.Controls.OfType<Label>().ToList();
             for (int i = 0; i < last28Days.Count && i < labels.Count; i++)

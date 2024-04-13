@@ -1,10 +1,19 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.View.IFormControllers;
-using CodingTracker.View.IFormFactories;
+using CodingTracker.View.FormControllers;
+using CodingTracker.View.FormFactories;
 
 namespace CodingTracker.View.FormControllers
 {
+
+    public interface IFormController
+    {
+        void HandleAndShowForm<TForm>(Func<TForm> createForm, string methodName, bool closeCurrent = true) where TForm : Form;
+        void ExecutePageAction(Action action, string methodName);
+        void CloseCurrentForm();
+        void DisplayForm<TForm>(TForm newForm) where TForm : Form;
+        void CloseTargetForm(Form targetForm);
+    }
     public class FormController : IFormController
     {
         private readonly IApplicationLogger _appLogger;
@@ -19,7 +28,7 @@ namespace CodingTracker.View.FormControllers
             _errorHandler = errorHandler;
         }
 
-        public void HandleAndShowForm(Func<Form> createForm, string methodName, bool closeCurrent = true) // Handles the logic for closing forms & implementing error handling logic via ExecutePageAction
+        public void HandleAndShowForm<TForm>(Func<TForm> createForm, string methodName, bool closeCurrent = true) where TForm : Form // Handles the logic for closing forms & implementing error handling logic via ExecutePageAction
         {
             ExecutePageAction(() =>
             {
@@ -41,19 +50,22 @@ namespace CodingTracker.View.FormControllers
         {
             if (currentForm != null)
             {
-                currentForm.Close();
-                currentForm.Dispose();
-                currentForm = null;
+                currentForm.Hide(); 
             }
         }
 
-        public void DisplayForm(Form newForm)
+        public void DisplayForm<TForm>(TForm newForm) where TForm : Form
         {
+            if (newForm == null)
+            {
+                _appLogger.Error($"Attempted to display a null form in {nameof(DisplayForm)}.");
+                throw new ArgumentNullException(nameof(newForm), "New form is null.");
+            }
+
             currentForm = newForm;
             currentForm.Show();
             _appLogger.Info($"Opened {newForm.Name}");
         }
-
 
 
 

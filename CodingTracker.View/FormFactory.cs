@@ -3,15 +3,29 @@ using CodingTracker.View;
 using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
-using CodingTracker.View.IFormFactories;
+using CodingTracker.View.FormFactories;
 
 namespace CodingTracker.View.FormFactories
 {
+    public interface IFormFactory
+    {
+        T CreateForm<T>(string methodName) where T : class;
+        LoginPage CreateLoginPage();
+        MainPage CreateMainPage();
+        CodingSessionPage CreateCodingSessionPage();
+        EditSessionPage CreateEditSessionPage();
+        SettingsPage CreateSettingsPage();
+        CreateAccountPage CreateAccountPage();
+        CodingSessionTimerForm CreateCodingSessionTimer();
+
+    }
+
     public class FormFactory : IFormFactory
     {
 
         private IServiceProvider _serviceProvider;
         private IApplicationLogger _appLogger;
+        private MainPage _mainPageInstance;
 
         public  FormFactory(IServiceProvider serviceProvider,IApplicationLogger appLogger)
         {
@@ -45,7 +59,11 @@ namespace CodingTracker.View.FormFactories
 
         public MainPage CreateMainPage()
         {
-            return CreateForm<MainPage>(nameof(CreateMainPage));
+            if (_mainPageInstance == null)
+            {
+                _mainPageInstance = CreateForm<MainPage>(nameof(CreateMainPage));
+            }
+            return _mainPageInstance;
         }
 
         public CodingSessionPage CreateCodingSessionPage()
@@ -61,11 +79,6 @@ namespace CodingTracker.View.FormFactories
         public SettingsPage CreateSettingsPage()
         {
             return CreateForm<SettingsPage>(nameof(CreateSettingsPage));
-        }
-
-        public ViewSessionsPage CreateViewSessionsPage()
-        {
-            return CreateForm<ViewSessionsPage>(nameof(CreateViewSessionsPage));
         }
         
         public CreateAccountPage CreateAccountPage() 

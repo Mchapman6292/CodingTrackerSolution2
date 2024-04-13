@@ -26,43 +26,23 @@ namespace CodingTracker.Data.DatabaseSessionDeletes
             _appLogger = appLogger;
         }
 
-
-
-
         public void DeleteSession(CodingSessionDTO codingSessionDTO)
         {
-            using (var activity = new Activity(nameof(DeleteSession)).Start())
+            _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                _appLogger.Debug($"Starting {nameof(DeleteSession)}. TraceID: {activity.TraceId}, SessionId: {codingSessionDTO.SessionId}, UserId: {codingSessionDTO.UserId}");
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
 
-                _databaseManager.ExecuteCRUD(connection =>
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = @"
-                DELETE FROM CodingSessions 
+            DELETE FROM 
+                        CodingSessions 
                 WHERE 
-                    SessionId = @SessionId AND 
-                    UserId = @UserId";
+                        SessionId = @SessionId AND 
+                        UserId = @UserId";
 
-                    command.Parameters.AddWithValue("@SessionId", codingSessionDTO.SessionId);
-                    command.Parameters.AddWithValue("@UserId", codingSessionDTO.UserId);
-
-                    try
-                    {
-                        Stopwatch stopwatch = Stopwatch.StartNew();
-                        int affectedRows = command.ExecuteNonQuery();
-                        stopwatch.Stop();
-                        _appLogger.Info($"Session deleted successfully. SessionId: {codingSessionDTO.SessionId}, UserId: {codingSessionDTO.UserId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    }
-                    catch (SQLiteException ex)
-                    {
-                        _appLogger.Error($"Failed to delete session. SessionId: {codingSessionDTO.SessionId}, UserId: {codingSessionDTO.UserId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                        Console.Write("Failed to delete session");
-                    }
-                });
-            }
+                command.Parameters.AddWithValue("@SessionId", codingSessionDTO.SessionId);
+                command.Parameters.AddWithValue("@UserId", codingSessionDTO.UserId);
+                command.ExecuteNonQuery();
+            }, nameof(DeleteSession));
         }
-
-
     }
 }

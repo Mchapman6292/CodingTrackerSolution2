@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -55,6 +56,7 @@
             CodingGoalSetMinToggle = new Guna.UI2.WinForms.Guna2NumericUpDown();
             CodingSessionPageCodingGoalToggle = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             CodingSessionPageConfirmSessionGoalButton = new Guna.UI2.WinForms.Guna2Button();
+            CodingSessionPageNotifyIcon = new NotifyIcon(components);
             CodingSessionPageTopPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)CodingGoalSetHourToggle).BeginInit();
             ((System.ComponentModel.ISupportInitialize)CodingGoalSetMinToggle).BeginInit();
@@ -142,6 +144,7 @@
             CodingSesionPageEndSessionButton.Size = new Size(120, 38);
             CodingSesionPageEndSessionButton.TabIndex = 20;
             CodingSesionPageEndSessionButton.Text = "End Session";
+            CodingSesionPageEndSessionButton.Click += CodingSesionPageEndSessionButton_Click;
             // 
             // CodingGoalSetHourToggle
             // 
@@ -166,7 +169,7 @@
             CodingGoalSetMinToggle.CustomizableEdges = customizableEdges13;
             CodingGoalSetMinToggle.Enabled = false;
             CodingGoalSetMinToggle.Font = new Font("Segoe UI", 9F);
-            CodingGoalSetMinToggle.Increment = new decimal(new int[] { 10, 0, 0, 0 });
+            CodingGoalSetMinToggle.Increment = new decimal(new int[] { 2, 0, 0, 0 });
             CodingGoalSetMinToggle.Location = new Point(870, 294);
             CodingGoalSetMinToggle.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             CodingGoalSetMinToggle.Name = "CodingGoalSetMinToggle";
@@ -215,6 +218,11 @@
             CodingSessionPageConfirmSessionGoalButton.Text = "Confirm session goal";
             CodingSessionPageConfirmSessionGoalButton.Click += CodingSessionPageConfirmSessionGoalButton_Click;
             // 
+            // CodingSessionPageNotifyIcon
+            // 
+            CodingSessionPageNotifyIcon.Text = "notifyIcon1";
+            CodingSessionPageNotifyIcon.Visible = true;
+            // 
             // CodingSessionPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -248,5 +256,6 @@
         private Guna.UI2.WinForms.Guna2NumericUpDown CodingGoalSetMinToggle;
         private Guna.UI2.WinForms.Guna2ToggleSwitch CodingSessionPageCodingGoalToggle;
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageConfirmSessionGoalButton;
+        private NotifyIcon CodingSessionPageNotifyIcon;
     }
 }

@@ -11,17 +11,12 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 {
     public interface IDatabaseSessionRead
     {
-        List<int> ReadSessionDurationMinutes(int numberOfDays);
+        List<int> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false);
 
         List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
-
-        int GetUserIdWithMostRecentLogin();
-
         int GetSessionIdWithMostRecentLogin();
 
-
-
-            List<CodingSessionDTO> ViewAllSession(bool partialView = false);
+        List<CodingSessionDTO> ViewAllSession(bool partialView = false);
         List<CodingSessionDTO> ViewSpecific(string chosenDate);
         List<CodingSessionDTO> ViewRecentSession(int numberOfSessions);
 
@@ -29,6 +24,8 @@ namespace CodingTracker.Common.IDatabaseSessionReads
         List<CodingSessionDTO> FilterSessionsByDay(string date, bool isDescending);
         List<CodingSessionDTO> FilterSessionsByWeek(string date, bool isDescending);
         List<CodingSessionDTO> FilterSessionsByYear(string year, bool isDescending);
+
+        void GetLast28DaysSessions();
 
 
     }

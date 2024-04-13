@@ -20,6 +20,5 @@ namespace CodingTracker.Common.UserCredentialDTOs
 
 
 
-
     }
 }

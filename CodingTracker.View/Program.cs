@@ -2,12 +2,10 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using CodingTracker.Business.ApplicationControls;
-using CodingTracker.Business.CodingGoals;
 using CodingTracker.Business.CodingSessions;
 using CodingTracker.Common.InputValidators;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ICodingGoals;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
@@ -23,21 +21,17 @@ using CodingTracker.Data.DatabaseManagers;
 using CodingTracker.Data.LoginManagers;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
-using CodingTracker.View.IFormFactories;
-using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.SessionGoalCountDownTimers;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidationResults;
 using CodingTracker.View.IMessageBoxManagers;
 using CodingTracker.View.MessageBoxManagers;
-using System.ComponentModel.DataAnnotations;
 using CodingTracker.Common.InputValidationResults;
 using CodingTracker.Business.PanelColorControls;
-using CodingTracker.Common.IPanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ErrorHandlers;
-using CodingTracker.View.IFormSwitchers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Data.DatabaseSessionInserts;
 using CodingTracker.Common.IDatabaseSessionInserts;
@@ -45,14 +39,12 @@ using CodingTracker.Common.IDatabaseSessionDeletes;
 using CodingTracker.Data.DatabaseSessionDeletes;
 using CodingTracker.Data.DatabaseSessionReads;
 using CodingTracker.Common.IDatabaseSessionReads;
-using CodingTracker.Data.DatabaseSessionUpdates;
-using CodingTracker.Common.IDatabaseSessionUpdates;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.CodingSessionDTOProviders;
-using CodingTracker.Common.ICodingSessionDTOProviders;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
+using CodingTracker.Common.CodingSessionDTOManagers;
+using CodingTracker.Common.SessionCalculators;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -103,7 +95,6 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
                     .AddSingleton<IDatabaseSessionDelete, DatabaseSessionDelete>()
                     .AddSingleton<IDatabaseSessionInsert, DatabaseSessionInsert>()
-                    .AddSingleton<IDatabaseSessionUpdate, DatabaseSessionUpdate>()
                     .AddSingleton<IDatabaseSessionRead, DatabaseSessionRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
@@ -112,7 +103,6 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
-                    .AddSingleton<ICodingGoal, CodingGoal>()
                     .AddSingleton<IFormController, FormController>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
@@ -123,6 +113,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
+                    .AddSingleton<ISessionCalculator, SessionCalculator>()
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
@@ -130,7 +121,6 @@ namespace CodingTracker.View.Program
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()
                     .AddTransient<EditSessionPage>()
-                    .AddTransient<ViewSessionsPage>()
                     .AddTransient<CodingSessionTimerForm>()
                     .AddTransient<SettingsPage>()
                     .AddTransient<CreateAccountPage>();

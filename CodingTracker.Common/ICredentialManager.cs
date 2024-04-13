@@ -14,5 +14,7 @@ namespace CodingTracker.Common.ICredentialManagers
 
         bool IsAccountCreatedSuccessfully(string username);
 
+        int GetUserIdWithMostRecentLogin();
+
     }
 }

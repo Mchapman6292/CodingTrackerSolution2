@@ -5,13 +5,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.IPanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
 using System.Drawing;
 
 namespace CodingTracker.Business.PanelColorControls
 {
-    public class PanelColorControl : IPanelColorControl
+    public enum SessionColor
+    {
+        Grey,        // For 0 minutes
+        RedGrey,     // For less than 60 minutes
+        Red,         // For 1 to less than 2 hours
+        Yellow,      // For 2 to less than 3 hours
+        Green        // For 3 hours and more
+    }
+    public interface IPanelColorControl
+    {
+        SessionColor DetermineSessionColor(int sessionDurationMinutes);
+
+        Color GetColorFromSessionColor(SessionColor color);
+    }
+
+
+
+public class PanelColorControl : IPanelColorControl
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;

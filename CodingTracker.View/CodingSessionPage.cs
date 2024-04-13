@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.View.IFormControllers;
-using CodingTracker.View.IFormSwitchers;
+using CodingTracker.View.FormSwitchers;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
@@ -111,6 +111,26 @@ namespace CodingTracker.View
 
             CodingGoalSetHourToggle.Enabled = isChecked;
             CodingGoalSetMinToggle.Enabled = isChecked;
+        }
+
+        public void MinimizeToTray()
+        {
+            this.Hide();
+            this.CodingSessionPageNotifyIcon.Visible = true;
+
+            this.CodingSessionPageNotifyIcon.MouseDoubleClick += (sender, e) =>
+            {
+                this.Show();
+                this.WindowState = FormWindowState.Normal;
+                this.CodingSessionPageNotifyIcon.Visible = false;
+            };
+        }
+
+        private void CodingSesionPageEndSessionButton_Click(object sender, EventArgs e)
+        {
+            _codingSession.EndSession();
+            this.Hide();
+            _formSwitcher.SwitchToMainPage();   
         }
     }
 }
