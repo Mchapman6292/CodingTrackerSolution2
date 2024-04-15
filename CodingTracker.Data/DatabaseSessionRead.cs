@@ -206,7 +206,10 @@ namespace CodingTracker.Data.DatabaseSessionReads
                             SessionId,
                             StartTime,
                             EndTime,
-                            DurationSeconds 
+                            DurationSeconds,
+                            DurationHHMM,
+                            GoalHHMM
+
                     FROM
                             CodingSessions 
                     WHERE
@@ -228,7 +231,9 @@ namespace CodingTracker.Data.DatabaseSessionReads
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
                             EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? 0 : reader.GetInt32(reader.GetOrdinal("DurationSeconds"))
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DurationSeconds")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM"))
                         };
                         codingSessionList.Add(session);
                     }
@@ -274,7 +279,9 @@ namespace CodingTracker.Data.DatabaseSessionReads
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
                             EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                            DurationSeconds = reader.GetInt32(reader.GetOrdinal("DurationSeconds")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DurationSeconds")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM"))
                         };
                         codingSessionList.Add(session);
                     }

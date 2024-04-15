@@ -8,6 +8,8 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.CodingGoalDTOs;
+using CodingTracker.Common.CodingGoalDTOManagers;
 
 namespace CodingTracker.Business.SessionCalculators
 {
@@ -25,12 +27,14 @@ namespace CodingTracker.Business.SessionCalculators
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly ICodingSessionDTOManager _codingSessionDTOManager;
+        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
 
-        public SessionCalculator(IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, ICodingSessionDTOManager codingSessionDTOManager)
+        public SessionCalculator(IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, ICodingSessionDTOManager codingSessionDTOManager, ICodingGoalDTOManager codingGoalDTOManager)
         {
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
             _codingSessionDTOManager = codingSessionDTOManager;
+            _codingGoalDTOManager = codingGoalDTOManager;
         }
 
 
@@ -128,6 +132,39 @@ namespace CodingTracker.Business.SessionCalculators
                     _appLogger.Error($"Failed to calculate total average. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
                     throw;
                 }
+            }
+        }
+
+        public int CalculateGoalSeconds()
+        {
+            using (var activity = new Activity(nameof(CalculateGoalSeconds)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(CalculateGoalSeconds)}. TraceID: {activity.TraceId}");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                int totalSeconds = 0;
+                try
+                {
+                    CodingGoalDTO currentGoalDTO = _codingGoalDTOManager.GetCurrentCodingGoalDTO();
+                    if (currentGoalDTO == null)
+                    {
+                        _appLogger.Error($"No current CodingGoalDTO found. TraceID: {activity.TraceId}");
+                        return 0;
+                    }
+
+                    totalSeconds = (currentGoalDTO.GoalHours * 3600) + (currentGoalDTO.GoalMinutes * 60);
+
+                    _appLogger.Info($"Calculated goal seconds successfully. TotalSeconds: {totalSeconds}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to calculate goal seconds. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+
+                stopwatch.Stop();
+                return totalSeconds;
             }
         }
 

@@ -7,6 +7,7 @@ using CodingTracker.Common.ICodingSessions;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
+using CodingTracker.Business.SessionCalculators;
 
 
 
@@ -22,9 +23,11 @@ namespace CodingTracker.View
         private readonly ICodingSession _codingSession;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
+        private readonly ISessionCalculator _sessionCalculator;
 
 
-        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher = null)
+
+        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher = null, ISessionCalculator sessionCalculator = null)
         {
             InitializeComponent();
             _appLogger = applogger;
@@ -35,6 +38,7 @@ namespace CodingTracker.View
             _codingSession = codingSession;
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
+            _sessionCalculator = sessionCalculator;
         }
 
         private void MainPage_Load(object sender, EventArgs e)

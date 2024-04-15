@@ -11,7 +11,7 @@ using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Data.CredentialManagers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
 using System.Diagnostics;
 using CodingTracker.View;
 using System.Security.Principal;

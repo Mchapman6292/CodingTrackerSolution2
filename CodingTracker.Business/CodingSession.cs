@@ -88,15 +88,20 @@ namespace CodingTracker.Business.CodingSessions
             {
               
                CodingSessionDTO currentSessionDTO = _sessionDTOManager.GetCurrentSessionDTO();
+
                 var stopwatch = Stopwatch.StartNew();
+
                 _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
 
                 isCodingSessionActive = false;
 
                 _sessionTimer.EndCodingSessionTimer();
                 _sessionDTOManager.SetSessionEndTime();
-                int durationSeconds = _sessionCalculator.CalculateDurationSeconds();
 
+
+                int durationSeconds = _sessionCalculator.CalculateDurationSeconds();
+                TimeSpan durationTimeSpan = _sessionDTOManager.ConvertDurationSecondsToTimeSpan(durationSeconds);
+                string goalHHMM = _goalDTOManager.FormatCodingGoalHoursMinsToString();
 
 
                 _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, durationSeconds);
@@ -148,7 +153,5 @@ namespace CodingTracker.Business.CodingSessions
                 return dates;
             }
         }
-
-
     }
 }

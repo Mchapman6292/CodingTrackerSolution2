@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CodingTracker.View.IFormControllers;
+using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
@@ -64,7 +64,6 @@ namespace CodingTracker.View
         {
             var activity = new Activity(nameof(CodingSessionPageConfirmSessionGoalButton_Click)).Start();
             var stopwatch = Stopwatch.StartNew();
-            var currentGoalDTO = _goalDTOManager.GetCurrentCodingGoalDTO();
 
             int goalHours = Convert.ToInt32(CodingGoalSetHourToggle.Value);
             int goalMinutes = Convert.ToInt32(CodingGoalSetMinToggle.Value);

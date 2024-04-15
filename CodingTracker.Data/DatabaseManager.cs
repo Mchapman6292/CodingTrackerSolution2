@@ -207,6 +207,9 @@ namespace CodingTracker.Data.DatabaseManagers
                     StartTime DATETIME NOT NULL,
                     EndTime DATETIME,
                     DurationSeconds INTEGER,
+                    DurationHHMM STRING,
+                    GoalHHMM STRING,
+                    GoalReached INTEGER,
                     FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
                 );";
 
@@ -234,6 +237,9 @@ namespace CodingTracker.Data.DatabaseManagers
                 StartTime DATETIME NOT NULL,
                 EndTime DATETIME,
                 DurationSeconds  INTEGER,
+                DurationHHMM STRING,
+                GoalHHMM STRING,
+                GoalReached INTEGER,
                 FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
             );";
                 command.ExecuteNonQuery();
