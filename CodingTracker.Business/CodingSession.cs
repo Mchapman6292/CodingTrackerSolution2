@@ -143,7 +143,7 @@ namespace CodingTracker.Business.CodingSessions
                 List<DateTime> dates = new List<DateTime>();
                 DateTime today = DateTime.Today;
 
-                for (int i = 1; i <= 28; i++)
+                for (int i = 1; i <= 29; i++)
                 {
                     dates.Add(today.AddDays(-i));
                 }

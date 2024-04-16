@@ -13,7 +13,7 @@ namespace CodingTracker.Business.PanelColorControls
 {
     public enum SessionColor
     {
-        Grey,        // For 0 minutes
+        Blue,        // For 0 minutes
         RedGrey,     // For less than 60 minutes
         Red,         // For 1 to less than 2 hours
         Yellow,      // For 2 to less than 3 hours
@@ -58,9 +58,10 @@ namespace CodingTracker.Business.PanelColorControls
 
         public SessionColor DetermineSessionColor(double sessionDurationSeconds)
         {
+            using(new Activity(nameof(DetermineSessionColor))) { }
             if (sessionDurationSeconds <= 0)
             {
-                return SessionColor.Grey;
+                return SessionColor.Blue;
             }
             else if (sessionDurationSeconds < 3600) // Less than 60 minutes
             {
@@ -93,8 +94,8 @@ namespace CodingTracker.Business.PanelColorControls
                 Color result;
                 switch (color)
                 {
-                    case SessionColor.Grey:
-                        result = Color.Gray;
+                    case SessionColor.Blue:
+                        result = Color.Blue;
                         break;
                     case SessionColor.RedGrey:
                         result = Color.FromArgb(255, 128, 128);
@@ -109,7 +110,7 @@ namespace CodingTracker.Business.PanelColorControls
                         result = Color.Green;
                         break;
                     default:
-                        result = Color.Gray;
+                        result = Color.Blue;
                         break;
                 }
 

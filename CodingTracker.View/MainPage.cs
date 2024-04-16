@@ -8,6 +8,7 @@ using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Business.SessionCalculators;
+using Guna.UI2.WinForms;
 
 
 
@@ -39,11 +40,15 @@ namespace CodingTracker.View
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
             _sessionCalculator = sessionCalculator;
+
+
+
         }
 
         private void MainPage_Load(object sender, EventArgs e)
         {
- 
+            UpdateLabels(Last28DaysPanel);
+            UpDateLast28Days(Last28DaysPanel);
         }
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
@@ -68,30 +73,53 @@ namespace CodingTracker.View
 
         private void UpdateLabels(Panel parentPanel)
         {
+            _appLogger.Debug("UpdateLabels method started.");
+            try
             {
                 List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-                var labels = parentPanel.Controls.OfType<Label>().ToList();
-                for (int i = 0; i < last28Days.Count && i < labels.Count; i++)
+                var GunaLabels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2HtmlLabel>().ToList();
+                for (int i = 0; i < last28Days.Count && i < GunaLabels.Count; i++)
                 {
-                    labels[i].Text = last28Days[i].ToShortDateString();
+                    GunaLabels[i].Text = last28Days[i].ToShortDateString();
                 }
+                _appLogger.Debug("UpdateLabels method completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"An error occurred in UpdateLabels: {ex.Message}");
             }
         }
 
         private void UpDateLast28Days(Panel parentPanel)
         {
-            List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-            List<double> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
-
-            var labels = parentPanel.Controls.OfType<Label>().ToList();
-            for (int i = 0; i < last28Days.Count && i < labels.Count; i++)
+            _appLogger.Debug("UpDateLast28Days method started.");
+            try
             {
-                double duration = sessionDurations.ElementAtOrDefault(i);
-                SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
-                Color color = _panelColorControl.GetColorFromSessionColor(sessionColor);
+                List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
+                List<double> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
+                var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
+                for (int i = 0; i < last28Days.Count && i < gradientPanels.Count; i++)
+                {
+                    double duration = sessionDurations.ElementAtOrDefault(i);
+                    SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
+                    Color color = _panelColorControl.GetColorFromSessionColor(sessionColor);
 
-                labels[i].BackColor = color;
-                labels[i].Text = last28Days[i].ToShortDateString();
+                    gradientPanels[i].BackColor = color;
+                    gradientPanels[i].Tag = last28Days[i].ToShortDateString();
+
+                    var label = gradientPanels[i].Controls.OfType<Label>().FirstOrDefault();
+                    if (label != null)
+                    {
+                        label.Text = last28Days[i].ToShortDateString();
+                    }
+
+                    _appLogger.Debug($"Panel {i}: Date {last28Days[i].ToShortDateString()}, Duration {duration}, SessionColor {sessionColor}, RGB ({color.R}, {color.G}, {color.B})");
+                }
+                _appLogger.Debug("UpDateLast28Days method completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"An error occurred in UpDateLast28Days: {ex.Message}");
             }
         }
     }
