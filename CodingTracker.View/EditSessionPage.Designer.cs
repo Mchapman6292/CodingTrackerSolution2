@@ -348,12 +348,12 @@
             // 
             // GoalHHMM
             // 
-            GoalHHMM.HeaderText = "Goal";
+            GoalHHMM.HeaderText = "GoalHHMM";
             GoalHHMM.Name = "GoalHHMM";
             // 
             // DurationHHMM
             // 
-            DurationHHMM.HeaderText = "Duration";
+            DurationHHMM.HeaderText = "DurationHHMM";
             DurationHHMM.Name = "DurationHHMM";
             // 
             // StartTimeColumn

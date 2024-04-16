@@ -11,11 +11,11 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 {
     public interface IDatabaseSessionRead
     {
-        List<int> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false);
+        List<double> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false);
 
         List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
 
-        List<(DateTime Day, int TotalDurationSeconds)> ReadTotalSessionDurationByDay();
+        List<(DateTime Day, double TotalDurationSeconds)> ReadTotalSessionDurationByDay();
         int GetSessionIdWithMostRecentLogin();
 
         List<CodingSessionDTO> ViewAllSession(bool partialView = false);

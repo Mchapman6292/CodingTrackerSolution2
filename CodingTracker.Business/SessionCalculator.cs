@@ -18,7 +18,7 @@ namespace CodingTracker.Business.SessionCalculators
         double CalculateLastSevenDaysAvg();
         double CalculateTodayTotal();
         double CalculateTotalAvg();
-        int CalculateDurationSeconds();
+        double CalculateDurationSeconds();
     }
 
 
@@ -48,7 +48,7 @@ namespace CodingTracker.Business.SessionCalculators
                 try
                 {
                     int numberOfDays = 7;
-                    List<int> last7Days = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
+                    List<double> last7Days = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
 
                     double averageMinutes = 0;
                     if (last7Days.Count > 0)
@@ -81,7 +81,7 @@ namespace CodingTracker.Business.SessionCalculators
                 try
                 {
                     int numberOfDays = 1;
-                    List<int> todayMins = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
+                    List<double> todayMins = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
 
                     double totalMinutes = 0;
                     if (todayMins.Count > 0)
@@ -112,7 +112,7 @@ namespace CodingTracker.Business.SessionCalculators
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
-                    List<int> totalMins = _databaseSessionRead.ReadSessionDurationSeconds(0, true);
+                    List<double> totalMins = _databaseSessionRead.ReadSessionDurationSeconds(0, true);
 
                     double averageMinutes = 0;
                     if (totalMins.Count > 0)
@@ -169,10 +169,10 @@ namespace CodingTracker.Business.SessionCalculators
         }
 
 
-        public int CalculateDurationSeconds()
+        public double CalculateDurationSeconds()
         {
             CodingSessionDTO currentSessionDTO = _codingSessionDTOManager.GetCurrentSessionDTO();
-            int durationSeconds = 0;
+            double durationSeconds = 0;
             using (var activity = new Activity(nameof(CalculateDurationSeconds)).Start())
             {
                 _appLogger.Info($"Calculating duration seconds. TraceID: {activity.TraceId}");
@@ -185,10 +185,10 @@ namespace CodingTracker.Business.SessionCalculators
                     }
 
                     TimeSpan duration = currentSessionDTO.EndTime.Value - currentSessionDTO.StartTime.Value;
-                    durationSeconds = (int)duration.TotalSeconds;
+                    durationSeconds = (double)duration.TotalSeconds;
                     
 
-                    _appLogger.Info($"Duration seconds calculated. TraceID: {activity.TraceId}, DurationSeconds: {durationSeconds}");
+                    _appLogger.Info($"Duration seconds calculated: {durationSeconds}. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {

@@ -42,6 +42,8 @@ namespace CodingTracker.View
             LoadSessionsIntoDataGridView();
         }
 
+        
+
         private void LoadSessionsIntoDataGridView()
         {
             var methodName = nameof(LoadSessionsIntoDataGridView);
@@ -67,7 +69,7 @@ namespace CodingTracker.View
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
                        
 
-                        _appLogger.Debug($"Added session to DataGridView: UserID={session.UserId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
+                        _appLogger.Debug($"Added session to DataGridView: SessionID={session.SessionId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
                     }
 
                     stopwatch.Stop();

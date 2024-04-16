@@ -206,7 +206,7 @@ namespace CodingTracker.Data.DatabaseManagers
                     UserId INTEGER NOT NULL,
                     StartTime DATETIME NOT NULL,
                     EndTime DATETIME,
-                    DurationSeconds INTEGER,
+                    DurationSeconds REAL,
                     DurationHHMM STRING,
                     GoalHHMM STRING,
                     GoalReached INTEGER,
@@ -225,24 +225,24 @@ namespace CodingTracker.Data.DatabaseManagers
                 OpenConnectionWithRetry();
 
                 using var command = _connection.CreateCommand();
-
                 command.CommandText = "DROP TABLE IF EXISTS CodingSessions;";
                 command.ExecuteNonQuery();
 
- 
+
                 command.CommandText = @"
-            CREATE TABLE CodingSessions (
-                SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                UserId INTEGER NOT NULL,
-                StartTime DATETIME NOT NULL,
-                EndTime DATETIME,
-                DurationSeconds  INTEGER,
-                DurationHHMM STRING,
-                GoalHHMM STRING,
-                GoalReached INTEGER,
-                FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
-            );";
-                command.ExecuteNonQuery();
+                    CREATE TABLE CodingSessions (
+                        SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserId INTEGER NOT NULL,
+                        StartTime DATETIME NOT NULL,
+                        EndTime DATETIME,
+                        DurationSeconds REAL, 
+                        DurationHHMM STRING,
+                        GoalHHMM STRING,
+                        GoalReached INTEGER,
+                        FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+                        
+                        );";
+                        command.ExecuteNonQuery();
 
                 _appLogger.Info($"Updated CodingSessions table successfully. TraceID: {activity.TraceId}");
             }

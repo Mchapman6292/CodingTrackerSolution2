@@ -102,9 +102,10 @@ namespace CodingTracker.Business.CodingSessions
                 int durationSeconds = _sessionCalculator.CalculateDurationSeconds();
                 TimeSpan durationTimeSpan = _sessionDTOManager.ConvertDurationSecondsToTimeSpan(durationSeconds);
                 string goalHHMM = _goalDTOManager.FormatCodingGoalHoursMinsToString();
+                string durationHHMM = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(durationSeconds);
 
 
-                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, durationSeconds);
+                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, durationSeconds, durationHHMM, goalHHMM);
                 _databaseSessionInsert.InsertSession();
 
                 stopwatch.Stop();

@@ -81,12 +81,12 @@ namespace CodingTracker.View
         private void UpDateLast28Days(Panel parentPanel)
         {
             List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-            List<int> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
+            List<double> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
 
             var labels = parentPanel.Controls.OfType<Label>().ToList();
             for (int i = 0; i < last28Days.Count && i < labels.Count; i++)
             {
-                int duration = sessionDurations.ElementAtOrDefault(i);
+                double duration = sessionDurations.ElementAtOrDefault(i);
                 SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
                 Color color = _panelColorControl.GetColorFromSessionColor(sessionColor);
 

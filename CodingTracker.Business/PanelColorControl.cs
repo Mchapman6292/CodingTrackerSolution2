@@ -21,7 +21,7 @@ namespace CodingTracker.Business.PanelColorControls
     }
     public interface IPanelColorControl
     {
-        SessionColor DetermineSessionColor(int sessionDurationSeconds);
+        SessionColor DetermineSessionColor(double sessionDurationSeconds);
         List<SessionColor> DetermineSessionColors();
 
         Color GetColorFromSessionColor(SessionColor color);
@@ -34,7 +34,7 @@ namespace CodingTracker.Business.PanelColorControls
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
         private readonly IDatabaseSessionRead _databaseSessionRead;
-        private readonly List<(DateTime Day, int TotalDurationMinutes)> _dailyDurations;
+        private readonly List<(DateTime Day, double TotalDurationMinutes)> _dailyDurations;
 
 
 
@@ -56,7 +56,7 @@ namespace CodingTracker.Business.PanelColorControls
             return colors;
         }
 
-        public SessionColor DetermineSessionColor(int sessionDurationSeconds)
+        public SessionColor DetermineSessionColor(double sessionDurationSeconds)
         {
             if (sessionDurationSeconds <= 0)
             {

@@ -44,7 +44,7 @@ namespace CodingTracker.Common.SessionCalculators
                 try
                 {
                     int numberOfDays = 7;
-                    List<int> last7Days = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
+                    List<double> last7Days = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
 
                     double averageMinutes = 0;
                     if (last7Days.Count > 0)
@@ -77,7 +77,7 @@ namespace CodingTracker.Common.SessionCalculators
                 try
                 {
                     int numberOfDays = 1;
-                    List<int> todayMins = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
+                    List<double> todayMins = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
 
                     double totalMinutes = 0;
                     if (todayMins.Count > 0)
@@ -108,7 +108,7 @@ namespace CodingTracker.Common.SessionCalculators
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
-                    List<int> totalMins = _databaseSessionRead.ReadSessionDurationSeconds(0, true);
+                    List<double> totalMins = _databaseSessionRead.ReadSessionDurationSeconds(0, true);
 
                     double averageMinutes = 0;
                     if (totalMins.Count > 0)
