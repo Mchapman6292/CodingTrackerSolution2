@@ -88,18 +88,24 @@ namespace CodingTracker.Business.CodingSessions
             {
               
                CodingSessionDTO currentSessionDTO = _sessionDTOManager.GetCurrentSessionDTO();
+
                 var stopwatch = Stopwatch.StartNew();
+
                 _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
 
                 isCodingSessionActive = false;
 
                 _sessionTimer.EndCodingSessionTimer();
                 _sessionDTOManager.SetSessionEndTime();
+
+
                 int durationSeconds = _sessionCalculator.CalculateDurationSeconds();
+                TimeSpan durationTimeSpan = _sessionDTOManager.ConvertDurationSecondsToTimeSpan(durationSeconds);
+                string goalHHMM = _goalDTOManager.FormatCodingGoalHoursMinsToString();
+                string durationHHMM = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(durationSeconds);
 
 
-
-                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, durationSeconds);
+                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, durationSeconds, durationHHMM, goalHHMM);
                 _databaseSessionInsert.InsertSession();
 
                 stopwatch.Stop();
@@ -137,7 +143,7 @@ namespace CodingTracker.Business.CodingSessions
                 List<DateTime> dates = new List<DateTime>();
                 DateTime today = DateTime.Today;
 
-                for (int i = 1; i <= 28; i++)
+                for (int i = 1; i <= 29; i++)
                 {
                     dates.Add(today.AddDays(-i));
                 }
@@ -148,7 +154,5 @@ namespace CodingTracker.Business.CodingSessions
                 return dates;
             }
         }
-
-
     }
 }

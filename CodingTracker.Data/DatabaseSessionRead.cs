@@ -36,9 +36,9 @@ namespace CodingTracker.Data.DatabaseSessionReads
         }
 
 
-        public List<int> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false)
+        public List<double> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false)
         {
-            List<int> durationSecondsList = new List<int>();
+            List<double> durationSecondsList = new List<double>();
             _databaseManager.ExecuteDatabaseOperation(connection =>
             {
                 using var command = new SQLiteCommand(connection);
@@ -70,7 +70,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     {
                         if (!reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
                         {
-                            int durationSeconds = reader.GetInt32(reader.GetOrdinal("DurationSeconds"));
+                            double durationSeconds = reader.GetInt32(reader.GetOrdinal("DurationSeconds"));
                             durationSecondsList.Add(durationSeconds);
                         }
                     }
@@ -131,9 +131,9 @@ namespace CodingTracker.Data.DatabaseSessionReads
         }
 
 
-        public List<(DateTime Day, int TotalDurationSeconds)> ReadTotalSessionDurationByDay()
+        public List<(DateTime Day, double TotalDurationSeconds)> ReadTotalSessionDurationByDay()
         {
-            List<(DateTime Day, int TotalDurationSeconds)> dailyDurations = new List<(DateTime Day, int TotalDurationSeconds)>();
+            List<(DateTime Day, double TotalDurationSeconds)> dailyDurations = new List<(DateTime Day, double TotalDurationSeconds)>();
             _databaseManager.ExecuteDatabaseOperation(connection =>
             {
                 using var command = new SQLiteCommand(connection);
@@ -156,7 +156,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     while (reader.Read())
                     {
                         DateTime sessionDay = reader.GetDateTime(reader.GetOrdinal("SessionDay"));
-                        int totalDurationSeconds = reader.GetInt32(reader.GetOrdinal("TotalDurationSeconds"));
+                        double totalDurationSeconds = reader.GetInt32(reader.GetOrdinal("TotalDurationSeconds"));
                         dailyDurations.Add((sessionDay, totalDurationSeconds));
                     }
                 }
@@ -206,7 +206,10 @@ namespace CodingTracker.Data.DatabaseSessionReads
                             SessionId,
                             StartTime,
                             EndTime,
-                            DurationSeconds 
+                            DurationSeconds,
+                            DurationHHMM,
+                            GoalHHMM
+
                     FROM
                             CodingSessions 
                     WHERE
@@ -228,7 +231,9 @@ namespace CodingTracker.Data.DatabaseSessionReads
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
                             EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? 0 : reader.GetInt32(reader.GetOrdinal("DurationSeconds"))
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (double?)null : reader.GetDouble(reader.GetOrdinal("DurationSeconds")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM"))
                         };
                         codingSessionList.Add(session);
                     }
@@ -248,19 +253,19 @@ namespace CodingTracker.Data.DatabaseSessionReads
             _databaseManager.ExecuteDatabaseOperation(connection =>
             {
                 using var command = new SQLiteCommand(@"
-                    SELECT
-                            SessionId,
-                            StartTime, 
-                            EndTime,
-                            DurationSeconds
-                            
-                    FROM
-                            CodingSessions 
-                    WHERE
-                            UserId = @UserId 
-                ORDER BY 
-                            StartTime DESC", 
-                            
+            SELECT
+                    SessionId,
+                    GoalHHMM,
+                    DurationHHMM,
+                    StartTime, 
+                    EndTime
+            FROM
+                    CodingSessions
+            WHERE
+                    UserId = @UserId 
+            ORDER BY 
+                    StartTime DESC",
+
                             connection);
 
                 command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
@@ -272,9 +277,10 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         var session = new CodingSessionDTO
                         {
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                            DurationSeconds = reader.GetInt32(reader.GetOrdinal("DurationSeconds")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime"))
                         };
                         codingSessionList.Add(session);
                     }

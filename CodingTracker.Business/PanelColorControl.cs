@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
+using CodingTracker.Common.IDatabaseSessionReads;
 using System.Drawing;
 
 namespace CodingTracker.Business.PanelColorControls
 {
     public enum SessionColor
     {
-        Grey,        // For 0 minutes
+        Blue,        // For 0 minutes
         RedGrey,     // For less than 60 minutes
         Red,         // For 1 to less than 2 hours
         Yellow,      // For 2 to less than 3 hours
@@ -20,67 +21,66 @@ namespace CodingTracker.Business.PanelColorControls
     }
     public interface IPanelColorControl
     {
-        SessionColor DetermineSessionColor(int sessionDurationMinutes);
+        SessionColor DetermineSessionColor(double sessionDurationSeconds);
+        List<SessionColor> DetermineSessionColors();
 
         Color GetColorFromSessionColor(SessionColor color);
     }
 
 
 
-public class PanelColorControl : IPanelColorControl
+    public class PanelColorControl : IPanelColorControl
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
+        private readonly IDatabaseSessionRead _databaseSessionRead;
+        private readonly List<(DateTime Day, double TotalDurationMinutes)> _dailyDurations;
 
 
-        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler)
+
+        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, IDatabaseSessionRead databaseSessionRead)
         {
             _appLogger = appLogger;
             _errorHandler = errorHandler;
+            _databaseSessionRead = databaseSessionRead;
+            _dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
         }
 
-        public SessionColor DetermineSessionColor(int sessionDurationMinutes)
+        public List<SessionColor> DetermineSessionColors()
         {
-            var activity = new Activity(nameof(DetermineSessionColor)).Start();
-            var stopwatch = Stopwatch.StartNew();
-
-            try
+            var colors = new List<SessionColor>();
+            foreach (var duration in _dailyDurations)
             {
-                _appLogger.Debug($"Determining session color for duration: {sessionDurationMinutes} minutes. TraceID: {activity.TraceId}");
-
-                SessionColor color;
-                if (sessionDurationMinutes <= 0)
-                {
-                    color = SessionColor.Grey;
-                }
-                else if (sessionDurationMinutes < 60)
-                {
-                    color = SessionColor.RedGrey;
-                }
-                else if (sessionDurationMinutes < 120)
-                {
-                    color = SessionColor.Red;
-                }
-                else if (sessionDurationMinutes < 180)
-                {
-                    color = SessionColor.Yellow;
-                }
-                else
-                {
-                    color = SessionColor.Green;
-                }
-
-                stopwatch.Stop();
-                _appLogger.Info($"Session color determined: {color}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-
-                return color;
+                colors.Add(DetermineSessionColor(duration.TotalDurationMinutes));
             }
-            finally
+            return colors;
+        }
+
+        public SessionColor DetermineSessionColor(double sessionDurationSeconds)
+        {
+            using(new Activity(nameof(DetermineSessionColor))) { }
+            if (sessionDurationSeconds <= 0)
             {
-                stopwatch.Stop();
-                activity.Stop();
+                return SessionColor.Blue;
+            }
+            else if (sessionDurationSeconds < 3600) // Less than 60 minutes
+            {
+                return SessionColor.RedGrey;
+            }
+            else if (sessionDurationSeconds < 7200) // 1 to less than 2 hours
+            {
+                return SessionColor.Red;
+            }
+            else if (sessionDurationSeconds < 10800) // 2 to less than 3 hours
+            {
+                return SessionColor.Yellow;
+            }
+            else
+            {
+                return SessionColor.Green; // 3 hours and more
             }
         }
+    
 
         public Color GetColorFromSessionColor(SessionColor color)
         {
@@ -94,8 +94,8 @@ public class PanelColorControl : IPanelColorControl
                 Color result;
                 switch (color)
                 {
-                    case SessionColor.Grey:
-                        result = Color.Gray;
+                    case SessionColor.Blue:
+                        result = Color.Blue;
                         break;
                     case SessionColor.RedGrey:
                         result = Color.FromArgb(255, 128, 128);
@@ -110,7 +110,7 @@ public class PanelColorControl : IPanelColorControl
                         result = Color.Green;
                         break;
                     default:
-                        result = Color.Gray;
+                        result = Color.Blue;
                         break;
                 }
 

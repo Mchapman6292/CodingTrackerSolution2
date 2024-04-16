@@ -121,7 +121,7 @@
   <data name="EditSessionPageBackButton.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EQAACxEBf2RfkQAAAaRJREFUSEvdlLtOAkEYRgkIlc8FVgqG+Ere8dIZ7UDRV9DSVmOneGu9tGhn4nq+
+        DAAACwwBP0AiyAAAAaRJREFUSEvdlLtOAkEYRgkIlc8FVgqG+Ere8dIZ7UDRV9DSVmOneGu9tGhn4nq+
         9YMFmWWxoNCTnMB88w9L/tmZ3P8miqISLuERdvDd6rsyzZVc/jtYuIiPKJ6xjZtW35WJB6x5WTYU53FN
         K+ECy5j3dB9lWMFLFKs4UjcCRetxeRTt4YzjVKgp4IoW6NNxGArUFtFwNDGs2fpeGlUdDcOENlQ9V1sK
         jidGa1Dtusei4wRCvRGi7KgP2Sye4b6jIMxrT0TdUQKhXrsnHNooxvrxc/zABcdBtBZfsOUogfAW2x7G
@@ -134,13 +134,19 @@
   <metadata name="DateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="GoalHHMM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="DurationHHMM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="StartTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="EndTimeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="DurationMinutes.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="GoalReached.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
 </root>

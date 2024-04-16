@@ -45,6 +45,7 @@ using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.SessionCalculators;
+using CodingTracker.Common.DataTypeHelpers;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -114,6 +115,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<ISessionCalculator, SessionCalculator>()
+                    .AddSingleton<IDataTypeHelper, DataTypeHelper>()
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()

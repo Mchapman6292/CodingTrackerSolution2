@@ -12,6 +12,7 @@ using CodingTracker.View.FormSwitchers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.CodingGoalDTOManagers;
 using System.Diagnostics;
 
 namespace CodingTracker.View
@@ -23,7 +24,8 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly IApplicationLogger _appLogger;
-        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger)
+        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
+        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager)
         {
             _appLogger = appLogger;
             _appControl = appControl;
@@ -32,12 +34,15 @@ namespace CodingTracker.View
             InitializeComponent();
             InitializeDataGridView();
             LoadSessionsIntoDataGridView();
+            _codingGoalDTOManager = codingGoalDTOManager;
         }
 
         private void EditSessionPage_Load(object sender, EventArgs e)
         {
             LoadSessionsIntoDataGridView();
         }
+
+        
 
         private void LoadSessionsIntoDataGridView()
         {
@@ -57,12 +62,14 @@ namespace CodingTracker.View
                     foreach (var session in sessions)
                     {
                         int rowIndex = EditSessionPageDataGridView.Rows.Add();
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.UserId;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.StartTime?.ToString("g");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.EndTime?.ToString("g");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.DurationSeconds;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.SessionId;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.GoalHHMM;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.DurationHHMM;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartTime?.ToString("g");
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
+                       
 
-                        _appLogger.Debug($"Added session to DataGridView: UserID={session.UserId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
+                        _appLogger.Debug($"Added session to DataGridView: SessionID={session.SessionId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
                     }
 
                     stopwatch.Stop();

@@ -12,8 +12,12 @@ namespace CodingTracker.Common.CodingSessionDTOs
         public int UserId { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public int? DurationSeconds { get; set; }
+        public double? DurationSeconds { get; set; }
 
+        public string? DurationHHMM { get; set; }
+
+        public string? GoalHHMM { get; set; }
+        public int? GoalReached { get; set; }
 
     }
 }
