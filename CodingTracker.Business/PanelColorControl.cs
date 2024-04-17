@@ -8,6 +8,7 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using System.Drawing;
+using CodingTracker.Common.CodingSessionDTOs;
 
 namespace CodingTracker.Business.PanelColorControls
 {
@@ -17,14 +18,16 @@ namespace CodingTracker.Business.PanelColorControls
         RedGrey,     // For less than 60 minutes
         Red,         // For 1 to less than 2 hours
         Yellow,      // For 2 to less than 3 hours
-        Green        // For 3 hours and more
+        Green,       // For 3 hours and more
+        Black        // For errors/null   
     }
     public interface IPanelColorControl
     {
-        SessionColor DetermineSessionColor(double sessionDurationSeconds);
-        List<SessionColor> DetermineSessionColors();
 
-        Color GetColorFromSessionColor(SessionColor color);
+        List<SessionColor> AssignColorsToSessionsInLast28Days();
+        Color ConvertSessionColorToColor(SessionColor color);
+
+        SessionColor DetermineSessionColor(double? sessionDurationSeconds);
     }
 
 
@@ -35,6 +38,7 @@ namespace CodingTracker.Business.PanelColorControls
         private readonly IErrorHandler _errorHandler;
         private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly List<(DateTime Day, double TotalDurationMinutes)> _dailyDurations;
+        private readonly List<SessionColor> _sessionColors;
 
 
 
@@ -46,20 +50,40 @@ namespace CodingTracker.Business.PanelColorControls
             _dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
         }
 
-        public List<SessionColor> DetermineSessionColors()
+        public List<SessionColor> AssignColorsToSessionsInLast28Days()
         {
-            var colors = new List<SessionColor>();
-            foreach (var duration in _dailyDurations)
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(AssignColorsToSessionsInLast28Days)))
             {
-                colors.Add(DetermineSessionColor(duration.TotalDurationMinutes));
+                _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
+
+                List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
+                List<SessionColor> sessionColors = new List<SessionColor>();
+
+
+                foreach (var dayDuration in dailyDurations)
+                {
+                    SessionColor color = DetermineSessionColor(dayDuration.TotalDurationSeconds);
+                    sessionColors.Add(color);
+
+                    _appLogger.Debug($"Assigned color for day: {dayDuration.Date.ToShortDateString()}, Duration Seconds: {dayDuration.TotalDurationSeconds}, Color: {color}.");
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"Completed {nameof(AssignColorsToSessionsInLast28Days)}. Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                return sessionColors;
             }
-            return colors;
         }
 
-        public SessionColor DetermineSessionColor(double sessionDurationSeconds)
+
+
+
+
+
+        public SessionColor DetermineSessionColor(double? sessionDurationSeconds)
         {
-            using(new Activity(nameof(DetermineSessionColor))) { }
-            if (sessionDurationSeconds <= 0)
+            using (new Activity(nameof(DetermineSessionColor))) { }
+            if (!sessionDurationSeconds.HasValue || sessionDurationSeconds <= 0)
             {
                 return SessionColor.Blue;
             }
@@ -80,11 +104,11 @@ namespace CodingTracker.Business.PanelColorControls
                 return SessionColor.Green; // 3 hours and more
             }
         }
-    
 
-        public Color GetColorFromSessionColor(SessionColor color)
+
+        public Color ConvertSessionColorToColor(SessionColor color)
         {
-            var activity = new Activity(nameof(GetColorFromSessionColor)).Start();
+            var activity = new Activity(nameof(ConvertSessionColorToColor)).Start();
             var stopwatch = Stopwatch.StartNew();
 
             try
@@ -109,8 +133,11 @@ namespace CodingTracker.Business.PanelColorControls
                     case SessionColor.Green:
                         result = Color.Green;
                         break;
+                    case SessionColor.Black: // For errors/null
+                        result = Color.Black;
+                        break;
                     default:
-                        result = Color.Blue;
+                        result = Color.Blue; // Default case as fallback
                         break;
                 }
 
