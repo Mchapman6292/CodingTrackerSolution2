@@ -57,6 +57,21 @@ namespace CodingTracker.View
             _formSwitcher.SwitchToCodingSessionPage();
         }
 
+        private void MainPageCodingSessionButton_MouseEnter(object sender, EventArgs e)
+        {
+            Guna.UI2.WinForms.Guna2GradientButton btn = sender as Guna.UI2.WinForms.Guna2GradientButton;
+            btn.FillColor = Color.FromArgb(94, 148, 255);
+            btn.FillColor2 = Color.FromArgb(255, 77, 165);
+        }
+
+        private void MainPageCodingSessionButton_MouseLeave(object sender, EventArgs e)
+        {
+            Guna.UI2.WinForms.Guna2GradientButton btn = sender as Guna.UI2.WinForms.Guna2GradientButton;
+            btn.FillColor = Color.FromArgb(35, 34, 50);
+            btn.FillColor2 = Color.FromArgb(35, 34, 50);
+        }
+
+
 
         private void MainPageEditSessionsButton_Click(object sender, EventArgs e)
         {
@@ -102,7 +117,7 @@ namespace CodingTracker.View
                 {
                     double duration = sessionDurations.ElementAtOrDefault(i);
                     SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
-                    Color color = _panelColorControl.GetColorFromSessionColor(sessionColor);
+                    Color color = _panelColorControl.ConvertSessionColorToColor(sessionColor);
 
                     gradientPanels[i].BackColor = color;
                     gradientPanels[i].Tag = last28Days[i].ToShortDateString();
@@ -122,5 +137,11 @@ namespace CodingTracker.View
                 _appLogger.Error($"An error occurred in UpDateLast28Days: {ex.Message}");
             }
         }
+
+        private void Day2Label_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
+ 

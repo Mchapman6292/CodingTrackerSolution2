@@ -15,7 +15,7 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 
         List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
 
-        List<(DateTime Day, double TotalDurationSeconds)> ReadTotalSessionDurationByDay();
+        List<(DateTime Date, double TotalDurationSeconds)> ReadTotalSessionDurationByDay();
         int GetSessionIdWithMostRecentLogin();
 
         List<CodingSessionDTO> ViewAllSession(bool partialView = false);
@@ -23,9 +23,9 @@ namespace CodingTracker.Common.IDatabaseSessionReads
         List<CodingSessionDTO> ViewRecentSession(int numberOfSessions);
 
 
-        List<CodingSessionDTO> FilterSessionsByDay(string date, bool isDescending);
-        List<CodingSessionDTO> FilterSessionsByWeek(string date, bool isDescending);
-        List<CodingSessionDTO> FilterSessionsByYear(string year, bool isDescending);
+        List<CodingSessionDTO> SelectAllSessionsForDate(string date, bool isDescending);
+        List<CodingSessionDTO> SelectAllSesssionsForWeek(string date, bool isDescending);
+        List<CodingSessionDTO> SelectAllSessionsForYear(string year, bool isDescending);
 
         void GetLast28DaysSessions();
 

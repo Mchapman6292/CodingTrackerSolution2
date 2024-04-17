@@ -129,7 +129,13 @@ namespace CodingTracker.View
         {
             _codingSession.EndSession();
             this.Hide();
-            _formSwitcher.SwitchToMainPage();   
+            _formSwitcher.SwitchToMainPage();
+        }
+
+        private void CodingSessionPageHomeButton_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            _formSwitcher.SwitchToMainPage();
         }
     }
 }
