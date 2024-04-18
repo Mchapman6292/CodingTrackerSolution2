@@ -9,6 +9,7 @@ using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Business.SessionCalculators;
 using Guna.UI2.WinForms;
+using System.Diagnostics;
 
 
 
@@ -135,6 +136,15 @@ namespace CodingTracker.View
             catch (Exception ex)
             {
                 _appLogger.Error($"An error occurred in UpDateLast28Days: {ex.Message}");
+            }
+        }
+
+        private void UpdatedateTodaySessionLabel() 
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using(var activity = new Activity(nameof(UpdatedateTodaySessionLabel))) 
+            {
+
             }
         }
 

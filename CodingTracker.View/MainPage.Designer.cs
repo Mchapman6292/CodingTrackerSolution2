@@ -50,9 +50,9 @@
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges76 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges77 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges19 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges21 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges22 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges23 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges24 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -120,8 +120,8 @@
             MainPageTodayTotalPanel = new Guna.UI2.WinForms.Guna2GradientPanel();
             guna2Panel2 = new Guna.UI2.WinForms.Guna2Panel();
             Last28DaysPanel = new Panel();
-            MainPageProgressBar = new Guna.UI2.WinForms.Guna2CircleProgressBar();
             guna2GradientPanel28M = new Guna.UI2.WinForms.Guna2GradientPanel();
+            MainPageProgressBar = new Guna.UI2.WinForms.Guna2CircleProgressBar();
             guna2GradientPanel27M = new Guna.UI2.WinForms.Guna2GradientPanel();
             guna2GradientPanel26M = new Guna.UI2.WinForms.Guna2GradientPanel();
             guna2GradientPanel25M = new Guna.UI2.WinForms.Guna2GradientPanel();
@@ -177,9 +177,11 @@
             Day3Label = new Guna.UI2.WinForms.Guna2HtmlLabel();
             Day2Label = new Guna.UI2.WinForms.Guna2HtmlLabel();
             Day1Label = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            guna2HtmlLabel1 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             MainPageProgressLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
             panel2.SuspendLayout();
             guna2Panel1.SuspendLayout();
+            MainPageTodayTotalPanel.SuspendLayout();
             guna2Panel2.SuspendLayout();
             Last28DaysPanel.SuspendLayout();
             SuspendLayout();
@@ -374,6 +376,7 @@
             // 
             MainPageTodayTotalPanel.Anchor = AnchorStyles.None;
             MainPageTodayTotalPanel.BorderRadius = 30;
+            MainPageTodayTotalPanel.Controls.Add(guna2HtmlLabel1);
             MainPageTodayTotalPanel.CustomizableEdges = customizableEdges15;
             MainPageTodayTotalPanel.FillColor = Color.FromArgb(100, 90, 210);
             MainPageTodayTotalPanel.FillColor2 = Color.FromArgb(110, 213, 228);
@@ -460,6 +463,15 @@
             Last28DaysPanel.Size = new Size(1117, 345);
             Last28DaysPanel.TabIndex = 6;
             // 
+            // guna2GradientPanel28M
+            // 
+            guna2GradientPanel28M.CustomizableEdges = customizableEdges19;
+            guna2GradientPanel28M.Location = new Point(720, 215);
+            guna2GradientPanel28M.Name = "guna2GradientPanel28M";
+            guna2GradientPanel28M.ShadowDecoration.CustomizableEdges = customizableEdges20;
+            guna2GradientPanel28M.Size = new Size(23, 15);
+            guna2GradientPanel28M.TabIndex = 55;
+            // 
             // MainPageProgressBar
             // 
             MainPageProgressBar.FillColor = Color.WhiteSmoke;
@@ -478,15 +490,6 @@
             MainPageProgressBar.Text = "guna2CircleProgressBar1";
             MainPageProgressBar.TextMode = Guna.UI2.WinForms.Enums.ProgressBarTextMode.Custom;
             MainPageProgressBar.Value = 50;
-            // 
-            // guna2GradientPanel28M
-            // 
-            guna2GradientPanel28M.CustomizableEdges = customizableEdges19;
-            guna2GradientPanel28M.Location = new Point(720, 215);
-            guna2GradientPanel28M.Name = "guna2GradientPanel28M";
-            guna2GradientPanel28M.ShadowDecoration.CustomizableEdges = customizableEdges20;
-            guna2GradientPanel28M.Size = new Size(23, 15);
-            guna2GradientPanel28M.TabIndex = 55;
             // 
             // guna2GradientPanel27M
             // 
@@ -1013,6 +1016,17 @@
             Day1Label.TabIndex = 0;
             Day1Label.Text = "guna2HtmlLabel1";
             // 
+            // guna2HtmlLabel1
+            // 
+            guna2HtmlLabel1.AutoSize = false;
+            guna2HtmlLabel1.BackColor = Color.Transparent;
+            guna2HtmlLabel1.IsContextMenuEnabled = false;
+            guna2HtmlLabel1.Location = new Point(27, 19);
+            guna2HtmlLabel1.Name = "guna2HtmlLabel1";
+            guna2HtmlLabel1.Size = new Size(186, 88);
+            guna2HtmlLabel1.TabIndex = 0;
+            guna2HtmlLabel1.Text = "MainPageTodayLabel";
+            // 
             // MainPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1029,6 +1043,7 @@
             Load += MainPage_Load;
             panel2.ResumeLayout(false);
             guna2Panel1.ResumeLayout(false);
+            MainPageTodayTotalPanel.ResumeLayout(false);
             guna2Panel2.ResumeLayout(false);
             Last28DaysPanel.ResumeLayout(false);
             Last28DaysPanel.PerformLayout();
@@ -1107,5 +1122,6 @@
         private Guna.UI2.WinForms.Guna2HtmlLabel Day14Label;
         private Guna.UI2.WinForms.Guna2GradientButton MainPageCodingSessionButton;
         private Guna.UI2.WinForms.Guna2GradientButton MainPageEditSessionsButton;
+        private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel1;
     }
 }

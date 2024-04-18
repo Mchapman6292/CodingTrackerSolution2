@@ -66,7 +66,7 @@ namespace CodingTracker.Business.PanelColorControls
                     SessionColor color = DetermineSessionColor(dayDuration.TotalDurationSeconds);
                     sessionColors.Add(color);
 
-                    _appLogger.Debug($"Assigned color for day: {dayDuration.Date.ToShortDateString()}, Duration Seconds: {dayDuration.TotalDurationSeconds}, Color: {color}.");
+                    _appLogger.Debug($"Assigned color for day: {dayDuration.Date.ToShortDateString()}, Sum of DurationSeconds for date{dayDuration.Date} = {dayDuration.TotalDurationSeconds} , Color: {color}.");
                 }
 
                 stopwatch.Stop();
