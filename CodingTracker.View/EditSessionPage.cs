@@ -14,6 +14,7 @@ using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using System.Diagnostics;
+using Guna.UI2.WinForms;
 
 namespace CodingTracker.View
 {
@@ -25,6 +26,8 @@ namespace CodingTracker.View
         private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly IApplicationLogger _appLogger;
         private readonly ICodingGoalDTOManager _codingGoalDTOManager;
+        private List<int> deletionSessionIds = new List<int>();
+        private bool isEditSessionOn = false;
         public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager)
         {
             _appLogger = appLogger;
@@ -42,7 +45,7 @@ namespace CodingTracker.View
             LoadSessionsIntoDataGridView();
         }
 
-        
+
 
         private void LoadSessionsIntoDataGridView()
         {
@@ -67,7 +70,7 @@ namespace CodingTracker.View
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.DurationHHMM;
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartTime?.ToString("g");
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
-                       
+
 
                         _appLogger.Debug($"Added session to DataGridView: SessionID={session.SessionId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
                     }
@@ -96,13 +99,65 @@ namespace CodingTracker.View
 
         private void EditSessionPageEditSessionButton_Click(object sender, EventArgs e)
         {
-
+            isEditSessionOn = !isEditSessionOn; 
+            if (isEditSessionOn)
+            {
+                MessageBox.Show("Edit mode activated. Click on sessions to edit them.");
+                SetDataGridViewEditMode(true);
+            }
+            else
+            {
+                MessageBox.Show("Edit mode deactivated.");
+                SetDataGridViewEditMode(false);
+            }
         }
+
+        private void SetDataGridViewEditMode(bool enabled)
+        {
+            if (enabled)
+            {
+                EditSessionPageDataGridView.DefaultCellStyle.SelectionForeColor = Color.FromArgb(255, 140, 0); // Dark orange
+                EditSessionPageDataGridView.DefaultCellStyle.SelectionBackColor = Color.LightGray; 
+            }
+        }
+
+        private void EditSessionPageDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (isEditSessionOn && e.RowIndex >= 0) // Check to ensure valid row is clicked, e,g clicking column headers generates a cell click of -1.
+            {
+                DataGridViewRow row = EditSessionPageDataGridView.Rows[e.RowIndex];
+                int sessionId = Convert.ToInt32(row.Cells["SessionIdColumn"].Value);
+
+                if (!deletionSessionIds.Contains(sessionId))
+                {
+                    deletionSessionIds.Add(sessionId);
+                    row.Selected = true;
+                    MessageBox.Show($"Session ID {sessionId} added to edit list.");
+                }
+                else
+                {
+                    deletionSessionIds.Remove(sessionId);
+                    row.Selected = false;
+                }
+            }
+        }
+        
 
         private void EditSessionPageBackButton_Click(object sender, EventArgs e)
         {
             this.Hide();
             _formSwitcher.SwitchToMainPage();
+        }
+
+        private void CodingSessionPageHomeButton_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            _formSwitcher.SwitchToMainPage();
+        }
+
+        private void EditSessionPageDeleteSessionButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

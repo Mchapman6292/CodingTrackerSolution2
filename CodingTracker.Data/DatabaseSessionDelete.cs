@@ -1,14 +1,7 @@
-﻿using CodingTracker.Common;
-using System.Data.SQLite;
-using CodingTracker.Common.CodingSessionDTOs;
+﻿using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IDatabaseSessionDeletes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
+
 using CodingTracker.Common.IApplicationLoggers;
 
 namespace CodingTracker.Data.DatabaseSessionDeletes
@@ -26,22 +19,45 @@ namespace CodingTracker.Data.DatabaseSessionDeletes
             _appLogger = appLogger;
         }
 
-        public void DeleteSession(CodingSessionDTO codingSessionDTO)
+        public void DeleteSession(List<int> sessionIds)
         {
             _databaseManager.ExecuteDatabaseOperation(connection =>
             {
-                using var command = connection.CreateCommand();
-                command.CommandText = @"
+                using var transaction = connection.BeginTransaction();
+                try
+                {
+                    foreach (int sessionId in sessionIds)
+                    {
+                        try
+                        {
+                            using var command = connection.CreateCommand();
+                            command.CommandText = @"
 
-            DELETE FROM 
-                        CodingSessions 
-                WHERE 
-                        SessionId = @SessionId AND 
-                        UserId = @UserId";
+                                DELETE FROM
+                                                CodingSessions
+                                      WHERE
+                                                SessionId = @SessionId";
 
-                command.Parameters.AddWithValue("@SessionId", codingSessionDTO.SessionId);
-                command.Parameters.AddWithValue("@UserId", codingSessionDTO.UserId);
-                command.ExecuteNonQuery();
+                            command.Parameters.AddWithValue("@SessionId", sessionId);
+                            int affectedRows = command.ExecuteNonQuery();
+                            if (affectedRows == 0)
+                            {
+                                _appLogger.Warning($"No session found with SessionID {sessionId}, nothing was deleted.");
+                            }
+                            command.Parameters.Clear();
+                        }
+                        catch (Exception ex)
+                        {
+                            _appLogger.Error($"Unable to delete session: SessionID {sessionId}. Error: {ex.Message}");
+                        }
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    _appLogger.Error($"Transaction failed and was rolled back. Error: {ex.Message}");
+                }
             }, nameof(DeleteSession));
         }
     }

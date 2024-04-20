@@ -22,7 +22,6 @@ using CodingTracker.Data.LoginManagers;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormControllers;
-using CodingTracker.View.FormControllers;
 using CodingTracker.View.SessionGoalCountDownTimers;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidationResults;
@@ -124,7 +123,6 @@ namespace CodingTracker.View.Program
                     .AddTransient<CodingSessionPage>()
                     .AddTransient<EditSessionPage>()
                     .AddTransient<CodingSessionTimerForm>()
-                    .AddTransient<SettingsPage>()
                     .AddTransient<CreateAccountPage>();
 
             var startConfiguration = services.BuildServiceProvider()

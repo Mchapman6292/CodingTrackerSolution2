@@ -80,11 +80,6 @@ namespace CodingTracker.View
             _formSwitcher.SwitchToEditSessionPage();
         }
 
-        private void MainPageSettingsButton_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-            _formSwitcher.SwitchToSettingsPage();
-        }
 
 
         private void UpdateLabels(Panel parentPanel)
@@ -108,36 +103,29 @@ namespace CodingTracker.View
 
         private void UpDateLast28Days(Panel parentPanel)
         {
-            _appLogger.Debug("UpDateLast28Days method started.");
-            try
+            using (var activity = new Activity(nameof(UpDateLast28Days)))
             {
-                List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-                List<double> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
-                var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
-                for (int i = 0; i < last28Days.Count && i < gradientPanels.Count; i++)
+                _appLogger.Debug($"UpDateLast28Days method started. Trace ID: {activity.TraceId}.");
+                try
                 {
-                    double duration = sessionDurations.ElementAtOrDefault(i);
-                    SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
-                    Color color = _panelColorControl.ConvertSessionColorToColor(sessionColor);
+                    var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
+                    List<Color> panelColors = _panelColorControl.AssignColorsToSessionsInLast28Days();
 
-                    gradientPanels[i].BackColor = color;
-                    gradientPanels[i].Tag = last28Days[i].ToShortDateString();
-
-                    var label = gradientPanels[i].Controls.OfType<Label>().FirstOrDefault();
-                    if (label != null)
+                    for (int i = 0; i < panelColors.Count && i < gradientPanels.Count; i++)
                     {
-                        label.Text = last28Days[i].ToShortDateString();
+                        gradientPanels[i].BackColor = panelColors[i];
                     }
-
-                    _appLogger.Debug($"Panel {i}: Date {last28Days[i].ToShortDateString()}, Duration {duration}, SessionColor {sessionColor}, RGB ({color.R}, {color.G}, {color.B})");
+                    _appLogger.Debug("UpdateSessionPanels method completed successfully.");
                 }
-                _appLogger.Debug("UpDateLast28Days method completed successfully.");
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"An error occurred in UpDateLast28Days: {ex.Message}");
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred in UpdateSessionPanels: {ex.Message}");
+                }
             }
         }
+
+
+
 
         private void UpdatedateTodaySessionLabel() 
         {

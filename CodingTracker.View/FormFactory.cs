@@ -14,7 +14,6 @@ namespace CodingTracker.View.FormFactories
         MainPage CreateMainPage();
         CodingSessionPage CreateCodingSessionPage();
         EditSessionPage CreateEditSessionPage();
-        SettingsPage CreateSettingsPage();
         CreateAccountPage CreateAccountPage();
         CodingSessionTimerForm CreateCodingSessionTimer();
 
@@ -75,12 +74,6 @@ namespace CodingTracker.View.FormFactories
         {
             return CreateForm<EditSessionPage>(nameof(CreateEditSessionPage));
         }
-
-        public SettingsPage CreateSettingsPage()
-        {
-            return CreateForm<SettingsPage>(nameof(CreateSettingsPage));
-        }
-        
         public CreateAccountPage CreateAccountPage() 
         {
             return CreateForm<CreateAccountPage>(nameof(CreateAccountPage));    

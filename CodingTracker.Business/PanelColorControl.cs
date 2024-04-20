@@ -24,8 +24,8 @@ namespace CodingTracker.Business.PanelColorControls
     public interface IPanelColorControl
     {
 
-        List<SessionColor> AssignColorsToSessionsInLast28Days();
-        Color ConvertSessionColorToColor(SessionColor color);
+        List<Color> AssignColorsToSessionsInLast28Days();
+        Color ConvertSessionColorEnumToColor(SessionColor color);
 
         SessionColor DetermineSessionColor(double? sessionDurationSeconds);
     }
@@ -50,7 +50,7 @@ namespace CodingTracker.Business.PanelColorControls
             _dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
         }
 
-        public List<SessionColor> AssignColorsToSessionsInLast28Days()
+        public List<Color> AssignColorsToSessionsInLast28Days()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(AssignColorsToSessionsInLast28Days)))
@@ -58,15 +58,15 @@ namespace CodingTracker.Business.PanelColorControls
                 _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
 
                 List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
-                List<SessionColor> sessionColors = new List<SessionColor>();
-
+                List<Color> sessionColors = new List<Color>();
 
                 foreach (var dayDuration in dailyDurations)
                 {
-                    SessionColor color = DetermineSessionColor(dayDuration.TotalDurationSeconds);
+                    SessionColor colorEnum = DetermineSessionColor(dayDuration.TotalDurationSeconds);
+                    Color color = ConvertSessionColorEnumToColor(colorEnum);
                     sessionColors.Add(color);
 
-                    _appLogger.Debug($"Assigned color for day: {dayDuration.Date.ToShortDateString()}, Sum of DurationSeconds for date{dayDuration.Date} = {dayDuration.TotalDurationSeconds} , Color: {color}.");
+                    _appLogger.Debug($"Assigned color for day: {dayDuration.Date.ToShortDateString()}, DurationSeconds: {dayDuration.TotalDurationSeconds}, Color: {color}.");
                 }
 
                 stopwatch.Stop();
@@ -106,9 +106,9 @@ namespace CodingTracker.Business.PanelColorControls
         }
 
 
-        public Color ConvertSessionColorToColor(SessionColor color)
+        public Color ConvertSessionColorEnumToColor(SessionColor color)
         {
-            var activity = new Activity(nameof(ConvertSessionColorToColor)).Start();
+            var activity = new Activity(nameof(ConvertSessionColorEnumToColor)).Start();
             var stopwatch = Stopwatch.StartNew();
 
             try

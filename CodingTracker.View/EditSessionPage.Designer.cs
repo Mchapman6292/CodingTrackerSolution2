@@ -30,8 +30,8 @@
         {
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditSessionPage));
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditSessionPage));
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -52,7 +52,7 @@
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
-            EditSessionPageBackButton = new Guna.UI2.WinForms.Guna2Button();
+            CodingSessionPageHomeButton = new Guna.UI2.WinForms.Guna2GradientButton();
             EditSessionPageComboBox = new Guna.UI2.WinForms.Guna2ComboBox();
             EditSessionPageSortByLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
             EditSessionPageSessionsLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
@@ -77,7 +77,7 @@
             // 
             // guna2Panel1
             // 
-            guna2Panel1.Controls.Add(EditSessionPageBackButton);
+            guna2Panel1.Controls.Add(CodingSessionPageHomeButton);
             guna2Panel1.Controls.Add(EditSessionPageComboBox);
             guna2Panel1.Controls.Add(EditSessionPageSortByLabel);
             guna2Panel1.Controls.Add(EditSessionPageSessionsLabel);
@@ -92,23 +92,25 @@
             guna2Panel1.Size = new Size(1300, 75);
             guna2Panel1.TabIndex = 0;
             // 
-            // EditSessionPageBackButton
+            // CodingSessionPageHomeButton
             // 
-            EditSessionPageBackButton.BackgroundImage = (Image)resources.GetObject("EditSessionPageBackButton.BackgroundImage");
-            EditSessionPageBackButton.CustomizableEdges = customizableEdges1;
-            EditSessionPageBackButton.DisabledState.BorderColor = Color.DarkGray;
-            EditSessionPageBackButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            EditSessionPageBackButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            EditSessionPageBackButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            EditSessionPageBackButton.FillColor = Color.FromArgb(25, 24, 40);
-            EditSessionPageBackButton.Font = new Font("Segoe UI", 9F);
-            EditSessionPageBackButton.ForeColor = Color.White;
-            EditSessionPageBackButton.Location = new Point(1174, 0);
-            EditSessionPageBackButton.Name = "EditSessionPageBackButton";
-            EditSessionPageBackButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            EditSessionPageBackButton.Size = new Size(45, 29);
-            EditSessionPageBackButton.TabIndex = 32;
-            EditSessionPageBackButton.Click += EditSessionPageBackButton_Click;
+            CodingSessionPageHomeButton.CustomizableEdges = customizableEdges1;
+            CodingSessionPageHomeButton.DisabledState.BorderColor = Color.DarkGray;
+            CodingSessionPageHomeButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            CodingSessionPageHomeButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            CodingSessionPageHomeButton.DisabledState.FillColor2 = Color.FromArgb(169, 169, 169);
+            CodingSessionPageHomeButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            CodingSessionPageHomeButton.FillColor = Color.FromArgb(25, 24, 40);
+            CodingSessionPageHomeButton.FillColor2 = Color.FromArgb(25, 24, 40);
+            CodingSessionPageHomeButton.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageHomeButton.ForeColor = Color.White;
+            CodingSessionPageHomeButton.Image = (Image)resources.GetObject("CodingSessionPageHomeButton.Image");
+            CodingSessionPageHomeButton.Location = new Point(1175, 0);
+            CodingSessionPageHomeButton.Name = "CodingSessionPageHomeButton";
+            CodingSessionPageHomeButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
+            CodingSessionPageHomeButton.Size = new Size(45, 29);
+            CodingSessionPageHomeButton.TabIndex = 32;
+            CodingSessionPageHomeButton.Click += CodingSessionPageHomeButton_Click;
             // 
             // EditSessionPageComboBox
             // 
@@ -215,6 +217,7 @@
             EditSessionPageDeleteSessionButton.Size = new Size(105, 33);
             EditSessionPageDeleteSessionButton.TabIndex = 21;
             EditSessionPageDeleteSessionButton.Text = "Delete Session";
+            EditSessionPageDeleteSessionButton.Click += EditSessionPageDeleteSessionButton_Click;
             // 
             // EditSessionPageSaveButton
             // 
@@ -405,12 +408,12 @@
         private Guna.UI2.WinForms.Guna2HtmlLabel EditSessionPageSessionsLabel;
         private Guna.UI2.WinForms.Guna2ComboBox EditSessionPageComboBox;
         private Guna.UI2.WinForms.Guna2Button EditSessionPageSaveButton;
-        private Guna.UI2.WinForms.Guna2Button EditSessionPageBackButton;
         private DataGridViewTextBoxColumn DateColumn;
         private DataGridViewTextBoxColumn GoalHHMM;
         private DataGridViewTextBoxColumn DurationHHMM;
         private DataGridViewTextBoxColumn StartTimeColumn;
         private DataGridViewTextBoxColumn EndTimeColumn;
         private DataGridViewTextBoxColumn GoalReached;
+        private Guna.UI2.WinForms.Guna2GradientButton CodingSessionPageHomeButton;
     }
 }
