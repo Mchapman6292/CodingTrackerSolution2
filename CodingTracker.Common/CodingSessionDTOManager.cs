@@ -18,9 +18,9 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         CodingSessionDTO GetOrCreateCurrentSessionDTO();
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
 
-        string ConvertDurationSecondsIntoStringHHMM(int? durationSeconds);
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, int? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
-        TimeSpan ConvertDurationSecondsToTimeSpan(int? durationSeconds);
+        string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
+        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
+        TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
 
@@ -50,7 +50,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
             _credentialManager = credentialManager;
-            _userId = _credentialManager.GetUserIdWithMostRecentLogin();
+            _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
             _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _inputValidator = inputValidator;
         }
@@ -68,6 +68,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         {
             using (var activity = new Activity(nameof(CreateCodingSessionDTO)).Start())
             {
+                _appLogger.Debug($"Starting {nameof(CreateCodingSessionDTO)}, TraceId: {activity.TraceId}.");
                 var stopwatch = Stopwatch.StartNew();
 
                 _currentSessionDTO = new CodingSessionDTO
@@ -115,7 +116,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         {
             using (var activity = new Activity(nameof(CreateAndReturnCurrentSessionDTO)).Start())
             {
-                var stopwatch = Stopwatch.StartNew();
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
                 _appLogger.Debug($"Starting {nameof(CreateAndReturnCurrentSessionDTO)}. TraceID: {activity.TraceId}");
 
@@ -133,7 +134,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         {
             using (var activity = new Activity(nameof(SetSessionStartTime)).Start())
             {
-                var stopwatch = Stopwatch.StartNew();
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
                 _appLogger.Info($"Starting {nameof(SetSessionStartTime)}. TraceID: {activity.TraceId}");
 
@@ -178,7 +179,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             }
         }
 
-        public TimeSpan ConvertDurationSecondsToTimeSpan(int? durationSeconds)
+        public TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(ConvertDurationSecondsToTimeSpan)).Start())
@@ -216,7 +217,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             }
         }
 
-        public string ConvertDurationSecondsIntoStringHHMM(int? durationSeconds)
+        public string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(ConvertDurationSecondsIntoStringHHMM)).Start())
@@ -272,7 +273,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, int? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
+        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
         {
             using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
             {

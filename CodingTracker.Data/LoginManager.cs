@@ -45,20 +45,23 @@ namespace CodingTracker.Data.LoginManagers
                     {
                         using var command = connection.CreateCommand();
                         command.CommandText = @"
-                SELECT 
-                        UserId, 
-                        Username, 
-                        PasswordHash,
-                        LastLogin
-                FROM 
-                        UserCredentials
-                WHERE 
-                        Username = @Username";
+                                SELECT 
+                                        UserId, 
+                                        Username, 
+                                        PasswordHash,
+                                        LastLogin
+                                FROM 
+                                        UserCredentials
+                                WHERE 
+                                        Username = @Username";
+
                         command.Parameters.AddWithValue("@Username", username);
                         command.Parameters.AddWithValue("@PasswordHash", password);
                         command.Parameters.AddWithValue("@LastLogin", lastLogin);
 
                         _appLogger.Debug($"Executing database query for {username}. TraceID: {activity.TraceId}");
+
+
                         using var reader = command.ExecuteReader();
                         if (reader.Read())
                         {
@@ -150,64 +153,6 @@ namespace CodingTracker.Data.LoginManagers
                     _appLogger.Error($"An error occurred during {nameof(ResetPassword)} for username {username}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                 }
             }
-        }
-
-
-
-        public List<CodingSessionDTO> ViewSpecific(string chosenDate) // Change
-        {
-            var methodName = nameof(ViewSpecific);
-            List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
-
-            using (var activity = new Activity(methodName).Start())
-            {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}, ChosenDate: {chosenDate}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
-                {
-                    _databaseManager.ExecuteCRUD(connection =>
-                    {
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.CommandText = @"
-                        SELECT SessionId, StartTime, EndTime FROM 
-                            CodingSessions 
-                        WHERE
-                            UserId = @UserId AND Date = @Date
-                        ORDER BY
-                            StartTime DESC"
-                            ;
-
-                            command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
-                            command.Parameters.AddWithValue("@Date", chosenDate);
-
-                            using (var reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    var session = new CodingSessionDTO
-                                    {
-                                        SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                                        StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                                        EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                                    };
-                                    codingSessionList.Add(session);
-                                }
-                            }
-                        }
-                    });
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{methodName} executed successfully. ChosenDate: {chosenDate}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to execute {methodName}. ChosenDate: {chosenDate}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
-            }
-            return codingSessionList;
         }
     }
 }

@@ -68,7 +68,11 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 {
                     while (reader.Read())
                     {
-                        if (!reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
+                        if (reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
+                        {
+                            _appLogger.Error($"No DurationSeconds values found for ReadSessionDurationSeconds.");
+                        }
+                       if (!reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
                         {
                             double durationSeconds = reader.GetDouble(reader.GetOrdinal("DurationSeconds"));
                             durationSecondsList.Add(durationSeconds);
@@ -133,37 +137,6 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
 
 
-        public int GetSessionIdWithMostRecentLogin()
-        {
-            int sessionId = 0;
-            _databaseManager.ExecuteDatabaseOperation(connection =>
-            {
-                using var command = new SQLiteCommand(@"
-                    SELECT
-                            SessionId
-                    FROM
-                            CodingSessions
-                    WHERE 
-                            EndTime IS NOT NULL
-                    ORDER BY
-                            EndTime DESC
-                    LIMIT 1",
-                    
-                    connection);
-
-                object result = command.ExecuteScalar(); 
-                if (result != null && result != DBNull.Value)
-                {
-                    sessionId = Convert.ToInt32(result);
-                }
-            }, nameof(GetSessionIdWithMostRecentLogin));
-
-            return sessionId;
-        }
-
-
-
-
         public List<CodingSessionDTO> ViewAllSession(bool partialView = false)
         {
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
@@ -209,7 +182,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
         }
 
 
-        public List<CodingSessionDTO> ViewSpecific(string chosenDate)
+        public List<CodingSessionDTO> ViewSpecific(DateTime chosenDate)
         {
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
@@ -217,11 +190,15 @@ namespace CodingTracker.Data.DatabaseSessionReads
             {
                 using var command = new SQLiteCommand(@"
                     SELECT
+                            UserId,
                             SessionId, 
                             StartTime, 
-                            EndTime 
-                    FROM 
-                            CodingSessions 
+                            EndTime,
+                            DurationSeconds REAL,
+                            DurationHHMM STRING,
+                            GoalHHMM STRING
+                    FROM
+                            CodingSessions
                     WHERE 
                             UserId = @UserId 
                     AND 
@@ -240,9 +217,13 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     {
                         var session = new CodingSessionDTO
                         {
+                            UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
                             EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (double?)null : reader.GetDouble(reader.GetOrdinal("DurationSeconds")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM"))
                         };
                         codingSessionList.Add(session);
                     }
@@ -256,7 +237,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)
         {
-            int userId = _credentialManager.GetUserIdWithMostRecentLogin();
+            int userId = GetUserIdWithMostRecentLogin();
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
             _databaseManager.ExecuteDatabaseOperation(connection =>
@@ -318,7 +299,8 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     SELECT
                             SessionId, 
                             StartTime, 
-                            EndTime 
+                            EndTime,
+                            DurationSeconds
                     FROM 
                             CodingSessions 
                     WHERE 
@@ -336,7 +318,8 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         {
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime"))
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (double?)null : reader.GetDouble(reader.GetOrdinal("DurationSeconds"))
                         });
                     }
                 }
@@ -469,7 +452,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
 
 
-        public List<(DateTime Date, double TotalDurationSeconds)> ReadTotalSessionDurationByDay()
+        public List<(DateTime Date, double TotalDurationSeconds)> ReadDurationSecondsLast28Days()
         {
             List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = new List<(DateTime Date, double TotalDurationSeconds)>();
             _databaseManager.ExecuteDatabaseOperation(connection =>
@@ -498,10 +481,47 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         dailyDurations.Add((sessionDay, totalDurationSeconds));
                     }
                 }
-            }, nameof(ReadTotalSessionDurationByDay));
+            }, nameof(ReadDurationSecondsLast28Days));
 
-            _appLogger.Info($"Summed DurationSeconds calculated from {DateTime.Now.AddDays(-29):yyyy-MM-dd} to {DateTime.Now.AddDays(-1):yyyy-MM-dd}.");
+            _appLogger.Info($" ReadDurationSecondsLast28Days StartDate: {DateTime.Now.AddDays(-29):yyyy-MM-dd}, EndDate: {DateTime.Now.AddDays(-1):yyyy-MM-dd}.");
             return dailyDurations;
+        }
+
+
+
+
+
+
+
+
+
+
+        public int GetUserIdWithMostRecentLogin()
+        {
+            int userId = 0;
+            _databaseManager.ExecuteDatabaseOperation(connection =>
+            {
+                using var command = new SQLiteCommand(@"
+                    SELECT 
+                            UserId
+                    FROM
+                            UserCredentials
+                    WHERE
+                            LastLogin IS NOT NULL
+                ORDER BY
+                            LastLogin DESC
+                    LIMIT
+                            1",
+                                connection);
+
+                object result = command.ExecuteScalar(); // used for returning only a single result set.
+                if (result != null && result != DBNull.Value)
+                {
+                    userId = Convert.ToInt32(result);
+                }
+            }, nameof(GetUserIdWithMostRecentLogin));
+
+            return userId;
         }
     }
 }

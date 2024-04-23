@@ -11,7 +11,7 @@ namespace CodingTracker.Common.UserCredentialDTOs
 {
     public class UserCredentialDTO 
     {
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public string Username { get; set; }
 
         public string PasswordHash { get; set; }
@@ -20,5 +20,7 @@ namespace CodingTracker.Common.UserCredentialDTOs
 
 
 
+
+      
     }
 }

@@ -8,6 +8,7 @@ using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Business.SessionCalculators;
+using CodingTracker.Common.CodingSessionDTOManagers;
 using Guna.UI2.WinForms;
 using System.Diagnostics;
 
@@ -21,35 +22,35 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
-        private readonly IDatabaseSessionRead _databaseRead;
+        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly ICodingSession _codingSession;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
+        private readonly ICodingSessionDTOManager _sessionDTOManager;
 
 
 
-        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher = null, ISessionCalculator sessionCalculator = null)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSessionDTOManager sessionDTOManager)
         {
             InitializeComponent();
-            _appLogger = applogger;
+            _appLogger = appLogger;
             _formController = formController;
             _panelColorControl = panelControl;
             _errorHandler = errorHandler;
-            _databaseRead = databaseRead;
+            _databaseSessionRead = databaseRead;
             _codingSession = codingSession;
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
             _sessionCalculator = sessionCalculator;
-
-
-
+            _sessionDTOManager = sessionDTOManager;
         }
 
         private void MainPage_Load(object sender, EventArgs e)
         {
             UpdateLabels(Last28DaysPanel);
             UpDateLast28Days(Last28DaysPanel);
+            UpdatedateTodaySessionLabel();
         }
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
@@ -132,7 +133,18 @@ namespace CodingTracker.View
             Stopwatch stopwatch = Stopwatch.StartNew();
             using(var activity = new Activity(nameof(UpdatedateTodaySessionLabel))) 
             {
+                _appLogger.Info($"Starting {nameof(UpdatedateTodaySessionLabel)}, TraceID: {activity.TraceId}.");
 
+          
+
+                double todayDurationSecondsTotal = _sessionCalculator.CalculateTodayTotal();
+
+                string formattedTotal = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(todayDurationSecondsTotal);
+
+                TodaySessionLabel.Text = $"Todays total: {formattedTotal}";
+
+                stopwatch.Stop();
+                _appLogger.Info($"TodaySessionLabel updated, todays total: {formattedTotal}, Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
             }
         }
 

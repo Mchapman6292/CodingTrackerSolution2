@@ -13,6 +13,7 @@ using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingGoalDTOManagers;
+using CodingTracker.Common.IDatabaseSessionDeletes;
 using System.Diagnostics;
 using Guna.UI2.WinForms;
 
@@ -26,18 +27,20 @@ namespace CodingTracker.View
         private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly IApplicationLogger _appLogger;
         private readonly ICodingGoalDTOManager _codingGoalDTOManager;
+        private readonly IDatabaseSessionDelete _databaseSessionDelete;
         private List<int> deletionSessionIds = new List<int>();
         private bool isEditSessionOn = false;
-        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager)
+
+        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager, IDatabaseSessionDelete databaseSessionDelete)
         {
             _appLogger = appLogger;
             _appControl = appControl;
             _formSwitcher = formSwitcher;
             _databaseSessionRead = databaseSessionRead;
-            InitializeComponent();
-            InitializeDataGridView();
-            LoadSessionsIntoDataGridView();
             _codingGoalDTOManager = codingGoalDTOManager;
+            _databaseSessionDelete = databaseSessionDelete;
+            InitializeComponent();
+            LoadSessionsIntoDataGridView();
         }
 
         private void EditSessionPage_Load(object sender, EventArgs e)
@@ -46,13 +49,11 @@ namespace CodingTracker.View
         }
 
 
-
         private void LoadSessionsIntoDataGridView()
         {
-            var methodName = nameof(LoadSessionsIntoDataGridView);
-            using (var activity = new Activity(methodName).Start())
+            using (var activity = new Activity(nameof(LoadSessionsIntoDataGridView)).Start())
             {
-                _appLogger.Debug($"Starting {methodName}. TraceID: {activity.TraceId}");
+                _appLogger.Debug($"Starting {nameof(LoadSessionsIntoDataGridView)}. TraceID: {activity.TraceId}");
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
@@ -71,7 +72,6 @@ namespace CodingTracker.View
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartTime?.ToString("g");
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
 
-
                         _appLogger.Debug($"Added session to DataGridView: SessionID={session.SessionId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
                     }
 
@@ -86,10 +86,67 @@ namespace CodingTracker.View
             }
         }
 
-
-        private void InitializeDataGridView()
+        private void EditModeDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            using (var activity = new Activity(nameof(EditModeDataGridView_CellClick)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(EditModeDataGridView_CellClick)}: TraceID: {activity.TraceId}");
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
+                try
+                {
+                    if (isEditSessionOn && e.RowIndex >= 0)
+                    {
+                        DataGridViewRow row = EditSessionPageDataGridView.Rows[e.RowIndex];
+                        int sessionId = Convert.ToInt32(row.Cells["SessionId"].Value);
+
+                        bool highlight = !deletionSessionIds.Contains(sessionId);
+                        if (highlight)
+                        {
+                            deletionSessionIds.Add(sessionId);
+                        }
+                        else
+                        {
+                            deletionSessionIds.Remove(sessionId);
+                        }
+                        HighlightRow(row, highlight);
+                        _appLogger.Info($"Row clicked: SessionID={sessionId}, Highlighted={highlight}, TraceID={activity.TraceId}");
+                    }
+                    stopwatch.Stop();
+                    _appLogger.Info($"{nameof(EditModeDataGridView_CellClick)} completed successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed during {nameof(EditModeDataGridView_CellClick)}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
+                }
+            }
+        }
+
+
+        private void HighlightRow(DataGridViewRow row, bool highlight)
+        {
+            using (var activity = new Activity(nameof(HighlightRow)).Start())
+            {
+                try
+                {
+                    if (highlight)
+                    {
+                        row.DefaultCellStyle.BackColor = Color.DarkOrange;
+                        row.DefaultCellStyle.ForeColor = Color.White;
+                    }
+                    else
+                    {
+                        row.DefaultCellStyle.BackColor = EditSessionPageDataGridView.DefaultCellStyle.BackColor;
+                        row.DefaultCellStyle.ForeColor = EditSessionPageDataGridView.DefaultCellStyle.ForeColor;
+                    }
+                    _appLogger.Debug($"{nameof(HighlightRow)} executed: RowIndex={row.Index}, Highlighted={highlight}, TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Error in {nameof(HighlightRow)}: {ex.Message}, TraceID: {activity.TraceId}");
+                }
+            }
         }
 
         private void EditSessionExitControlBox_Click(object sender, EventArgs e)
@@ -97,51 +154,117 @@ namespace CodingTracker.View
             _formController.CloseCurrentForm();
         }
 
-        private void EditSessionPageEditSessionButton_Click(object sender, EventArgs e)
+        private void EditSessionButton_Click(object sender, EventArgs e)
         {
-            isEditSessionOn = !isEditSessionOn; 
-            if (isEditSessionOn)
+            ToggleEditMode();
+            SetDataGridViewEditMode();
+            DeleteSessionButton.Visible = true;
+        }
+
+        private void ClearDeletionSessionIdsList()
+        {
+            using(var activity = new Activity(nameof(ClearDeletionSessionIdsList)).Start())
             {
-                MessageBox.Show("Edit mode activated. Click on sessions to edit them.");
-                SetDataGridViewEditMode(true);
-            }
-            else
-            {
-                MessageBox.Show("Edit mode deactivated.");
-                SetDataGridViewEditMode(false);
+                _appLogger.Info($"Starting {nameof(ClearDeletionSessionIdsList)}. TraceID: {activity.TraceId}.");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                deletionSessionIds.Clear();
+                stopwatch.Stop();
+
+                _appLogger.Info($"{nameof(ClearDeletionSessionIdsList)} complete, elapsed time : {stopwatch.ElapsedMilliseconds}, TraceID: {activity.TraceId}");
             }
         }
 
-        private void SetDataGridViewEditMode(bool enabled)
+        private void ToggleEditMode()
         {
-            if (enabled)
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(ToggleEditMode)).Start())
             {
-                EditSessionPageDataGridView.DefaultCellStyle.SelectionForeColor = Color.FromArgb(255, 140, 0); // Dark orange
-                EditSessionPageDataGridView.DefaultCellStyle.SelectionBackColor = Color.LightGray; 
-            }
-        }
-
-        private void EditSessionPageDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (isEditSessionOn && e.RowIndex >= 0) // Check to ensure valid row is clicked, e,g clicking column headers generates a cell click of -1.
-            {
-                DataGridViewRow row = EditSessionPageDataGridView.Rows[e.RowIndex];
-                int sessionId = Convert.ToInt32(row.Cells["SessionIdColumn"].Value);
-
-                if (!deletionSessionIds.Contains(sessionId))
+                if (!isEditSessionOn)
                 {
-                    deletionSessionIds.Add(sessionId);
-                    row.Selected = true;
-                    MessageBox.Show($"Session ID {sessionId} added to edit list.");
+                    isEditSessionOn = true;
+                    EditSessionPageDataGridView.BackgroundColor = Color.Yellow;
+                    _appLogger.Info("isEditSessionOn bool updated to true");
                 }
                 else
                 {
-                    deletionSessionIds.Remove(sessionId);
-                    row.Selected = false;
+                    isEditSessionOn = false;
+                    EditSessionPageDataGridView.BackgroundColor = Color.FromArgb(35, 34, 50);
+                    _appLogger.Info("isEditSessionOn bool updated to false");
+                }
+                stopwatch.Stop();
+                _appLogger.Info($" {nameof(ToggleEditMode)} completed, TraceID: {activity.TraceId}, elapsed time: {stopwatch.ElapsedMilliseconds}."); 
+            }
+        }
+
+        private void ChangeButtonColorIfEditSession()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(ChangeButtonColorIfEditSession)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ChangeButtonColorIfEditSession)}, TraceID: {activity.TraceId}.");
+
+                if (!isEditSessionOn) 
+                {
+                    EditSessionButton.ForeColor = Color.White;
+                }
+                else
+                {
+                    EditSessionButton.ForeColor = Color.FromArgb(193, 20, 137); // Default dark pink
+                }
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(EditSessionButton_Click)}: completed TraceID: {activity.TraceId}. Elapsed time: {stopwatch.ElapsedMilliseconds}.");
+            }
+        }
+
+        private void SetDataGridViewEditMode()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(SetDataGridViewEditMode)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(SetDataGridViewEditMode)}. TraceID: {activity.TraceId}.");
+
+                if (!isEditSessionOn)
+                {
+                    EditSessionButton.ForeColor = Color.White;
+                }
+                else 
+                {
+                    EditSessionPageDataGridView.DefaultCellStyle.SelectionForeColor = Color.FromArgb(255, 140, 0);
                 }
             }
         }
+
+        private void UpdateColorsForSelectedSessionsInEditMode()
+        {
+            throw new NotImplementedException();
+        }
+
         
+
+        private void DeleteSessionButton_Click(object sender, EventArgs e)
+        {
+            if (!isEditSessionOn)
+            {
+                _appLogger.Error("Error for DeleteSessionButton_Click. isEditSessionOn is set to false, session editing must be enabled to delete sessions");
+            }
+            else if (deletionSessionIds.Count == 0)
+            {
+            _appLogger.Error($" deletionSessionIds list is 0");
+            }
+            if (isEditSessionOn)
+            {
+                _databaseSessionDelete.DeleteSession(deletionSessionIds);
+                LoadSessionsIntoDataGridView();
+            } 
+        }
+
+
+
+
+
+
+
 
         private void EditSessionPageBackButton_Click(object sender, EventArgs e)
         {
@@ -155,9 +278,5 @@ namespace CodingTracker.View
             _formSwitcher.SwitchToMainPage();
         }
 
-        private void EditSessionPageDeleteSessionButton_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

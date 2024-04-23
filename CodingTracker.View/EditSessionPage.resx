@@ -121,7 +121,7 @@
   <data name="CodingSessionPageHomeButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DQAACw0B7QfALAAAAmpJREFUaEPt2L9LVXEYx/FrRBL0Q4QaxMGtlqClLXAIhLa22nRydtM/wdWxtSkI
+        DAAACwwBP0AiyAAAAmpJREFUaEPt2L9LVXEYx/FrRBL0Q4QaxMGtlqClLXAIhLa22nRydtM/wdWxtSkI
         IojGCPpBIEZTS7S0hCiCQjRkefx8v76PVNennvt4jn0P3Bd8EM59ns/3e4eOYW/IoaqqKeUFmeJxt+ji
         t5Utpbat3OHj8umyI8qi8lP5056yrJxivEy64AXlsfIvz5Rx1sqii11XPqVbOn1WbrCeHTzux8ft01mz
         yrd86mDSziw1qWdB+Z4++BUft0dnjCor+bTjeaCcpfOm8iU9rOXD2qL+SeVtPqkZ75T8itbPS8rz9DDJ
@@ -134,7 +134,7 @@
         ocLGXAgVbqyFUGHTzKuD0cFR4cZaxNF/XRwaalqvtw9cp5Lmh9HxqgAAAABJRU5ErkJggg==
 </value>
   </data>
-  <metadata name="DateColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="SessionId.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="GoalHHMM.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

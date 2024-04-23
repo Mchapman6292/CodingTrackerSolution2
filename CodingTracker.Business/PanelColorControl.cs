@@ -47,7 +47,7 @@ namespace CodingTracker.Business.PanelColorControls
             _appLogger = appLogger;
             _errorHandler = errorHandler;
             _databaseSessionRead = databaseSessionRead;
-            _dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
+            _dailyDurations = _databaseSessionRead.ReadDurationSecondsLast28Days();
         }
 
         public List<Color> AssignColorsToSessionsInLast28Days()
@@ -57,7 +57,7 @@ namespace CodingTracker.Business.PanelColorControls
             {
                 _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
 
-                List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
+                List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = _databaseSessionRead.ReadDurationSecondsLast28Days();
                 List<Color> sessionColors = new List<Color>();
 
                 foreach (var dayDuration in dailyDurations)

@@ -43,8 +43,9 @@ using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
-using CodingTracker.Common.SessionCalculators;
+using CodingTracker.Business.SessionCalculators;
 using CodingTracker.Common.DataTypeHelpers;
+using CodingTracker.Common.UserCredentialDTOManagers;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -101,6 +102,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ILoginManager, LoginManager>()
                     .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
+                    .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
                     .AddSingleton<IFormController, FormController>()
@@ -113,8 +115,8 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
-                    .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()
+                    .AddSingleton<IUserCredentialDTOManager, UserCredentialDTOManager>()
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
