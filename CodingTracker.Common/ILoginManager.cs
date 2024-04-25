@@ -12,6 +12,9 @@ namespace CodingTracker.Common.ILoginManagers
         UserCredentialDTO ValidateLogin(string username, string password);
         void ResetPassword(string username, string newPassword);
 
+        void AssignCurrentUserId(int? userId);
+
+        int ReturnCurrentUserId();
 
     }
 }

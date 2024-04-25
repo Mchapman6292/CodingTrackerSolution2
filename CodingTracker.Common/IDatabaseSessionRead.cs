@@ -17,6 +17,7 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 
         List<(DateTime Date, double TotalDurationSeconds)> ReadDurationSecondsLast28Days();
         int GetUserIdWithMostRecentLogin();
+        int GetSessionIdWithMostRecentLogin();
 
         List<CodingSessionDTO> ViewAllSession(bool partialView = false);
         List<CodingSessionDTO> ViewSpecific(DateTime chosenDate);

@@ -94,14 +94,15 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
+                    .AddSingleton<IApplicationLogger, ApplicationLogger>()
+                    .AddSingleton<IUserCredentialDTOManager, UserCredentialDTOManager>()
+                    .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IDatabaseSessionDelete, DatabaseSessionDelete>()
                     .AddSingleton<IDatabaseSessionInsert, DatabaseSessionInsert>()
                     .AddSingleton<IDatabaseSessionRead, DatabaseSessionRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<ILoginManager, LoginManager>()
-                    .AddSingleton<ICredentialManager, CredentialManager>()
-                    .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
@@ -116,7 +117,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()
-                    .AddSingleton<IUserCredentialDTOManager, UserCredentialDTOManager>()
+                    
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()

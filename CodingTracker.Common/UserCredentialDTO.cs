@@ -11,10 +11,10 @@ namespace CodingTracker.Common.UserCredentialDTOs
 {
     public class UserCredentialDTO 
     {
-        public int? UserId { get; set; }
-        public string Username { get; set; }
+        public int? UserId { get; set; } = 0;
+        public required string Username { get; set; }
 
-        public string PasswordHash { get; set; }
+        public required string PasswordHash { get; set; }
 
         public DateTime LastLogin { get; set; }
 

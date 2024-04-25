@@ -19,14 +19,13 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
     public class UserCredentialDTOManager : IUserCredentialDTOManager
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICredentialManager _credentialManager;
-        private UserCredentialDTO _currentUserCredentialDTO { get; set; }
+        private UserCredentialDTO _currentUserCredentialDTO;
 
 
-        public UserCredentialDTOManager(IApplicationLogger appLogger, ICredentialManager credentialManager)
+
+        public UserCredentialDTOManager(IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
-            _credentialManager = credentialManager;
         }
 
 
@@ -41,12 +40,12 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
                 try
                 {
 
-                    string hashedPassword = _credentialManager.HashPassword(password);
+                    
 
                     UserCredentialDTO userCredentialDTO = new UserCredentialDTO
                     {
                         Username = username,
-                        PasswordHash = hashedPassword
+                        PasswordHash = password
                     };
                 }
                 catch (Exception ex)
@@ -119,9 +118,20 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
         }
 
 
-        public void UpdateCurrentUserCredentialDTO(UserCredentialDTO userCredentialDTO) 
+        public void UpdateCurrentUserCredentialDTO(UserCredentialDTO userCredentialDTO)
         {
-            throw new NotImplementedException();
+            using (var activity = new Activity(nameof(GetCurrentUserCredential)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetCurrentUserCredential)}. TraceID: {activity.TraceId}.");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                {
+                    _currentUserCredentialDTO = userCredentialDTO;
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"currentUserCredentialDTO updated for Username: {userCredentialDTO.Username}, UserID {userCredentialDTO.UserId} Elapsed time: {stopwatch.ElapsedMilliseconds}.");
+                }
+            }
         }
     }
 }

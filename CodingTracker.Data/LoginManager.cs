@@ -6,6 +6,7 @@ using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.UserCredentialDTOManagers;
 
 
 // resetPassword, updatePassword, rememberUser 
@@ -15,12 +16,14 @@ namespace CodingTracker.Data.LoginManagers
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
-        private readonly ICredentialManager _credentialStorage;
+        private readonly ICredentialManager _credentialManager;
         private readonly CodingSessionDTO _codingSessionDTO;
-        public LoginManager(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialStorage)
+
+        private int _currentUserId;
+        public LoginManager(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager)
         {
             _databaseManager = databaseManager;
-            _credentialStorage = credentialStorage;
+            _credentialManager = credentialManager;
             _appLogger = appLogger;
         }
 
@@ -36,7 +39,7 @@ namespace CodingTracker.Data.LoginManagers
                     Stopwatch stopwatch = Stopwatch.StartNew();
 
                     _appLogger.Debug($"Hashing password for {username}. TraceID: {activity.TraceId}");
-                    var hashedPassword = _credentialStorage.HashPassword(password);
+                    var hashedPassword = _credentialManager.HashPassword(password);
                     _appLogger.Debug($"PasswordHash hashed for {username}. TraceID: {activity.TraceId}");
 
                     UserCredentialDTO userCredential = null;
@@ -94,6 +97,7 @@ namespace CodingTracker.Data.LoginManagers
                     if (userCredential != null)
                     {
                         _appLogger.Info($"User {username} validated successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        AssignCurrentUserId(userCredential.UserId);
                     }
                     else
                     {
@@ -110,6 +114,33 @@ namespace CodingTracker.Data.LoginManagers
             }
         }
 
+        public void AssignCurrentUserId(int? userId)
+        {
+            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+
+                _currentUserId = (int)userId;
+            }
+        }
+
+        public int ReturnCurrentUserId()
+        {
+            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+
+                if (_currentUserId == 0)
+                {
+                    _appLogger.Info($"CurrentUserId is 0 (default for not created.");
+                }
+                else 
+                {
+                    return _currentUserId;
+                }
+                return _currentUserId;
+            }
+        }
 
 
         public void ResetPassword(string username, string newPassword)
@@ -120,7 +151,7 @@ namespace CodingTracker.Data.LoginManagers
                 try
                 {
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    string hashedPassword = _credentialStorage.HashPassword(newPassword);
+                    string hashedPassword = _credentialManager.HashPassword(newPassword);
 
                     _databaseManager.ExecuteCRUD(connection =>
                     {

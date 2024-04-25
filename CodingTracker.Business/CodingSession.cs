@@ -51,7 +51,7 @@ namespace CodingTracker.Business.CodingSessions
             _goalDTOManager = goalDTOManager;
             _databaseSessionInsert = databaseSessionInsert;
             _sessionCalculator = sessionCalculator;
-            _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
+            _userId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             
         }

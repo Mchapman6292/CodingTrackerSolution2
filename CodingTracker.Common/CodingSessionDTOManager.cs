@@ -50,7 +50,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
             _credentialManager = credentialManager;
-            _userId = _databaseSessionRead.GetUserIdWithMostRecentLogin();
+            _userId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _inputValidator = inputValidator;
         }

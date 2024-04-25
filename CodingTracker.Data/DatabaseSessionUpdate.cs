@@ -9,6 +9,9 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IDatabaseSessionUpdates;
 using CodingTracker.Data.DatabaseManagers;
+using CodingTracker.Common.ICredentialManagers;
+
+using CodingTracker.Common.ICredentialManagers;
 
 namespace CodingTracker.Data
 {
@@ -16,11 +19,13 @@ namespace CodingTracker.Data
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
+        private readonly ICredentialManager _credentialManager;
 
-        public DatabaseSessionUpdate(IApplicationLogger appLogger, IDatabaseManager databaseManager)
+        public DatabaseSessionUpdate(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager)
         {
             _appLogger = appLogger;
             _databaseManager = databaseManager;
+            _credentialManager = credentialManager;
         }
 
 
@@ -66,7 +71,7 @@ namespace CodingTracker.Data
             using (var activity = new Activity(nameof(UpdatePassword)).Start())
             {
                 _appLogger.Debug($"Starting {nameof(UpdatePassword)}. TraceID: {activity.TraceId}, UserId: {userId}");
-                string hashedPassword = HashPassword(newPassword);
+                string hashedPassword = _credentialManager.HashPassword(newPassword);
                 _databaseManager.ExecuteCRUD(connection =>
                 {
                     using var command = new SQLiteCommand(@"
