@@ -12,6 +12,10 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
         void SetCurrentUserCredential(UserCredentialDTO userCredentialDTO);
         UserCredentialDTO GetCurrentUserCredential();
         void UpdateCurrentUserCredentialDTO(UserCredentialDTO userCredentialDTO);
+
+        void AssignCurrentUserId(int? userId);
+
+        int ReturnCurrentUserId();
     }
 
 
@@ -20,6 +24,7 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
     {
         private readonly IApplicationLogger _appLogger;
         private UserCredentialDTO _currentUserCredentialDTO;
+        private int _currentUserId;
 
 
 
@@ -131,6 +136,45 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
                     stopwatch.Stop();
                     _appLogger.Info($"currentUserCredentialDTO updated for Username: {userCredentialDTO.Username}, UserID {userCredentialDTO.UserId} Elapsed time: {stopwatch.ElapsedMilliseconds}.");
                 }
+            }
+        }
+
+
+        public void AssignCurrentUserId(int? userId)
+        {
+            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+
+                if (_currentUserId >0)
+                {
+                    _appLogger.Debug($"_currentUserId already has a value {_currentUserId}.");
+                }
+                if (_currentUserId == 0) 
+                {
+                    _currentUserId = (int)userId;
+
+                    _appLogger.Debug($"_currentUserId updated to {_currentUserId}, Eapsed time : {stopwatch.ElapsedMilliseconds}, TraceID: {activity.TraceId}");
+                }
+            }
+        }
+
+        public int ReturnCurrentUserId()
+        {
+            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+
+                if (_currentUserId == 0)
+                {
+                    _appLogger.Info($"CurrentUserId is 0 (default for not created.");
+                }
+                else
+                {
+                    return _currentUserId;
+                }
+                return _currentUserId;
             }
         }
     }

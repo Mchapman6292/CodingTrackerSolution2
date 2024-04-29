@@ -13,6 +13,7 @@ namespace CodingTracker.Common.IDatabaseManagers
         void EnsureDatabaseForUser();
         void ExecuteDatabaseOperation(Action<SQLiteConnection> operation, string operationName);
         void CreateTableIfNotExists();
+        List<string> GetTableColumns(string tableName);
         void OpenConnectionWithRetry();
         void CloseDatabaseConnection();
         void ExecuteCRUD(Action<SQLiteConnection> action);

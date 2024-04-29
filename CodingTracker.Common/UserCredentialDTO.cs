@@ -16,7 +16,7 @@ namespace CodingTracker.Common.UserCredentialDTOs
 
         public required string PasswordHash { get; set; }
 
-        public DateTime LastLogin { get; set; }
+        public DateTime? LastLogin { get; set; }
 
 
 

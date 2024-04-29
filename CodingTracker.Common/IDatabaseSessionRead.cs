@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentialDTOs;
 
 namespace CodingTracker.Common.IDatabaseSessionReads
@@ -30,6 +31,8 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 
         void GetLast28DaysSessions();
 
+        List<CodingSessionDTO> ReadFromCodingSessionsTable(IQueryBuilder query);
 
+        List<UserCredentialDTO> ReadFromUserCredentialsTable(IQueryBuilder query);
     }
 }

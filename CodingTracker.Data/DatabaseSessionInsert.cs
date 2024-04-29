@@ -78,7 +78,7 @@ namespace CodingTracker.Data.DatabaseSessionInserts
 
                 command.ExecuteNonQuery();
 
-                _appLogger.Debug($"Session inserted successfully User ID: {codingSessionDTO.UserId}, StartTime: {codingSessionDTO.StartTime}, EndTime: {codingSessionDTO.EndTime}, DurationSeconds: {codingSessionDTO.DurationSeconds}, DurationHHMM: {codingSessionDTO.DurationHHMM}.");
+                _appLogger.Debug($"Session inserted successfully Session ID: {codingSessionDTO.UserId}, StartTime: {codingSessionDTO.StartTime}, EndTime: {codingSessionDTO.EndTime}, DurationSeconds: {codingSessionDTO.DurationSeconds}, DurationHHMM: {codingSessionDTO.DurationHHMM}.");
             }, nameof(InsertSession));
         }
     }

@@ -10,7 +10,9 @@ namespace CodingTracker.Common.CodingSessionDTOs
     {
         public int SessionId { get; set; } = 0; // Default value indicating not set. 
         public int UserId { get; set; } = 0;
+        public DateTime? StartDate { get; set; }
         public DateTime? StartTime { get; set; }
+        public DateTime? EndDate { get; set; }
         public DateTime? EndTime { get; set; }
         public double? DurationSeconds { get; set; }
 
@@ -18,6 +20,8 @@ namespace CodingTracker.Common.CodingSessionDTOs
 
         public string? GoalHHMM { get; set; }
         public int? GoalReached { get; set; }
+
+
 
     }
 }

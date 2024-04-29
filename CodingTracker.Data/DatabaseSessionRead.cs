@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.UserCredentialDTOManagers;
+using CodingTracker.Common.IQueryBuilders;
 
 
 // To do 
@@ -27,18 +28,20 @@ namespace CodingTracker.Data.DatabaseSessionReads
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
         private readonly ICredentialManager _credentialManager;
+        private readonly IQueryBuilder _queryBuilder;
 
         private int _currentUserId;
 
 
 
 
-        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler, ICredentialManager credentialManager)
+        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler, ICredentialManager credentialManager, IQueryBuilder queryBuilder)
         {
             _databaseManager = databaseManager;
             _appLogger = appLogger;
             _errorHandler = errorHandler;
             _credentialManager = credentialManager;
+            _queryBuilder = queryBuilder;
         }
 
 
@@ -670,6 +673,104 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 }
                 return _currentUserId;
             }
+        }
+
+
+
+        public List<CodingSessionDTO> ReadFromCodingSessionsTable(IQueryBuilder query)
+        {
+            List<CodingSessionDTO> sessions = new List<CodingSessionDTO>();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Activity activity = new Activity(nameof(ReadFromCodingSessionsTable)).Start();
+
+            _appLogger.Info($"Starting {nameof(ReadFromCodingSessionsTable)}, TraceID: {activity.TraceId}.");
+
+            try
+            {
+                _databaseManager.ExecuteDatabaseOperation(connection =>
+                {
+                    string commandText = _queryBuilder.CreateCommandText("CodingSessions");
+                    using var command = new SQLiteCommand(commandText, connection);
+                    _queryBuilder.SetCommandParameters(command, query);
+
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        sessions.Add(new CodingSessionDTO
+                        {
+                            SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
+                            UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                            StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (double?)null : reader.GetDouble(reader.GetOrdinal("DurationSeconds")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM")),
+                            GoalReached = reader.IsDBNull(reader.GetOrdinal("GoalReached")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("GoalReached")),
+                        });
+                    }
+                }, "ReadFromCodingSessionsTable");
+
+                stopwatch.Stop();
+                _appLogger.Info($"Completed {nameof(ReadFromCodingSessionsTable)}. Retrieved {sessions.Count} sessions. Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _appLogger.Error($"Error in {nameof(ReadFromCodingSessionsTable)}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                throw;
+            }
+            finally
+            {
+                activity.Stop();
+            }
+
+            return sessions;
+        }
+
+        public List<UserCredentialDTO> ReadFromUserCredentialsTable(string query)
+        {
+            List<UserCredentialDTO> userCredentials = new List<UserCredentialDTO>();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            Activity activity = new Activity(nameof(ReadFromUserCredentialsTable)).Start();
+
+            _appLogger.Info($"Starting {nameof(ReadFromUserCredentialsTable)}, TraceID: {activity.TraceId}.");
+
+            try
+            {
+                _databaseManager.ExecuteDatabaseOperation(connection =>
+                {
+                    string commandText = _queryBuilder.CreateCommandText("UserCredentials");
+                    using var command = new SQLiteCommand(commandText, connection);
+                    _queryBuilder.SetCommandParameters(command, query);
+
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        userCredentials.Add(new UserCredentialDTO
+                        {
+                            UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                            Username = reader.GetString(reader.GetOrdinal("Username")),
+                            PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                            LastLogin = reader.IsDBNull(reader.GetOrdinal("LastLogin")) ? null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("LastLogin"))
+                        });
+                    }
+                }, "ReadFromUserCredentialsTable");
+
+                stopwatch.Stop();
+                _appLogger.Info($"Completed {nameof(ReadFromUserCredentialsTable)}. Retrieved {userCredentials.Count} user credentials. Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _appLogger.Error($"Error in {nameof(ReadFromUserCredentialsTable)}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                throw;
+            }
+            finally
+            {
+                activity.Stop();
+            }
+
+            return userCredentials;
         }
     }
 }

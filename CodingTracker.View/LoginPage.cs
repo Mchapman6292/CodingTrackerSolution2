@@ -20,7 +20,7 @@ namespace CodingTracker.View
 {
     public partial class LoginPage : Form
     {
-        private readonly ILoginManager _loginManager;
+        private readonly IAuthenticationService _loginManager;
         private readonly IApplicationControl _appControl;
         private readonly IApplicationLogger _appLogger;
         private readonly ICredentialManager _credentialManager;
@@ -31,7 +31,7 @@ namespace CodingTracker.View
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
+        public LoginPage(IAuthenticationService loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
         {
             _loginManager = loginManager;
             _appControl = appControl;

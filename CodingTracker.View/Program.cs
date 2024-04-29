@@ -46,6 +46,10 @@ using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Business.SessionCalculators;
 using CodingTracker.Common.DataTypeHelpers;
 using CodingTracker.Common.UserCredentialDTOManagers;
+using CodingTracker.Data.QueryBuilders;
+using CodingTracker.Common.IQueryBuilders;
+using CodingTracker.Data.NewDatabaseReads;
+using CodingTracker.Common.INewDatabaseReads;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -100,9 +104,10 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IDatabaseSessionDelete, DatabaseSessionDelete>()
                     .AddSingleton<IDatabaseSessionInsert, DatabaseSessionInsert>()
                     .AddSingleton<IDatabaseSessionRead, DatabaseSessionRead>()
+                    .AddSingleton<INewDatabaseRead, NewDatabaseRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
-                    .AddSingleton<ILoginManager, LoginManager>()
+                    .AddSingleton<IAuthenticationService, AuthenticationService>()
                     .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
@@ -117,6 +122,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()
+                    .AddSingleton<IQueryBuilder, QueryBuilder>()
                     
 
                     // Transient services.

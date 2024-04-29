@@ -28,7 +28,6 @@ namespace CodingTracker.View
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
         private readonly ICodingSessionDTOManager _sessionDTOManager;
-        private readonly 
 
 
 
