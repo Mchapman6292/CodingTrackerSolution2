@@ -39,7 +39,7 @@ namespace CodingTracker.Data.QueryBuilders
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForUserCredentials)}, TraceID: {activity.TraceId}");
 
                 // Checking that orderBy and groupBy parameters are valid column names. 
-                var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin" };
+                var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin"};
 
                 if (orderBy != null && !validColumns.Contains(orderBy))
                     throw new ArgumentException("Invalid orderBy column.");
@@ -223,9 +223,7 @@ namespace CodingTracker.Data.QueryBuilders
             DateTime? startDate = null,
             DateTime? startTime = null,
             DateTime? endDate = null,
-            DateTime? endTime = null,
-            bool useStartDate = true,
-            bool useEndDate = true
+            DateTime? endTime = null
         )
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -240,11 +238,11 @@ namespace CodingTracker.Data.QueryBuilders
                     if (userId > 0)
                         command.Parameters.AddWithValue("@UserId", userId);
 
-                    if (startDate.HasValue && useStartDate)
+                    if (startDate.HasValue )
                         command.Parameters.AddWithValue("@StartDate", startDate.Value.ToString("yyyy-MM-dd"));
                     if (startTime.HasValue)
                         command.Parameters.AddWithValue("@StartTime", startTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-                    if (endDate.HasValue && useEndDate)
+                    if (endDate.HasValue)
                         command.Parameters.AddWithValue("@EndDate", endDate.Value.ToString("yyyy-MM-dd"));
                     if (endTime.HasValue)
                         command.Parameters.AddWithValue("@EndTime", endTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -260,6 +258,6 @@ namespace CodingTracker.Data.QueryBuilders
                 }
             }
         }
-
+    }
     }
 

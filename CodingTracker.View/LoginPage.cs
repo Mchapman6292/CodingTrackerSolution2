@@ -144,9 +144,10 @@ namespace CodingTracker.View
             string username = loginPageUsernameTextbox.Text;
             string password = LoginPagePasswordTextbox.Text;
 
-            var loginCredentials = _loginManager.ValidateLogin(username, password);
 
-            if (loginCredentials != null)
+            bool isValidLogin = _loginManager.AuthenticateLogin(username, password);
+
+            if (isValidLogin)
             {
                 if (LoginPageRememberMeToggle.Checked)
                 {
@@ -154,7 +155,7 @@ namespace CodingTracker.View
                     Properties.Settings.Default.Save();
                 }
 
-                this.Hide(); 
+                this.Hide();
                 _formSwitcher.SwitchToMainPage();
                 _appLogger.Info("User logged in successfully.");
             }
@@ -163,6 +164,7 @@ namespace CodingTracker.View
                 LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
             }
         }
+
 
         private void AccountCreatedSuccessfully(string message)
         {
@@ -203,7 +205,7 @@ namespace CodingTracker.View
 
         private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
         {
-            _databaseManager.UpdateCodingSessionsTable();
+            _databaseManager.UpdateUserCredentialsTable();
         }
 
         private void LoginPageRememberMeToggle_CheckedChanged(object sender, EventArgs e)

@@ -27,35 +27,56 @@ namespace CodingTracker.Data.NewDatabaseReads
 
         public List<UserCredentialDTO> ReadFromUserCredentialsTable
         (
-           List<string> columnsToSelect,
-           int userId = 0,
-           string? username = null,
-           string? passwordHash = null,
-           DateTime? lastLoginDate = null,
-           string? orderBy = null,
-           bool ascending = true,
-           string? groupBy = null,
-           int? limit = null
+               List<string> columnsToSelect,
+               int userId = 0,
+               string? username = null,
+               string? passwordHash = null,
+               DateTime? lastLoginDate = null,
+               string? orderBy = null,
+               bool ascending = true,
+               string? groupBy = null,
+               int? limit = null
         )
         {
             List<UserCredentialDTO> userCredentials = new List<UserCredentialDTO>();
-
-            _databaseManager.ExecuteDatabaseOperation(connection =>
+            using (var activity = new Activity(nameof(ReadFromUserCredentialsTable)).Start())
             {
-                string commandText = _queryBuilder.CreateCommandTextForUserCredentials(userId, username, passwordHash, lastLoginDate,  orderBy, ascending, groupBy, limit);    
-                using (var command = new SQLiteCommand(commandText, connection))
-                {
-                    _queryBuilder.SetCommandParametersForUserCredentials(command);
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Info($"Starting {nameof(ReadFromUserCredentialsTable)}. TraceID: {activity.TraceId}");
 
-                    using (var reader = command.ExecuteReader())
+                _appLogger.Debug($"Parameters: UserId={userId}, Username={username}, PasswordHash={passwordHash}, " +
+                        $"LastLoginDate={lastLoginDate}, OrderBy={orderBy}, Ascending={ascending}, GroupBy={groupBy}, Limit={limit}");
+
+                try
+                {
+                    _databaseManager.ExecuteDatabaseOperation(connection =>
                     {
-                        while (reader.Read())
+                        string commandText = _queryBuilder.CreateCommandTextForUserCredentials(
+                            columnsToSelect, userId, username, passwordHash, lastLoginDate, orderBy, ascending, groupBy, limit);
+                        using (var command = new SQLiteCommand(commandText, connection))
                         {
-                            userCredentials.Add(ExtractUserCredentialFromReader(reader));
+                            _queryBuilder.SetCommandParametersForUserCredentials(command, userId, username, passwordHash, lastLoginDate);
+
+                            using (var reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    userCredentials.Add(ExtractUserCredentialFromReader(reader));
+                                }
+                            }
                         }
-                    }
+                    }, nameof(ReadFromUserCredentialsTable));
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Completed {nameof(ReadFromUserCredentialsTable)}. Retrieved {userCredentials.Count} user credentials. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
-            }, nameof(ReadFromUserCredentialsTable));
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Error in {nameof(ReadFromUserCredentialsTable)}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    throw;
+                }
+            }
 
             return userCredentials;
         }
@@ -96,11 +117,15 @@ namespace CodingTracker.Data.NewDatabaseReads
                 var stopwatch = Stopwatch.StartNew();
                 _appLogger.Info($"Starting {nameof(ReadFromCodingSessionsTable)}. TraceID: {activity.TraceId}");
 
+                _appLogger.Debug($"Parameters: SessionId={sessionId}, UserId={userId}, StartDate={startDate}, StartTime={startTime}, " +
+                        $"EndDate={endDate}, EndTime={endTime}, OrderBy={orderBy}, Ascending={ascending}, GroupBy={groupBy}, " +
+                        $"SumColumn={sumColumn}, Limit={limit}");
+
                 try
                 {
                     _databaseManager.ExecuteDatabaseOperation(connection =>
                     {
-                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(sessionId, userId, startDate, startTime, endDate, endTime, false, orderBy, ascending, groupBy, sumColumn, limit);
+                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect,sessionId, userId, startDate, startTime, endDate, endTime, orderBy, ascending, groupBy, sumColumn, limit);
                         using (var command = new SQLiteCommand(commandText, connection))
                         {
                             _queryBuilder.SetCommandParametersForCodingSessions(command);

@@ -190,34 +190,40 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public void CreateTableIfNotExists()
         {
-            using var command = _connection.CreateCommand();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(CreateTableIfNotExists)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(CreateTableIfNotExists)}. TraceID: {activity.TraceId}");
+                using var command = _connection.CreateCommand();
 
 
-            command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS UserCredentials (
-                    UserId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL,
-                    LastLogin DATETIME
-                );
+                command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS UserCredentials (
+                        UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Username TEXT NOT NULL UNIQUE,
+                        PasswordHash TEXT NOT NULL,
+                        LastLogin DATETIME
+                    );
 
-                    CREATE TABLE CodingSessions (
-                        SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                        UserId INTEGER NOT NULL,
-                        StartDate DATE NOT NULL,
-                        StartTime DATETIME NOT NULL,
-                        EndDate DATE,
-                        EndTime DATETIME,
-                        DurationSeconds REAL, 
-                        DurationHHMM STRING,
-                        GoalHHMM STRING,
-                        GoalReached INTEGER,
-                        FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+                         CREATE TABLE IF NOT EXISTS CodingSessions (
+                            SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                            UserId INTEGER NOT NULL,
+                            StartDate DATE NOT NULL,
+                            StartTime DATETIME NOT NULL,
+                            EndDate DATE,
+                            EndTime DATETIME,
+                            DurationSeconds REAL, 
+                            DurationHHMM STRING,
+                            GoalHHMM STRING,
+                            GoalReached INTEGER,
+                            FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
                         
-                        );";
-            command.ExecuteNonQuery();
+                            );";
+                command.ExecuteNonQuery();
 
-            command.ExecuteNonQuery();
+                _appLogger.Info($"{nameof(CreateTableIfNotExists)} finished, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+            }
+           
         }
 
         public List<string> GetTableColumns(string tableName)

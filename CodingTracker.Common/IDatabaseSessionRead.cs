@@ -31,8 +31,7 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 
         void GetLast28DaysSessions();
 
-        List<CodingSessionDTO> ReadFromCodingSessionsTable(IQueryBuilder query);
 
-        List<UserCredentialDTO> ReadFromUserCredentialsTable(IQueryBuilder query);
+
     }
 }

@@ -9,7 +9,7 @@ namespace CodingTracker.Common.ILoginManagers
 {
     public interface IAuthenticationService
     {
-        bool ValidateLogin(string username, string password);
+        bool AuthenticateLogin(string username, string password);
         UserCredentialDTO GetUserDetails(string username);
 
 

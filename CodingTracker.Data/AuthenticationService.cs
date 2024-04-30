@@ -8,11 +8,15 @@ using System.Diagnostics;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using CodingTracker.Common.IQueryBuilders;
+using CodingTracker.Data.NewDatabaseReads;
 using System.Runtime.CompilerServices;
+using CodingTracker.Common.INewDatabaseReads;
+using System.Text;
+using System.Security.Cryptography;
 
 
 // resetPassword, updatePassword, rememberUser 
-namespace CodingTracker.Data.LoginManagers
+namespace CodingTracker.Data.AuthenticationServices
 {
     public class AuthenticationService : IAuthenticationService
     {
@@ -22,41 +26,59 @@ namespace CodingTracker.Data.LoginManagers
         private readonly CodingSessionDTO _codingSessionDTO;
         private readonly IUserCredentialDTOManager _userCredentialDTOManager;
         private readonly IQueryBuilder _queryBuilder;
+        private readonly INewDatabaseRead _newDatabaseRead;
 
         private int _currentUserId;
-        public AuthenticationService(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager, IUserCredentialDTOManager userCredentialDTOManager, IQueryBuilder queryBuilder)
+        public AuthenticationService(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager, IUserCredentialDTOManager userCredentialDTOManager, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead)
         {
             _databaseManager = databaseManager;
             _credentialManager = credentialManager;
             _appLogger = appLogger;
             _userCredentialDTOManager = userCredentialDTOManager;
             _queryBuilder = queryBuilder;
+            _newDatabaseRead = newDatabaseRead;
         }
 
 
-        public bool ValidateLogin(string username, string password)
+        public bool AuthenticateLogin(string username, string password)
         {
-            var hashedPassword = _credentialManager.HashPassword(password);
-            var isValid = false;
-
-            _databaseManager.ExecuteDatabaseOperation(connection =>
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(AuthenticateLogin)).Start())
             {
-                var commandText = _queryBuilder.CreateCommandTextForUserCredentials(
-                    new List<string> { "PasswordHash" }, username: username);
 
-                using (var command = new SQLiteCommand(commandText, connection))
+                try
                 {
-                    _queryBuilder.SetCommandParametersForUserCredentials(command, username: username, passwordHash: hashedPassword);
+                    List<UserCredentialDTO> credentials = _newDatabaseRead.ReadFromUserCredentialsTable(
+                            columnsToSelect: new List<string> { "PasswordHash" },
+                            username: username);
 
-                    using var reader = command.ExecuteReader();
-                    if (reader.Read())
+                    if(credentials.Any()) 
                     {
-                        isValid = hashedPassword == reader["PasswordHash"].ToString();
+                        string storedHash = credentials.First().PasswordHash;
+                        string inputHash = HashPassword(password);
+
+                        bool isValid = storedHash == inputHash;
+
+                        stopwatch.Stop();
+                        _appLogger.Info($"{nameof(AuthenticateLogin)} complete for {username} isValid: {isValid}, TraceID:{activity.TraceId}.");
+
+                        return isValid;
+                    }
+                    else
+                    {
+                        stopwatch.Stop();
+                        _appLogger.Info($"No credentials found for {username}. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+
+                        return false;
                     }
                 }
-            }, nameof(ValidateLogin));
-
-            return isValid;
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Error in {nameof(AuthenticateLogin)}: {ex.Message}. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+                    throw;
+                }
+            }
         }
 
 
@@ -133,6 +155,53 @@ namespace CodingTracker.Data.LoginManagers
                 catch (SQLiteException ex)
                 {
                     _appLogger.Error($"An error occurred during {nameof(ResetPassword)} for username {username}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                }
+            }
+        }
+
+
+
+        public string HashPassword(string password)
+        {
+            using (var activity = new Activity(nameof(HashPassword)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(HashPassword)}, TraceId: {activity.TraceId}.");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                try
+                {
+                    using (SHA256 sha256Hash = SHA256.Create())
+                    {
+                        byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+                        StringBuilder builder = new StringBuilder();
+                        for (int i = 0; i < bytes.Length; i++)
+                        {
+                            builder.Append(bytes[i].ToString("x2"));
+                        }
+
+                        stopwatch.Stop();
+                        _appLogger.Info($"{nameof(HashPassword)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                        return builder.ToString();
+                    }
+                }
+                catch (ArgumentNullException ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Password cannot be null. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+                catch (EncoderFallbackException ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Encoding error while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An unexpected error occurred while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    throw;
                 }
             }
         }

@@ -11,6 +11,7 @@ namespace CodingTracker.Common.IQueryBuilders
     {
         string CreateCommandTextForUserCredentials
         (
+            List<string> columnsToSelect,
             int userId = 0,
             string? username = null,
             string? passwordHash = null,
@@ -21,29 +22,29 @@ namespace CodingTracker.Common.IQueryBuilders
             int? limit = null
         );
         void SetCommandParametersForUserCredentials
-        (
-            SQLiteCommand command,
-            int userId = 0,
-            string? username = null,
-            string? passwordHash = null,
-            DateTime? lastLoginDate = null
-        );
+         (
+           SQLiteCommand command,
+           int userId = 0,
+           string? username = null,
+           string? passwordHash = null,
+           DateTime? lastLoginDate = null
+         );
 
         public string CreateCommandTextForCodingSessions
-        (
-            int sessionId = 0,
-            int userId = 0,
-            DateTime? startDate = null,
-            DateTime? startTime = null,
-            DateTime? endDate = null,
-            DateTime? endTime = null,
-            bool aggregateDurationsByDate = false,
-            string? orderBy = null,
-            bool ascending = true,
-            string? groupBy = null,
-            string? sumColumn = null, // New parameter to specify which column to sum
-            int? limit = null
-        );
+             (
+                 List<string> columnsToSelect,
+                 int sessionId = 0,
+                 int userId = 0,
+                 DateTime? startDate = null,
+                 DateTime? startTime = null,
+                 DateTime? endDate = null,
+                 DateTime? endTime = null,
+                 string? orderBy = null,
+                 bool ascending = true,
+                 string? groupBy = null,
+                 string? sumColumn = null, // Parameter to specify which column to sum
+                 int? limit = null
+             );
 
         void SetCommandParametersForCodingSessions
         (
