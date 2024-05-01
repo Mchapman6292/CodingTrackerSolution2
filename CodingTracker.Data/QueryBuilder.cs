@@ -20,6 +20,7 @@ namespace CodingTracker.Data.QueryBuilders
 
         // Method to construct SQL command, parameters represent table columns & SQL commands.
         // Parameters for this method represent various SQL commands, e.g orderBy = ORDER BY.
+        // Column names are capitalized while query parameters use @ & lower case. Ex UserId = column name, @userId = query parameter.
         public string CreateCommandTextForUserCredentials
             (
             List<string> columnsToSelect,
