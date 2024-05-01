@@ -21,17 +21,16 @@ namespace CodingTracker.Data.QueryBuilders
         // Method to construct SQL command, parameters represent table columns & SQL commands.
         // Parameters for this method represent various SQL commands, e.g orderBy = ORDER BY.
         public string CreateCommandTextForUserCredentials
-        (
-           List<string> columnsToSelect,
-           int userId = 0,
-           string? username = null,
-           string? passwordHash = null,
-           DateTime? lastLoginDate = null,
-           string? orderBy = null,
-           bool ascending = true,
-           string? groupBy = null,
-           int? limit = null
-        )
+            (
+            List<string> columnsToSelect,
+            int userId = 0,
+            string? username = null,
+            string? passwordHash = null,
+            DateTime? lastLoginDate = null,
+            string? orderBy = null,
+            bool ascending = true,
+            string? groupBy = null,
+            int? limit = null)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(CreateCommandTextForUserCredentials)).Start())
@@ -39,7 +38,7 @@ namespace CodingTracker.Data.QueryBuilders
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForUserCredentials)}, TraceID: {activity.TraceId}");
 
                 // Checking that orderBy and groupBy parameters are valid column names. 
-                var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin"};
+                var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin" };
 
                 if (orderBy != null && !validColumns.Contains(orderBy))
                     throw new ArgumentException("Invalid orderBy column.");
@@ -52,21 +51,24 @@ namespace CodingTracker.Data.QueryBuilders
 
                 try
                 {
-                    var columns = string.Join(", ", columnsToSelect);
-                    var sql = new StringBuilder($"SELECT {columns} FROM UserCredentials WHERE 1=1");
-
+                    var conditions = new List<string>();
                     if (userId > 0)
-                        sql.Append(" AND UserId = @UserId");
-
+                        conditions.Add("UserId = @userId");
                     if (!string.IsNullOrEmpty(username))
-                        sql.Append(" AND Username = @Username");
-
+                        conditions.Add("Username = @username");
                     if (!string.IsNullOrEmpty(passwordHash))
-                        sql.Append(" AND PasswordHash = @PasswordHash");
-
+                        conditions.Add("PasswordHash = @passwordHash");
                     if (lastLoginDate.HasValue)
-                        sql.Append(" AND LastLogin >= @LastLogin");
+                        conditions.Add("LastLogin >= @lastLogin");
 
+                    var columns = string.Join(", ", columnsToSelect);
+                    var sql = new StringBuilder($"SELECT {columns} FROM UserCredentials");
+
+                    // WHERE 1=1 allows additional conditions with AND without having to check if its the first condition in the WHERE clause.
+                    if (conditions.Count > 0)
+                    {
+                        sql.Append(" WHERE " + (conditions.Count > 1 ? "1=1 AND " : "") + string.Join(" AND ", conditions));
+                    }
 
                     if (!string.IsNullOrEmpty(groupBy))
                         sql.Append($" GROUP BY {groupBy}");
@@ -95,11 +97,11 @@ namespace CodingTracker.Data.QueryBuilders
         // Creates the command parameters that are used for the query.
         public void SetCommandParametersForUserCredentials
         (
-          SQLiteCommand command,
-          int userId = 0,
-          string? username = null,
-          string? passwordHash = null,
-          DateTime? lastLoginDate = null
+            SQLiteCommand command,
+            int userId = 0,
+            string? username = null,
+            string? passwordHash = null,
+            DateTime? lastLoginDate = null
         )
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -110,13 +112,25 @@ namespace CodingTracker.Data.QueryBuilders
                 try
                 {
                     if (userId > 0)
-                        command.Parameters.AddWithValue("@UserId", userId);
+                    {
+                        command.Parameters.AddWithValue("@userId", userId);
+                        _appLogger.Debug($"Binding @UserId with value: {userId}");
+                    }
                     if (!string.IsNullOrEmpty(username))
-                        command.Parameters.AddWithValue("@Username", username);
+                    {
+                        command.Parameters.AddWithValue("@username", username);
+                        _appLogger.Debug($"Binding @Username with value: {username}");
+                    }
                     if (!string.IsNullOrEmpty(passwordHash))
-                        command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+                    {
+                        command.Parameters.AddWithValue("@passwordHash", passwordHash);
+                        _appLogger.Debug($"Binding @PasswordHash with value: {passwordHash}");
+                    }
                     if (lastLoginDate.HasValue)
-                        command.Parameters.AddWithValue("@LastLogin", lastLoginDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                    {
+                        command.Parameters.AddWithValue("@lastLogin", lastLoginDate.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                        _appLogger.Debug($"Binding @LastLogin with value: {lastLoginDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
+                    }
 
                     stopwatch.Stop();
                     _appLogger.Debug($"{nameof(SetCommandParametersForUserCredentials)} complete, TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
@@ -129,6 +143,7 @@ namespace CodingTracker.Data.QueryBuilders
                 }
             }
         }
+
 
 
 

@@ -502,60 +502,95 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
         public int GetSessionIdWithMostRecentLogin()
         {
-            int sessionId = 0;
-            _databaseManager.ExecuteDatabaseOperation(connection =>
+            using (var activity = new Activity(nameof(GetSessionIdWithMostRecentLogin)).Start())
             {
-                using var command = new SQLiteCommand(@"
-                    SELECT
-                            SessionId
-                    FROM
-                            CodingSessions
-                    WHERE 
-                            EndTime IS NOT NULL
-                    ORDER BY
-                            EndTime DESC
-                    LIMIT 1",
+                _appLogger.Debug($"Starting {nameof(GetSessionIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                int sessionId = 0;
 
-                    connection);
-
-                object result = command.ExecuteScalar();
-                if (result != null && result != DBNull.Value)
+                try
                 {
-                    sessionId = Convert.ToInt32(result);
-                }
-            }, nameof(GetSessionIdWithMostRecentLogin));
+                    _databaseManager.ExecuteDatabaseOperation(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                SELECT
+                        SessionId
+                FROM
+                        CodingSessions
+                WHERE 
+                        EndTime IS NOT NULL
+                ORDER BY
+                        EndTime DESC
+                LIMIT 1",
+                        connection);
 
-            return sessionId;
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            sessionId = Convert.ToInt32(result);
+                        }
+                    }, nameof(GetSessionIdWithMostRecentLogin));
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An error occurred during {nameof(GetSessionIdWithMostRecentLogin)}. Error: {ex.Message}. TraceID: {activity.TraceId}, Elapsed time: {stopwatch.ElapsedMilliseconds}ms.", ex);
+                    throw;
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(GetSessionIdWithMostRecentLogin)} completed. Retrieved SessionId: {sessionId}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                return sessionId;
+            }
         }
+
 
 
         public int GetUserIdWithMostRecentLogin()
         {
-            int userId = 0;
-            _databaseManager.ExecuteDatabaseOperation(connection =>
+            using (var activity = new Activity(nameof(GetUserIdWithMostRecentLogin)).Start())
             {
-                using var command = new SQLiteCommand(@"
-                    SELECT 
-                            UserId
-                    FROM
-                            UserCredentials
-                    WHERE
-                            LastLogin IS NOT NULL
-                ORDER BY
-                            LastLogin DESC
-                    LIMIT
-                            1",
-                                connection);
+                _appLogger.Debug($"Starting {nameof(GetUserIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                int userId = 0;
 
-                object result = command.ExecuteScalar(); // used for returning only a single result set.
-                if (result != null && result != DBNull.Value)
+                try
                 {
-                    userId = Convert.ToInt32(result);
-                }
-            }, nameof(GetUserIdWithMostRecentLogin));
+                    _databaseManager.ExecuteDatabaseOperation(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                SELECT 
+                        UserId
+                FROM
+                        UserCredentials
+                WHERE
+                        LastLogin IS NOT NULL
+                ORDER BY
+                        LastLogin DESC
+                LIMIT
+                        1",
+                        connection);
 
-            return userId;
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            userId = Convert.ToInt32(result);
+                        }
+                    }, nameof(GetUserIdWithMostRecentLogin));
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An error occurred during {nameof(GetUserIdWithMostRecentLogin)}. Error: {ex.Message}. TraceID: {activity.TraceId}, Elapsed time: {stopwatch.ElapsedMilliseconds}ms.", ex);
+                    throw;
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(GetUserIdWithMostRecentLogin)} completed. Retrieved UserId: {userId}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                return userId;
+            }
         }
+
 
 
 

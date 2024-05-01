@@ -26,17 +26,17 @@ namespace CodingTracker.Data.NewDatabaseReads
 
 
         public List<UserCredentialDTO> ReadFromUserCredentialsTable
-        (
-               List<string> columnsToSelect,
-               int userId = 0,
-               string? username = null,
-               string? passwordHash = null,
-               DateTime? lastLoginDate = null,
-               string? orderBy = null,
-               bool ascending = true,
-               string? groupBy = null,
-               int? limit = null
-        )
+(
+     List<string> columnsToSelect,
+     int userId = 0,
+     string? username = null,
+     string? passwordHash = null,
+     DateTime? lastLoginDate = null,
+     string? orderBy = null,
+     bool ascending = true,
+     string? groupBy = null,
+     int? limit = null
+)
         {
             List<UserCredentialDTO> userCredentials = new List<UserCredentialDTO>();
             using (var activity = new Activity(nameof(ReadFromUserCredentialsTable)).Start())
@@ -61,14 +61,21 @@ namespace CodingTracker.Data.NewDatabaseReads
                             {
                                 while (reader.Read())
                                 {
-                                    userCredentials.Add(ExtractUserCredentialFromReader(reader));
+                                    if (reader.HasRows)
+                                    {
+                                        userCredentials.Add(ExtractUserCredentialFromReader(reader));
+                                    }
+                                    else
+                                    {
+                                        _appLogger.Debug("No rows found to read.");
+                                    }
                                 }
                             }
                         }
-                    }, nameof(ReadFromUserCredentialsTable));
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"Completed {nameof(ReadFromUserCredentialsTable)}. Retrieved {userCredentials.Count} user credentials. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        stopwatch.Stop();
+                        _appLogger.Info($"Completed {nameof(ReadFromUserCredentialsTable)}. Retrieved {userCredentials.Count} user credentials. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }, nameof(ReadFromUserCredentialsTable));
                 }
                 catch (Exception ex)
                 {
@@ -83,33 +90,67 @@ namespace CodingTracker.Data.NewDatabaseReads
 
         private UserCredentialDTO ExtractUserCredentialFromReader(SQLiteDataReader reader)
         {
-            return new UserCredentialDTO
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(ExtractUserCredentialFromReader)).Start())
             {
-                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
-                Username = reader.GetString(reader.GetOrdinal("Username")),
-                PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
-                LastLogin = reader.IsDBNull(reader.GetOrdinal("LastLogin")) ? null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("LastLogin"))
-            };
+                _appLogger.Debug($"Starting {nameof(ExtractUserCredentialFromReader)}. TraceID: {activity.TraceId}");
+
+                try
+                {
+                    var dto = new UserCredentialDTO();
+
+                    int userIdIndex = reader.GetOrdinal("UserId");
+                    int usernameIndex = reader.GetOrdinal("Username");
+                    int passwordHashIndex = reader.GetOrdinal("PasswordHash");
+                    int lastLoginIndex = reader.GetOrdinal("LastLogin");
+
+                    if (!reader.IsDBNull(userIdIndex))
+                        dto.UserId = reader.GetInt32(userIdIndex); 
+                    else
+                        dto.UserId = 0; 
+
+ 
+                    dto.Username = reader.IsDBNull(usernameIndex) ? "" : reader.GetString(usernameIndex); 
+
+   
+                    dto.PasswordHash = reader.IsDBNull(passwordHashIndex) ? "" : reader.GetString(passwordHashIndex); 
+
+                    if (!reader.IsDBNull(lastLoginIndex))
+                        dto.LastLogin = reader.GetDateTime(lastLoginIndex); // Nullable in DTO, handle appropriately
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"{nameof(ExtractUserCredentialFromReader)} completed successfully. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
+
+                    return dto;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Error in {nameof(ExtractUserCredentialFromReader)}: {ex.Message}. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
+                    throw; 
+                }
+            }
         }
 
 
 
+
         public List<CodingSessionDTO> ReadFromCodingSessionsTable
-        (
-            List<string> columnsToSelect,
-            int sessionId = 0,
-            int userId = 0,
-            DateTime? startDate = null,
-            DateTime? startTime = null,
-            DateTime? endDate = null,
-            DateTime? endTime = null,
-            bool aggregateDurationsByDate = false,
-            string? orderBy = null,
-            bool ascending = true,
-            string? groupBy = null,
-            string? sumColumn = null, // New parameter to specify which column to sum
-            int? limit = null
-        )
+               (
+                   List<string> columnsToSelect,
+                   int sessionId = 0,
+                   int userId = 0,
+                   DateTime? startDate = null,
+                   DateTime? startTime = null,
+                   DateTime? endDate = null,
+                   DateTime? endTime = null,
+                   bool aggregateDurationsByDate = false,
+                   string? orderBy = null,
+                   bool ascending = true,
+                   string? groupBy = null,
+                   string? sumColumn = null, // New parameter to specify which column to sum
+                   int? limit = null
+               )
         {
             List<CodingSessionDTO> codingSessions = new List<CodingSessionDTO>();
             using (var activity = new Activity(nameof(ReadFromCodingSessionsTable)).Start())
@@ -125,8 +166,8 @@ namespace CodingTracker.Data.NewDatabaseReads
                 {
                     _databaseManager.ExecuteDatabaseOperation(connection =>
                     {
-                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect,sessionId, userId, startDate, startTime, endDate, endTime, orderBy, ascending, groupBy, sumColumn, limit);
-                        using (var command = new SQLiteCommand(commandText, connection))
+                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect, sessionId, userId, startDate, startTime, endDate, endTime, orderBy, ascending, groupBy, sumColumn, limit);
+                        using (var command = new SQLiteCommand(commandText, connection)) // Uses the text created by CreatecommandText to generate a new command object.
                         {
                             _queryBuilder.SetCommandParametersForCodingSessions(command);
 
@@ -159,20 +200,69 @@ namespace CodingTracker.Data.NewDatabaseReads
 
         private CodingSessionDTO ExtractCodingSessionFromReader(SQLiteDataReader reader)
         {
-            return new CodingSessionDTO
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(ExtractCodingSessionFromReader)).Start())
             {
-                SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
-                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
-                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                EndDate = reader.IsDBNull(reader.GetOrdinal("EndDate")) ? null : reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
-                DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? null : (double?)reader.GetDouble(reader.GetOrdinal("DurationSeconds")),
-                DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
-                GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM")),
-                GoalReached = reader.IsDBNull(reader.GetOrdinal("GoalReached")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("GoalReached"))
-            };
+                _appLogger.Debug($"Starting {nameof(ExtractCodingSessionFromReader)}. TraceID: {activity.TraceId}");
+
+                try
+                {
+                    var dto = new CodingSessionDTO();
+
+                    int sessionIdIndex = reader.GetOrdinal("SessionId");
+                    if (!reader.IsDBNull(sessionIdIndex))
+                        dto.SessionId = reader.GetInt32(sessionIdIndex);
+
+                    int userIdIndex = reader.GetOrdinal("UserId");
+                    if (!reader.IsDBNull(userIdIndex))
+                        dto.UserId = reader.GetInt32(userIdIndex);
+
+                    int startDateIndex = reader.GetOrdinal("StartDate");
+                    if (!reader.IsDBNull(startDateIndex))
+                        dto.StartDate = reader.GetDateTime(startDateIndex);
+
+                    int startTimeIndex = reader.GetOrdinal("StartTime");
+                    if (!reader.IsDBNull(startTimeIndex))
+                        dto.StartTime = reader.GetDateTime(startTimeIndex);
+
+                    int endDateIndex = reader.GetOrdinal("EndDate");
+                    if (!reader.IsDBNull(endDateIndex))
+                        dto.EndDate = reader.GetDateTime(endDateIndex);
+
+                    int endTimeIndex = reader.GetOrdinal("EndTime");
+                    if (!reader.IsDBNull(endTimeIndex))
+                        dto.EndTime = reader.GetDateTime(endTimeIndex);
+
+                    int durationSecondsIndex = reader.GetOrdinal("DurationSeconds");
+                    if (!reader.IsDBNull(durationSecondsIndex))
+                        dto.DurationSeconds = reader.GetDouble(durationSecondsIndex);
+
+                    int durationHHMMIndex = reader.GetOrdinal("DurationHHMM");
+                    if (!reader.IsDBNull(durationHHMMIndex))
+                        dto.DurationHHMM = reader.GetString(durationHHMMIndex);
+
+                    int goalHHMMIndex = reader.GetOrdinal("GoalHHMM");
+                    if (!reader.IsDBNull(goalHHMMIndex))
+                        dto.GoalHHMM = reader.GetString(goalHHMMIndex);
+
+                    int goalReachedIndex = reader.GetOrdinal("GoalReached");
+                    if (!reader.IsDBNull(goalReachedIndex))
+                        dto.GoalReached = reader.GetInt32(goalReachedIndex);
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"{nameof(ExtractCodingSessionFromReader)} completed successfully. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
+
+                    return dto;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Error in {nameof(ExtractCodingSessionFromReader)}: {ex.Message}. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
+                    throw; // Rethrow the exception after logging it
+                }
+            }
         }
+
 
     }
 }

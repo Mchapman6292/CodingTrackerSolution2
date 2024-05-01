@@ -73,6 +73,11 @@ namespace CodingTracker.Data.CredentialManagers
             }
         }
 
+        private bool checkifCredentialsExist()
+        {
+            throw new NotImplementedException();
+        }
+
 
         public bool IsAccountCreatedSuccessfully(string username)
         {
