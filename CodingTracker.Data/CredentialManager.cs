@@ -7,6 +7,7 @@ using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
+
 using System.Net;
 
 
@@ -17,6 +18,7 @@ namespace CodingTracker.Data.CredentialManagers
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
+
 
         public CredentialManager(IApplicationLogger applogger,  IDatabaseManager databaseManager)
         {

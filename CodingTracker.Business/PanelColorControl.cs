@@ -76,6 +76,8 @@ namespace CodingTracker.Business.PanelColorControls
                     ascending: true
                 );
 
+                _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {aggregatedSessions}.");
+
                 List<Color> sessionColors = new List<Color>();
                 foreach (var session in aggregatedSessions)
                 {

@@ -12,6 +12,9 @@ namespace CodingTracker.Common.ILoginManagers
         bool AuthenticateLogin(string username, string password);
         UserCredentialDTO GetUserDetails(string username);
 
+        void ResetPassword(string username, string newPassword);
+
+        string HashPassword(string password);
 
     }
 }

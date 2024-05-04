@@ -31,22 +31,26 @@ namespace CodingTracker.Common.IQueryBuilders
          );
 
         public string CreateCommandTextForCodingSessions
-             (
-                 List<string> columnsToSelect,
-                 int sessionId = 0,
-                 int userId = 0,
-                 DateTime? startDate = null,
-                 DateTime? startTime = null,
-                 DateTime? endDate = null,
-                 DateTime? endTime = null,
-                 string? orderBy = null,
-                 bool ascending = true,
-                 string? groupBy = null,
-                 string? sumColumn = null, // Parameter to specify which column to sum
-                 int? limit = null
-             );
+         (
+             List<string> columnsToSelect,
+             int sessionId = 0,
+             int userId = 0,
+             DateTime? startDate = null,
+             DateTime? startTime = null,
+             DateTime? endDate = null,
+             DateTime? endTime = null,
+             double? durationSeconds = 0,
+             string? durationHHMM = null,
+             string? goalHHMM = null,
+             int goalReached = 0,
+             string? orderBy = null,
+             bool ascending = true,
+             string? groupBy = null,
+             string? sumColumn = null,
+             int? limit = null
+         );
 
-        void SetCommandParametersForCodingSessions
+        public void SetCommandParametersForCodingSessions
         (
             SQLiteCommand command,
             int sessionId = 0,
@@ -54,7 +58,10 @@ namespace CodingTracker.Common.IQueryBuilders
             DateTime? startDate = null,
             DateTime? startTime = null,
             DateTime? endDate = null,
-            DateTime? endTime = null
+            DateTime? endTime = null,
+            double? durationSeconds = null,
+            string? durationHHMM = null,
+            string? goalHHMM = null
         );
 
 

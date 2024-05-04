@@ -6,6 +6,9 @@ using System.Data.SQLite;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.INewDatabaseReads;
+using CodingTracker.Common.CodingGoalDTOManagers;
+using CodingTracker.Common.CodingSessionDTOManagers;
+using CodingTracker.Common.UserCredentialDTOManagers;
 using System.Diagnostics;
 
 namespace CodingTracker.Data.NewDatabaseReads
@@ -15,28 +18,33 @@ namespace CodingTracker.Data.NewDatabaseReads
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
         private readonly IQueryBuilder _queryBuilder;
+        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
+        private readonly ICodingSessionDTOManager _codingSessionDTOManager;
+        private readonly IUserCredentialDTOManager _userCredentialDTOManager;
 
 
-        public NewDatabaseRead(IApplicationLogger appLogger, IDatabaseManager databaseManager, IQueryBuilder queryBuilder)
+        public NewDatabaseRead(IApplicationLogger appLogger, IDatabaseManager databaseManager, IQueryBuilder queryBuilder, ICodingGoalDTOManager codingGoalDTOManager, ICodingSessionDTOManager codingSessionDTOManager)
         {
             _appLogger = appLogger;
             _databaseManager = databaseManager;
             _queryBuilder = queryBuilder;
+            _codingGoalDTOManager = codingGoalDTOManager;
+            _codingSessionDTOManager = codingSessionDTOManager;
         }
 
 
         public List<UserCredentialDTO> ReadFromUserCredentialsTable
-(
-     List<string> columnsToSelect,
-     int userId = 0,
-     string? username = null,
-     string? passwordHash = null,
-     DateTime? lastLoginDate = null,
-     string? orderBy = null,
-     bool ascending = true,
-     string? groupBy = null,
-     int? limit = null
-)
+        (
+             List<string> columnsToSelect,
+             int userId = 0,
+             string username = null,
+             string passwordHash = null,
+             DateTime? lastLoginDate = null,
+             string? orderBy = null,
+             bool ascending = true,
+             string? groupBy = null,
+             int? limit = null
+        )
         {
             List<UserCredentialDTO> userCredentials = new List<UserCredentialDTO>();
             using (var activity = new Activity(nameof(ReadFromUserCredentialsTable)).Start())
@@ -53,6 +61,7 @@ namespace CodingTracker.Data.NewDatabaseReads
                     {
                         string commandText = _queryBuilder.CreateCommandTextForUserCredentials(
                             columnsToSelect, userId, username, passwordHash, lastLoginDate, orderBy, ascending, groupBy, limit);
+
                         using (var command = new SQLiteCommand(commandText, connection))
                         {
                             _queryBuilder.SetCommandParametersForUserCredentials(command, userId, username, passwordHash, lastLoginDate);
@@ -61,14 +70,14 @@ namespace CodingTracker.Data.NewDatabaseReads
                             {
                                 while (reader.Read())
                                 {
-                                    if (reader.HasRows)
+                                    foreach (var column in columnsToSelect)
                                     {
-                                        userCredentials.Add(ExtractUserCredentialFromReader(reader));
+                                        int columnIndex = reader.GetOrdinal(column);
+                                        string columnValue = reader.IsDBNull(columnIndex) ? "NULL" : reader.GetValue(columnIndex).ToString();
+                                        _appLogger.Debug($"Column {column}: {columnValue}");
                                     }
-                                    else
-                                    {
-                                        _appLogger.Debug("No rows found to read.");
-                                    }
+
+                                    userCredentials.Add(ExtractUserCredentialFromReader(reader));
                                 }
                             }
                         }
@@ -97,26 +106,25 @@ namespace CodingTracker.Data.NewDatabaseReads
 
                 try
                 {
-                    var dto = new UserCredentialDTO();
+                    var dto = _userCredentialDTOManager.CreateUserCredentialDTO();
 
                     int userIdIndex = reader.GetOrdinal("UserId");
                     int usernameIndex = reader.GetOrdinal("Username");
                     int passwordHashIndex = reader.GetOrdinal("PasswordHash");
                     int lastLoginIndex = reader.GetOrdinal("LastLogin");
 
+                    string dtoUsername = reader.IsDBNull(usernameIndex) ? "" : reader.GetString(usernameIndex); 
+                    string dtoPasswordHash = reader.IsDBNull(passwordHashIndex) ? "" : reader.GetString(passwordHashIndex);
+                    DateTime LastLogin = reader.IsDBNull(lastLoginIndex) ? DateTime.UtcNow : reader.GetDateTime(lastLoginIndex);
+
+                    _appLogger.Debug($"dtoUsername set {dtoUsername} passwordHash {dtoPasswordHash}.");
+
+                   
+
                     if (!reader.IsDBNull(userIdIndex))
-                        dto.UserId = reader.GetInt32(userIdIndex); 
-                    else
-                        dto.UserId = 0; 
-
- 
-                    dto.Username = reader.IsDBNull(usernameIndex) ? "" : reader.GetString(usernameIndex); 
-
-   
-                    dto.PasswordHash = reader.IsDBNull(passwordHashIndex) ? "" : reader.GetString(passwordHashIndex); 
-
+                        dto.UserId = reader.GetInt32(userIdIndex);
                     if (!reader.IsDBNull(lastLoginIndex))
-                        dto.LastLogin = reader.GetDateTime(lastLoginIndex); // Nullable in DTO, handle appropriately
+                        dto.LastLogin = reader.GetDateTime(lastLoginIndex); 
 
                     stopwatch.Stop();
                     _appLogger.Info($"{nameof(ExtractUserCredentialFromReader)} completed successfully. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
@@ -144,7 +152,10 @@ namespace CodingTracker.Data.NewDatabaseReads
                    DateTime? startTime = null,
                    DateTime? endDate = null,
                    DateTime? endTime = null,
-                   bool aggregateDurationsByDate = false,
+                   double? durationSeconds = null,
+                   string? durationHHMM = null,
+                   string? goalHHMM = null,
+                   int goalReached = 0,
                    string? orderBy = null,
                    bool ascending = true,
                    string? groupBy = null,
@@ -166,7 +177,7 @@ namespace CodingTracker.Data.NewDatabaseReads
                 {
                     _databaseManager.ExecuteDatabaseOperation(connection =>
                     {
-                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect, sessionId, userId, startDate, startTime, endDate, endTime, orderBy, ascending, groupBy, sumColumn, limit);
+                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect, sessionId, userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached, orderBy, ascending, groupBy, sumColumn, limit);
                         using (var command = new SQLiteCommand(commandText, connection)) // Uses the text created by CreatecommandText to generate a new command object.
                         {
                             _queryBuilder.SetCommandParametersForCodingSessions(command);
@@ -258,7 +269,7 @@ namespace CodingTracker.Data.NewDatabaseReads
                 {
                     stopwatch.Stop();
                     _appLogger.Error($"Error in {nameof(ExtractCodingSessionFromReader)}: {ex.Message}. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
-                    throw; // Rethrow the exception after logging it
+                    throw;
                 }
             }
         }

@@ -41,13 +41,9 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
                 _appLogger.Debug($"Starting {nameof(CreateUserCredentialDTO)}. TraceID: {activity.TraceId}.");
                 Stopwatch stopwatch = Stopwatch.StartNew();
 
-                UserCredentialDTO newCredential = null;
                 try
                 {
-
-                    
-
-                    UserCredentialDTO userCredentialDTO = new UserCredentialDTO
+                    return new UserCredentialDTO
                     {
                         Username = username,
                         PasswordHash = password
@@ -57,16 +53,20 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
                 {
                     stopwatch.Stop();
                     _appLogger.Error($"An error occurred during {nameof(CreateUserCredentialDTO)}. Error: {ex.Message}. TraceID: {activity.TraceId}, Elapsed time: {stopwatch.ElapsedMilliseconds}.", ex);
+                    return null; 
                 }
-
-                stopwatch.Stop();
-                _appLogger.Info($"{nameof(CreateUserCredentialDTO)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-                return newCredential;
+                finally
+                {
+                    stopwatch.Stop();
+                    _appLogger.Info($"{nameof(CreateUserCredentialDTO)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                }
             }
         }
 
+   
 
-        public void SetCurrentUserCredential(UserCredentialDTO userCredentialDTO)
+
+    public void SetCurrentUserCredential(UserCredentialDTO userCredentialDTO)
         {
             using (var activity = new Activity(nameof(SetCurrentUserCredential)).Start())
             {

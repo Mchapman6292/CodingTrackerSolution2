@@ -18,7 +18,7 @@ using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Data.CredentialManagers;
 using CodingTracker.Data.DatabaseManagers;
-using CodingTracker.Data.AuthenticationServices;
+using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormControllers;

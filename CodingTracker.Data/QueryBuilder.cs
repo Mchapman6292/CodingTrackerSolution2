@@ -158,10 +158,14 @@ namespace CodingTracker.Data.QueryBuilders
             DateTime? startTime = null,
             DateTime? endDate = null,
             DateTime? endTime = null,
+            double? durationSeconds = 0,
+            string? durationHHMM = null,
+            string? goalHHMM = null,
+            int goalReached = 0,
             string? orderBy = null,
             bool ascending = true,
             string? groupBy = null,
-            string? sumColumn = null, // Parameter to specify which column to sum
+            string? sumColumn = null, 
             int? limit = null
         )
         {
@@ -170,43 +174,69 @@ namespace CodingTracker.Data.QueryBuilders
             {
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForCodingSessions)}, TraceID: {activity.TraceId}");
 
+
+                var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached." };
+
+                // Checks that valid columns are selected.
+                if (orderBy != null && !validColumns.Contains(orderBy))
+                    throw new ArgumentException("Invalid orderBy column.");
+
+                if (groupBy != null && !validColumns.Contains(groupBy))
+                    throw new ArgumentException("Invalid groupBy column.");
+
+                if (columnsToSelect == null || columnsToSelect.Count == 0)
+                    throw new ArgumentException("At least one column must be specified.", nameof(columnsToSelect));
+
+
                 try
                 {
-                    StringBuilder sql = new StringBuilder("SELECT ");
-
-                    if (sumColumn != null)
-                    {
-                        sql.Append($"DATE(StartDate) AS GroupedDate, SUM({sumColumn}) AS Total{sumColumn}");
-                    }
-                    else
-                    {
-                        sql.Append($"{string.Join(", ", columnsToSelect)}");
-                    }
-
-                    sql.Append(" FROM CodingSessions WHERE 1=1");
+                    // building the conditions for the query.
+                    var conditions = new List<string>();
 
                     if (sessionId > 0)
-                        sql.Append(" AND SessionId = @SessionId");
+                        conditions.Add("SessionId = @sessionId");
                     if (userId > 0)
-                        sql.Append(" AND UserId = @UserId");
+                        conditions.Add("UserId = @userId");
                     if (startDate.HasValue)
-                        sql.Append(" AND StartDate >= @StartDate");
+                        conditions.Add("StartDate = @startDate");
                     if (startTime.HasValue)
-                        sql.Append(" AND StartTime >= @StartTime");
+                        conditions.Add("StartTime = @startTime");
                     if (endDate.HasValue)
-                        sql.Append(" AND EndDate <= @EndDate");
+                        conditions.Add("EndDate = @endDate");
                     if (endTime.HasValue)
-                        sql.Append(" AND EndTime <= @EndTime");
+                        conditions.Add("EndTime = @endTime");
+                    if (durationSeconds > 0)
+                        conditions.Add("DurationSeconds = @durationSeconds");
+                    if (!string.IsNullOrEmpty(durationHHMM))
+                        conditions.Add("DurationHHMM = @durationHHMM");
+                    if (!string.IsNullOrEmpty(goalHHMM))
+                        conditions.Add("GoalHHMM = @goalHHMM");
+                    if (sumColumn != null)
+                        conditions.Append($"DATE(StartDate), SUM({sumColumn}) AS Total{sumColumn}");
 
-                    if (sumColumn != null && groupBy == null)
+
+                    string columns = string.Join(", ", columnsToSelect);
+                    if (!string.IsNullOrEmpty(sumColumn))
                     {
-                        // Default grouping by date when aggregating
-                        sql.Append(" GROUP BY DATE(StartDate)");
+                        columns = $"SUM({sumColumn}) AS Total{sumColumn}";
+                        if (!string.IsNullOrEmpty(groupBy))
+                        {
+                            columns += $", {groupBy}";
+                        }
                     }
-                    else if (groupBy != null)
+
+
+                    // Constructs the full query, begins with SELECT & adds WHERE if there are any conditions.
+                    var sql = new StringBuilder($"SELECT {columns} FROM CodingSessions ");
+
+                    if (conditions.Count > 0)
                     {
+                        sql.Append(" WHERE " + (conditions.Count > 1 ? "1=1 AND " : "") + string.Join(" AND ", conditions));
+                    }
+
+
+                    if (!string.IsNullOrEmpty(groupBy))
                         sql.Append($" GROUP BY {groupBy}");
-                    }
 
                     if (!string.IsNullOrEmpty(orderBy))
                         sql.Append($" ORDER BY {orderBy} {(ascending ? "ASC" : "DESC")}");
@@ -215,21 +245,18 @@ namespace CodingTracker.Data.QueryBuilders
                         sql.Append($" LIMIT {limit}");
 
                     stopwatch.Stop();
-                    _appLogger.Debug($"{nameof(CreateCommandTextForCodingSessions)} complete, commandText = {sql}, TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
+                    _appLogger.Debug($" {nameof(CreateCommandTextForCodingSessions)} complete, commandText = {sql} TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
 
                     return sql.ToString();
                 }
                 catch (Exception ex)
                 {
                     stopwatch.Stop();
-                    _appLogger.Error($"Error building query for CodingSessions: {ex}. Time taken: {stopwatch.ElapsedMilliseconds} ms.");
+                    _appLogger.Error($"Error building query for UserCredentials: {ex}. Time taken: {stopwatch.ElapsedMilliseconds} ms.");
                     throw;
                 }
             }
         }
-
-
-
 
         public void SetCommandParametersForCodingSessions
         (
@@ -239,7 +266,10 @@ namespace CodingTracker.Data.QueryBuilders
             DateTime? startDate = null,
             DateTime? startTime = null,
             DateTime? endDate = null,
-            DateTime? endTime = null
+            DateTime? endTime = null,
+            double? durationSeconds = null,
+            string? durationHHMM = null,
+            string? goalHHMM = null
         )
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -254,7 +284,7 @@ namespace CodingTracker.Data.QueryBuilders
                     if (userId > 0)
                         command.Parameters.AddWithValue("@UserId", userId);
 
-                    if (startDate.HasValue )
+                    if (startDate.HasValue)
                         command.Parameters.AddWithValue("@StartDate", startDate.Value.ToString("yyyy-MM-dd"));
                     if (startTime.HasValue)
                         command.Parameters.AddWithValue("@StartTime", startTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -262,6 +292,13 @@ namespace CodingTracker.Data.QueryBuilders
                         command.Parameters.AddWithValue("@EndDate", endDate.Value.ToString("yyyy-MM-dd"));
                     if (endTime.HasValue)
                         command.Parameters.AddWithValue("@EndTime", endTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                    if (durationSeconds.HasValue)
+                        command.Parameters.AddWithValue("@DurationSeconds", durationSeconds.Value);
+                    if (!string.IsNullOrEmpty(durationHHMM))
+                        command.Parameters.AddWithValue("@DurationHHMM", durationHHMM);
+                    if (!string.IsNullOrEmpty(goalHHMM))
+                        command.Parameters.AddWithValue("@GoalHHMM", goalHHMM);
 
                     stopwatch.Stop();
                     _appLogger.Debug($"{nameof(SetCommandParametersForCodingSessions)} complete, TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds} ms");
@@ -274,6 +311,7 @@ namespace CodingTracker.Data.QueryBuilders
                 }
             }
         }
+
     }
-    }
+}
 

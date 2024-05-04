@@ -16,7 +16,7 @@ using System.Security.Cryptography;
 
 
 // resetPassword, updatePassword, rememberUser 
-namespace CodingTracker.Data.AuthenticationServices
+namespace CodingTracker.Common.IAuthenticationServices
 {
     public class AuthenticationService : IAuthenticationService
     {
@@ -49,7 +49,7 @@ namespace CodingTracker.Data.AuthenticationServices
                 try
                 {
                     List<UserCredentialDTO> credentials = _newDatabaseRead.ReadFromUserCredentialsTable(
-                            columnsToSelect: new List<string> { "PasswordHash" },
+                            columnsToSelect: new List<string> {"Username", "PasswordHash" },
                             username: username);
 
                     if(credentials.Any()) 
@@ -57,7 +57,14 @@ namespace CodingTracker.Data.AuthenticationServices
                         string storedHash = credentials.First().PasswordHash;
                         string inputHash = HashPassword(password);
 
+                        _appLogger.Debug($"storedHash = {storedHash}, inputHash = {inputHash}");
+
                         bool isValid = storedHash == inputHash;
+
+                        if (!isValid)
+                        {
+                            _appLogger.Info($"Password mismatch for {username}. StoredHash does not match input hash. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+                        }
 
                         stopwatch.Stop();
                         _appLogger.Info($"{nameof(AuthenticateLogin)} complete for {username} isValid: {isValid}, TraceID:{activity.TraceId}.");
