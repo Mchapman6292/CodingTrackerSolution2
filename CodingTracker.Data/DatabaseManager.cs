@@ -200,8 +200,8 @@ namespace CodingTracker.Data.DatabaseManagers
                 command.CommandText = @"
                     CREATE TABLE IF NOT EXISTS UserCredentials (
                         UserId INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Username TEXT NOT NULL UNIQUE,
-                        PasswordHash TEXT NOT NULL,
+                        Username TEXT,
+                        PasswordHash TEXT,
                         LastLogin DATETIME
                     );
 

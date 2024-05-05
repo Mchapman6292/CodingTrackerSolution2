@@ -20,7 +20,7 @@ namespace CodingTracker.View
 {
     public partial class LoginPage : Form
     {
-        private readonly IAuthenticationService _loginManager;
+        private readonly IAuthenticationService _authenticationService;
         private readonly IApplicationControl _appControl;
         private readonly IApplicationLogger _appLogger;
         private readonly ICredentialManager _credentialManager;
@@ -31,9 +31,9 @@ namespace CodingTracker.View
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(IAuthenticationService loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
+        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
         {
-            _loginManager = loginManager;
+            _authenticationService = authenticationService;
             _appControl = appControl;
             _appLogger = applogger;
             _credentialManager = credentialManager;
@@ -145,7 +145,7 @@ namespace CodingTracker.View
             string password = LoginPagePasswordTextbox.Text;
 
 
-            bool isValidLogin = _loginManager.AuthenticateLogin(username, password);
+            bool isValidLogin = _authenticationService.AuthenticateLogin(username, password);
 
             if (isValidLogin)
             {

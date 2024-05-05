@@ -53,7 +53,7 @@ namespace CodingTracker.Data.NewDatabaseReads
                 _appLogger.Info($"Starting {nameof(ReadFromUserCredentialsTable)}. TraceID: {activity.TraceId}");
 
                 _appLogger.Debug($"Parameters: UserId={userId}, Username={username}, PasswordHash={passwordHash}, " +
-                        $"LastLoginDate={lastLoginDate}, OrderBy={orderBy}, Ascending={ascending}, GroupBy={groupBy}, Limit={limit}");
+                        $"LastLoginDate={lastLoginDate}, OrderBy={orderBy}, Ascending={ascending}, GroupBy={groupBy}, Limit={limit}. TraceID: {activity.TraceId}");
 
                 try
                 {
@@ -94,37 +94,54 @@ namespace CodingTracker.Data.NewDatabaseReads
                 }
             }
 
+            foreach (var cred in userCredentials)
+            {
+                _appLogger.Info($"User Credential: UserId={cred.UserId}, Username={cred.Username}, PasswordHash={cred.PasswordHash}, LastLogin={cred.LastLogin}");
+            }
             return userCredentials;
         }
 
         private UserCredentialDTO ExtractUserCredentialFromReader(SQLiteDataReader reader)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
+
             using (var activity = new Activity(nameof(ExtractUserCredentialFromReader)).Start())
             {
                 _appLogger.Debug($"Starting {nameof(ExtractUserCredentialFromReader)}. TraceID: {activity.TraceId}");
 
                 try
                 {
-                    var dto = _userCredentialDTOManager.CreateUserCredentialDTO();
+                    var dto = new UserCredentialDTO();
 
                     int userIdIndex = reader.GetOrdinal("UserId");
                     int usernameIndex = reader.GetOrdinal("Username");
                     int passwordHashIndex = reader.GetOrdinal("PasswordHash");
                     int lastLoginIndex = reader.GetOrdinal("LastLogin");
 
-                    string dtoUsername = reader.IsDBNull(usernameIndex) ? "" : reader.GetString(usernameIndex); 
+                    string dtoUsername = reader.IsDBNull(usernameIndex) ? "" : reader.GetString(usernameIndex);
                     string dtoPasswordHash = reader.IsDBNull(passwordHashIndex) ? "" : reader.GetString(passwordHashIndex);
                     DateTime LastLogin = reader.IsDBNull(lastLoginIndex) ? DateTime.UtcNow : reader.GetDateTime(lastLoginIndex);
 
-                    _appLogger.Debug($"dtoUsername set {dtoUsername} passwordHash {dtoPasswordHash}.");
 
-                   
 
                     if (!reader.IsDBNull(userIdIndex))
                         dto.UserId = reader.GetInt32(userIdIndex);
+                    else
+                        _appLogger.Debug($"UserId from reader is null. TraceID: {activity.TraceId}");
+
+                    if (!reader.IsDBNull(usernameIndex))
+                        dto.Username = reader.GetString(usernameIndex);
+                    else
+                        _appLogger.Debug($"Username from reader is null. TraceID: {activity.TraceId}");
+                    if (!reader.IsDBNull(passwordHashIndex))
+                        dto.PasswordHash = reader.GetString(passwordHashIndex);
+
                     if (!reader.IsDBNull(lastLoginIndex))
-                        dto.LastLogin = reader.GetDateTime(lastLoginIndex); 
+                        dto.LastLogin = LastLogin;
+                    else
+                        _appLogger.Debug($"LastLogin from reader is null. TraceID: {activity.TraceId}");
+
+                    _appLogger.Debug($"dtoUsername set {dtoUsername}, passwordHash {dtoPasswordHash}.");
 
                     stopwatch.Stop();
                     _appLogger.Info($"{nameof(ExtractUserCredentialFromReader)} completed successfully. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
@@ -135,7 +152,7 @@ namespace CodingTracker.Data.NewDatabaseReads
                 {
                     stopwatch.Stop();
                     _appLogger.Error($"Error in {nameof(ExtractUserCredentialFromReader)}: {ex.Message}. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
-                    throw; 
+                    throw;
                 }
             }
         }
@@ -143,7 +160,10 @@ namespace CodingTracker.Data.NewDatabaseReads
 
 
 
-        public List<CodingSessionDTO> ReadFromCodingSessionsTable
+
+
+
+            public List<CodingSessionDTO> ReadFromCodingSessionsTable
                (
                    List<string> columnsToSelect,
                    int sessionId = 0,

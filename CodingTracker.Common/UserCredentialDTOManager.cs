@@ -22,8 +22,9 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
 
     public class UserCredentialDTOManager : IUserCredentialDTOManager
     {
+        public UserCredentialDTO _currentUserCredentialDTO;
+
         private readonly IApplicationLogger _appLogger;
-        private UserCredentialDTO _currentUserCredentialDTO;
         private int _currentUserId;
 
 
@@ -123,19 +124,47 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
         }
 
 
-        public void UpdateCurrentUserCredentialDTO(UserCredentialDTO userCredentialDTO)
+        public void UpdateCurrentUserCredentialDTO(UserCredentialDTO updatedUserCredentialDTO)
         {
-            using (var activity = new Activity(nameof(GetCurrentUserCredential)).Start())
+            using (var activity = new Activity(nameof(UpdateCurrentUserCredentialDTO)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(GetCurrentUserCredential)}. TraceID: {activity.TraceId}.");
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                _appLogger.Info($"Starting {nameof(UpdateCurrentUserCredentialDTO)}. TraceID: {activity.TraceId}");
 
+                if (_currentUserCredentialDTO == null)
                 {
-                    _currentUserCredentialDTO = userCredentialDTO;
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"currentUserCredentialDTO updated for Username: {userCredentialDTO.Username}, UserID {userCredentialDTO.UserId} Elapsed time: {stopwatch.ElapsedMilliseconds}.");
+                    _appLogger.Info("No current user credential DTO found. Creating new one.");
+                    _currentUserCredentialDTO = new UserCredentialDTO();
                 }
+
+                var updates = new List<(string Name, object Value)>();
+
+                if (_currentUserCredentialDTO.UserId != updatedUserCredentialDTO.UserId)
+                {
+                    _currentUserCredentialDTO.UserId = updatedUserCredentialDTO.UserId;
+                    updates.Add(("UserId", updatedUserCredentialDTO.UserId));
+                }
+                if (_currentUserCredentialDTO.Username != updatedUserCredentialDTO.Username)
+                {
+                    _currentUserCredentialDTO.Username = updatedUserCredentialDTO.Username;
+                    updates.Add(("Username", updatedUserCredentialDTO.Username));
+                }
+                if (_currentUserCredentialDTO.PasswordHash != updatedUserCredentialDTO.PasswordHash)
+                {
+                    _currentUserCredentialDTO.PasswordHash = updatedUserCredentialDTO.PasswordHash;
+                    updates.Add(("PasswordHash", updatedUserCredentialDTO.PasswordHash));
+                }
+                if (_currentUserCredentialDTO.LastLogin != updatedUserCredentialDTO.LastLogin)
+                {
+                    _currentUserCredentialDTO.LastLogin = updatedUserCredentialDTO.LastLogin;
+                    updates.Add(("LastLogin", updatedUserCredentialDTO.LastLogin));
+                }
+
+                foreach (var update in updates)
+                {
+                    _appLogger.Debug($"Updated {update.Name} to {update.Value}.");
+                }
+
+                _appLogger.Info($"Updated {nameof(UpdateCurrentUserCredentialDTO)} successfully. TraceID: {activity.TraceId}");
             }
         }
 

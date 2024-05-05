@@ -45,25 +45,41 @@ namespace CodingTracker.Common.IAuthenticationServices
             Stopwatch stopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(AuthenticateLogin)).Start())
             {
-
+                _appLogger.Debug($"Starting {nameof(AuthenticateLogin)} TraceId: {activity.TraceId}. ");
                 try
                 {
+                    _appLogger.Debug($"Hashing password for {username}. TraceId: {activity.TraceId}. ");
+                    var hashedPassword = HashPassword(password);  // Hash the input password
+                    _appLogger.Debug($"Password hash computed for {username}. TraceId: {activity.TraceId}. Hashed password = {hashedPassword} ");
+
                     List<UserCredentialDTO> credentials = _newDatabaseRead.ReadFromUserCredentialsTable(
-                            columnsToSelect: new List<string> {"Username", "PasswordHash" },
-                            username: username);
+                        columnsToSelect: new List<string> { "Username", "PasswordHash" },
+                        username: username,
+                        passwordHash: hashedPassword);
 
-                    if(credentials.Any()) 
+                    if (credentials.Any())
                     {
-                        string storedHash = credentials.First().PasswordHash;
-                        string inputHash = HashPassword(password);
+                        UserCredentialDTO currentCredentials = credentials.First<UserCredentialDTO>();
 
-                        _appLogger.Debug($"storedHash = {storedHash}, inputHash = {inputHash}");
+                        foreach (var credential in credentials)
+                        {
+                            if (credential.PasswordHash != null)
+                            {
+                                break;
+                            }
+                        }
 
-                        bool isValid = storedHash == inputHash;
+                        _appLogger.Debug($"Current credentials retrieved - Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}, UserId: {currentCredentials.UserId}, LastLogin: {currentCredentials.LastLogin}, TraceId: {activity.TraceId}");
+
+
+                        string? storedHash = currentCredentials.PasswordHash;
+
+                        _appLogger.Debug($"Current credentials retrieved - Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}, UserId: {currentCredentials.UserId}, LastLogin: {currentCredentials.LastLogin}, TraceId: {activity.TraceId}");
+                        bool isValid = storedHash == hashedPassword;  
 
                         if (!isValid)
                         {
-                            _appLogger.Info($"Password mismatch for {username}. StoredHash does not match input hash. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+                            _appLogger.Info($"Password mismatch for {username}. StoredHash does not match input hash. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                         }
 
                         stopwatch.Stop();
@@ -87,6 +103,7 @@ namespace CodingTracker.Common.IAuthenticationServices
                 }
             }
         }
+
 
 
 
