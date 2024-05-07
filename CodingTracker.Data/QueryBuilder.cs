@@ -269,7 +269,8 @@ namespace CodingTracker.Data.QueryBuilders
             DateTime? endTime = null,
             double? durationSeconds = null,
             string? durationHHMM = null,
-            string? goalHHMM = null
+            string? goalHHMM = null,
+            int goalReached = 0
         )
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -280,25 +281,57 @@ namespace CodingTracker.Data.QueryBuilders
                 try
                 {
                     if (sessionId > 0)
-                        command.Parameters.AddWithValue("@SessionId", sessionId);
+                    {
+                        command.Parameters.AddWithValue("@sessionId", sessionId);
+                        _appLogger.Debug($"Binding @sessionId with value: {sessionId}");
+                    }
                     if (userId > 0)
-                        command.Parameters.AddWithValue("@UserId", userId);
+                    {
+                        command.Parameters.AddWithValue("@userId", userId);
+                        _appLogger.Debug($"Binding @userId with value: {userId}");
+                    }
 
                     if (startDate.HasValue)
-                        command.Parameters.AddWithValue("@StartDate", startDate.Value.ToString("yyyy-MM-dd"));
+                    {
+                        command.Parameters.AddWithValue("@startDate", startDate.Value.ToString("yyyy-MM-dd"));
+                        _appLogger.Debug($"Binding @startDate with value: {startDate.Value.ToString("yyyy-MM-dd")}");
+                    }
                     if (startTime.HasValue)
-                        command.Parameters.AddWithValue("@StartTime", startTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                    {
+                        command.Parameters.AddWithValue("@startTime", startTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                        _appLogger.Debug($"Binding @startTime with value: {startTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
+                    }
                     if (endDate.HasValue)
-                        command.Parameters.AddWithValue("@EndDate", endDate.Value.ToString("yyyy-MM-dd"));
+                    {
+                        command.Parameters.AddWithValue("@endDate", endDate.Value.ToString("yyyy-MM-dd"));
+                        _appLogger.Debug($"Binding @endDate with value: {endDate.Value.ToString("yyyy-MM-dd")}");
+                    }
                     if (endTime.HasValue)
-                        command.Parameters.AddWithValue("@EndTime", endTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                    {
+                        command.Parameters.AddWithValue("@endTime", endTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+                        _appLogger.Debug($"Binding @endTime with value: {endTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
+                    }
 
                     if (durationSeconds.HasValue)
-                        command.Parameters.AddWithValue("@DurationSeconds", durationSeconds.Value);
+                    {
+                        command.Parameters.AddWithValue("@durationSeconds", durationSeconds.Value);
+                        _appLogger.Debug($"Binding @durationSeconds with value: {durationSeconds.Value}");
+                    }
                     if (!string.IsNullOrEmpty(durationHHMM))
-                        command.Parameters.AddWithValue("@DurationHHMM", durationHHMM);
+                    {
+                        command.Parameters.AddWithValue("@durationHHMM", durationHHMM);
+                        _appLogger.Debug($"Binding @durationHHMM with value: {durationHHMM}");
+                    }
                     if (!string.IsNullOrEmpty(goalHHMM))
-                        command.Parameters.AddWithValue("@GoalHHMM", goalHHMM);
+                    {
+                        command.Parameters.AddWithValue("@goalHHMM", goalHHMM);
+                        _appLogger.Debug($"Binding @goalHHMM with value: {goalHHMM}");
+                    }
+                    if (goalReached != 0)
+                    {
+                        command.Parameters.AddWithValue("@GoalReached", goalReached);
+                        _appLogger.Debug($"Binding @goalReached with value: {goalReached}");
+                    }
 
                     stopwatch.Stop();
                     _appLogger.Debug($"{nameof(SetCommandParametersForCodingSessions)} complete, TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds} ms");
@@ -311,6 +344,7 @@ namespace CodingTracker.Data.QueryBuilders
                 }
             }
         }
+
 
     }
 }

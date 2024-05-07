@@ -205,7 +205,7 @@ namespace CodingTracker.View
 
         private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
         {
-            _databaseManager.UpdateUserCredentialsTable();
+            _databaseManager.UpdateCodingSessionsTable();
         }
 
         private void LoginPageRememberMeToggle_CheckedChanged(object sender, EventArgs e)

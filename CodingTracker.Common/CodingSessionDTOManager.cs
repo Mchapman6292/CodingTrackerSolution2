@@ -13,13 +13,16 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
     {
         CodingSessionDTO CreateCodingSessionDTO();
         CodingSessionDTO GetCurrentSessionDTO();
+
+        void SetSessionStartDate();
         void SetSessionStartTime();
+        void SetSessionEndDate();
         void SetSessionEndTime();
         CodingSessionDTO GetOrCreateCurrentSessionDTO();
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
 
         string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
+        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null, DateTime? startTime = null, DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
         TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
@@ -130,6 +133,31 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             }
         }
 
+        public void SetSessionStartDate()
+        {
+            using (var activity = new Activity(nameof(SetSessionStartDate)).Start())
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                _appLogger.Info($"Starting {nameof(SetSessionStartDate)}. TraceID: {activity.TraceId}");
+
+                try
+                {
+                    DateTime startDate = DateTime.Today; // Use DateTime.Today to get the current date with the time component set to 00:00:00.
+                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, startDate: startDate);
+                    _appLogger.Info($"Start date set through UpdateCurrentSessionDTO, StartDate: {startDate}. Trace ID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during {nameof(SetSessionStartDate)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                }
+
+                stopwatch.Stop();
+
+                _appLogger.Info($"SetSessionStartDate completed in {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
+            }
+        }
+
         public void SetSessionStartTime()
         {
             using (var activity = new Activity(nameof(SetSessionStartTime)).Start())
@@ -154,6 +182,32 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 _appLogger.Info($"SetSessionStartTime completed in {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
             }
         }
+
+        public void SetSessionEndDate()
+        {
+            using (var activity = new Activity(nameof(SetSessionEndDate)).Start())
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                _appLogger.Info($"Starting {nameof(SetSessionEndDate)}. TraceID: {activity.TraceId}");
+
+                try
+                {
+                    DateTime endDate = DateTime.Today; // Using DateTime.Today to get the current date without the time part.
+                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, endDate: endDate);
+                    _appLogger.Info($"End date set through UpdateCurrentSessionDTO, EndDate: {endDate}. Trace ID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during {nameof(SetSessionEndDate)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                }
+
+                stopwatch.Stop();
+
+                _appLogger.Info($"SetSessionEndDate completed in {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
+            }
+        }
+
 
 
         public void SetSessionEndTime()
@@ -273,7 +327,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startTime = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
+        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null,  DateTime? startTime = null,  DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
         {
             using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
             {
@@ -288,9 +342,17 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 _currentSessionDTO.SessionId = sessionId;
                 _currentSessionDTO.UserId = userId;
 
+                if (startDate.HasValue) 
+                {
+                    _currentSessionDTO.StartDate = startDate.Value;
+                }
                 if (startTime.HasValue)
                 {
                     _currentSessionDTO.StartTime = startTime.Value;
+                }
+                if (endDate.HasValue) 
+                {
+                    _currentSessionDTO.EndDate = endDate.Value;
                 }
                 if (endTime.HasValue)
                 {
@@ -318,7 +380,9 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 updates.Add(("SessionId", (object)sessionId));
                 updates.Add(("UserId", (object)userId));
 
+                if (startDate.HasValue) updates.Add(("StartDate", (object)startDate));
                 if (startTime.HasValue) updates.Add(("StartTime", (object)startTime));
+                if (endDate.HasValue) updates.Add(("EndDate", ((object)endDate)));
                 if (endTime.HasValue) updates.Add(("EndTime", (object)endTime));
                 if (durationSeconds.HasValue) updates.Add(("DurationSeconds", (object)durationSeconds));
                 if (durationHHMM != null) updates.Add(("DurationHHMM", (object)durationHHMM));

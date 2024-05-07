@@ -71,7 +71,6 @@ namespace CodingTracker.Common.IAuthenticationServices
 
                         _appLogger.Debug($"Current credentials retrieved - Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}, UserId: {currentCredentials.UserId}, LastLogin: {currentCredentials.LastLogin}, TraceId: {activity.TraceId}");
 
-
                         string? storedHash = currentCredentials.PasswordHash;
 
                         _appLogger.Debug($"Current credentials retrieved - Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}, UserId: {currentCredentials.UserId}, LastLogin: {currentCredentials.LastLogin}, TraceId: {activity.TraceId}");

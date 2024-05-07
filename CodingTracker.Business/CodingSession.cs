@@ -74,6 +74,7 @@ namespace CodingTracker.Business.CodingSessions
 
                 isCodingSessionActive = true;
                 var sessionDto = _sessionDTOManager.CreateAndReturnCurrentSessionDTO();
+                _sessionDTOManager.SetSessionStartDate();
                 _sessionDTOManager.SetSessionStartTime();
                 _sessionTimer.StartCodingSessionTimer();
 
@@ -96,6 +97,7 @@ namespace CodingTracker.Business.CodingSessions
                 isCodingSessionActive = false;
 
                 _sessionTimer.EndCodingSessionTimer();
+                _sessionDTOManager.SetSessionEndDate();
                 _sessionDTOManager.SetSessionEndTime();
 
 
@@ -105,7 +107,7 @@ namespace CodingTracker.Business.CodingSessions
                 string durationHHMM = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(durationSeconds);
 
 
-                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartTime, currentSessionDTO.EndTime, durationSeconds, durationHHMM, goalHHMM);
+                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartDate,currentSessionDTO.StartTime, currentSessionDTO.EndDate,currentSessionDTO.EndTime, durationSeconds, durationHHMM, goalHHMM);
                 _databaseSessionInsert.InsertSession();
 
                 stopwatch.Stop();

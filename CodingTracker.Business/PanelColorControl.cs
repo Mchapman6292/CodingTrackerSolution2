@@ -108,7 +108,7 @@ namespace CodingTracker.Business.PanelColorControls
             using (new Activity(nameof(DetermineSessionColor))) { }
             if (!sessionDurationSeconds.HasValue || sessionDurationSeconds <= 0)
             {
-                return SessionColor.Blue;
+                return SessionColor.Green;
             }
             else if (sessionDurationSeconds < 3600) // Less than 60 minutes
             {

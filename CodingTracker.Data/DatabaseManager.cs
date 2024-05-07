@@ -208,8 +208,8 @@ namespace CodingTracker.Data.DatabaseManagers
                          CREATE TABLE IF NOT EXISTS CodingSessions (
                             SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
                             UserId INTEGER NOT NULL,
-                            StartDate DATE NOT NULL,
-                            StartTime DATETIME NOT NULL,
+                            StartDate DATE,
+                            StartTime DATETIME,
                             EndDate DATE,
                             EndTime DATETIME,
                             DurationSeconds REAL, 
@@ -280,8 +280,8 @@ namespace CodingTracker.Data.DatabaseManagers
                     CREATE TABLE CodingSessions (
                         SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
                         UserId INTEGER NOT NULL,
-                        StartDate DATE NOT NULL,
-                        StartTime DATETIME NOT NULL,
+                        StartDate DATE,
+                        StartTime DATETIME,
                         EndDate DATE,
                         EndTime DATETIME,
                         DurationSeconds REAL, 

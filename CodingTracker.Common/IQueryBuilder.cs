@@ -50,19 +50,20 @@ namespace CodingTracker.Common.IQueryBuilders
              int? limit = null
          );
 
-        public void SetCommandParametersForCodingSessions
-        (
-            SQLiteCommand command,
-            int sessionId = 0,
-            int userId = 0,
-            DateTime? startDate = null,
-            DateTime? startTime = null,
-            DateTime? endDate = null,
-            DateTime? endTime = null,
-            double? durationSeconds = null,
-            string? durationHHMM = null,
-            string? goalHHMM = null
-        );
+        void SetCommandParametersForCodingSessions
+           (
+               SQLiteCommand command,
+               int sessionId = 0,
+               int userId = 0,
+               DateTime? startDate = null,
+               DateTime? startTime = null,
+               DateTime? endDate = null,
+               DateTime? endTime = null,
+               double? durationSeconds = null,
+               string? durationHHMM = null,
+               string? goalHHMM = null,
+               int goalReached = 0
+           );
 
 
 
