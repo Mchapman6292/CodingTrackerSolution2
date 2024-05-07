@@ -3,7 +3,6 @@ using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormSwitchers;
-using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IDatabaseSessionReads;
 using System;
 using System.IO;
@@ -21,7 +20,7 @@ namespace CodingTracker.View
 {
     public partial class LoginPage : Form
     {
-        private readonly ILoginManager _loginManager;
+        private readonly IAuthenticationService _authenticationService;
         private readonly IApplicationControl _appControl;
         private readonly IApplicationLogger _appLogger;
         private readonly ICredentialManager _credentialManager;
@@ -32,9 +31,9 @@ namespace CodingTracker.View
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(ILoginManager loginManager, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
+        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
         {
-            _loginManager = loginManager;
+            _authenticationService = authenticationService;
             _appControl = appControl;
             _appLogger = applogger;
             _credentialManager = credentialManager;
@@ -145,9 +144,10 @@ namespace CodingTracker.View
             string username = loginPageUsernameTextbox.Text;
             string password = LoginPagePasswordTextbox.Text;
 
-            var loginCredentials = _loginManager.ValidateLogin(username, password);
 
-            if (loginCredentials != null)
+            bool isValidLogin = _authenticationService.AuthenticateLogin(username, password);
+
+            if (isValidLogin)
             {
                 if (LoginPageRememberMeToggle.Checked)
                 {
@@ -155,7 +155,7 @@ namespace CodingTracker.View
                     Properties.Settings.Default.Save();
                 }
 
-                this.Hide(); 
+                this.Hide();
                 _formSwitcher.SwitchToMainPage();
                 _appLogger.Info("User logged in successfully.");
             }
@@ -164,6 +164,7 @@ namespace CodingTracker.View
                 LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
             }
         }
+
 
         private void AccountCreatedSuccessfully(string message)
         {

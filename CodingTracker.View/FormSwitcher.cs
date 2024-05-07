@@ -10,7 +10,6 @@ namespace CodingTracker.View.FormSwitchers
         void SwitchToMainPage();
         void SwitchToCodingSessionPage();
         void SwitchToEditSessionPage();
-        void SwitchToSettingsPage();
         CreateAccountPage SwitchToCreateAccountPage();
         void SwitchToCodingSessionTimer();
     }
@@ -52,10 +51,6 @@ namespace CodingTracker.View.FormSwitchers
                 SwitchToForm(_formFactory.CreateEditSessionPage);
             }
 
-            public void SwitchToSettingsPage()
-            {
-                SwitchToForm(_formFactory.CreateSettingsPage);
-            }
 
 
             public CreateAccountPage SwitchToCreateAccountPage() // This is implemented to return an instance of CreateAccountPage so that the AccountCreatedCallback can be triggered. This allows for the Account Created message to be displayed on the LoginPage once a user account has been created. 

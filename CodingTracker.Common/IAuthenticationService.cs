@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace CodingTracker.Common.ILoginManagers
 {
-    public interface ILoginManager
+    public interface IAuthenticationService
     {
-        UserCredentialDTO ValidateLogin(string username, string password);
+        bool AuthenticateLogin(string username, string password);
+        UserCredentialDTO GetUserDetails(string username);
+
         void ResetPassword(string username, string newPassword);
 
+        string HashPassword(string password);
 
     }
 }

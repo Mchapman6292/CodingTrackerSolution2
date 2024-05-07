@@ -9,6 +9,8 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CodingTracker.Common.IErrorHandlers;
+using CodingTracker.Common.UserCredentialDTOManagers;
+using CodingTracker.Common.IQueryBuilders;
 
 
 // To do 
@@ -19,21 +21,30 @@ namespace CodingTracker.Data.DatabaseSessionReads
 {
     public class DatabaseSessionRead : IDatabaseSessionRead
     {
+        private readonly CodingSessionDTO _codingSessionDTO;
+        private readonly UserCredentialDTO _currentUserCredentialDTO;
+
         private readonly IDatabaseManager _databaseManager;
         private readonly IApplicationLogger _appLogger;
-        private readonly CodingSessionDTO _codingSessionDTO;
         private readonly IErrorHandler _errorHandler;
         private readonly ICredentialManager _credentialManager;
+        private readonly IQueryBuilder _queryBuilder;
+
+        private int _currentUserId;
 
 
 
-        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler, ICredentialManager credentialManager)
+
+        public DatabaseSessionRead(IDatabaseManager databaseManager, IApplicationLogger appLogger, IErrorHandler errorHandler, ICredentialManager credentialManager, IQueryBuilder queryBuilder)
         {
             _databaseManager = databaseManager;
             _appLogger = appLogger;
             _errorHandler = errorHandler;
             _credentialManager = credentialManager;
+            _queryBuilder = queryBuilder;
         }
+
+
 
 
         public List<double> ReadSessionDurationSeconds(int numberOfDays, bool readAll = false)
@@ -68,6 +79,10 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 {
                     while (reader.Read())
                     {
+                        if (reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
+                        {
+                            _appLogger.Error($"No DurationSeconds values found for ReadSessionDurationSeconds.");
+                        }
                         if (!reader.IsDBNull(reader.GetOrdinal("DurationSeconds")))
                         {
                             double durationSeconds = reader.GetDouble(reader.GetOrdinal("DurationSeconds"));
@@ -102,7 +117,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 }
                 else
                 {
-                   command.CommandText = @"
+                    command.CommandText = @"
                           SELECT 
                                   UserId, 
                                   Username,
@@ -128,37 +143,6 @@ namespace CodingTracker.Data.DatabaseSessionReads
                 }
             }, nameof(ReadUserCredentials));
             return userCredentialsList;
-        }
-
-
-
-
-        public int GetSessionIdWithMostRecentLogin()
-        {
-            int sessionId = 0;
-            _databaseManager.ExecuteDatabaseOperation(connection =>
-            {
-                using var command = new SQLiteCommand(@"
-                    SELECT
-                            SessionId
-                    FROM
-                            CodingSessions
-                    WHERE 
-                            EndTime IS NOT NULL
-                    ORDER BY
-                            EndTime DESC
-                    LIMIT 1",
-                    
-                    connection);
-
-                object result = command.ExecuteScalar(); 
-                if (result != null && result != DBNull.Value)
-                {
-                    sessionId = Convert.ToInt32(result);
-                }
-            }, nameof(GetSessionIdWithMostRecentLogin));
-
-            return sessionId;
         }
 
 
@@ -209,29 +193,35 @@ namespace CodingTracker.Data.DatabaseSessionReads
         }
 
 
-        public List<CodingSessionDTO> ViewSpecific(string chosenDate)
+        public List<CodingSessionDTO> ViewSpecific(DateTime chosenDate)
         {
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
+
+            int userId = ReturnCurrentUserId();
 
             _databaseManager.ExecuteDatabaseOperation(connection =>
             {
                 using var command = new SQLiteCommand(@"
                     SELECT
+                            UserId,
                             SessionId, 
                             StartTime, 
-                            EndTime 
-                    FROM 
-                            CodingSessions 
+                            EndTime,
+                            DurationSeconds REAL,
+                            DurationHHMM STRING,
+                            GoalHHMM STRING
+                    FROM
+                            CodingSessions
                     WHERE 
                             UserId = @UserId 
                     AND 
-                            Date = @Date
+                            StartTime = @Date
                 ORDER BY
-                            StartTime DESC", 
-                            
+                            StartTime DESC",
+
                             connection);
 
-                command.Parameters.AddWithValue("@UserId", _codingSessionDTO.UserId);
+                command.Parameters.AddWithValue("@UserId", userId); // Needs to be taken from usercredential 
                 command.Parameters.AddWithValue("@Date", chosenDate);
 
                 using (var reader = command.ExecuteReader())
@@ -240,9 +230,13 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     {
                         var session = new CodingSessionDTO
                         {
+                            UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
                             EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (double?)null : reader.GetDouble(reader.GetOrdinal("DurationSeconds")),
+                            DurationHHMM = reader.IsDBNull(reader.GetOrdinal("DurationHHMM")) ? null : reader.GetString(reader.GetOrdinal("DurationHHMM")),
+                            GoalHHMM = reader.IsDBNull(reader.GetOrdinal("GoalHHMM")) ? null : reader.GetString(reader.GetOrdinal("GoalHHMM"))
                         };
                         codingSessionList.Add(session);
                     }
@@ -256,7 +250,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
         public List<CodingSessionDTO> ViewRecentSession(int numberOfSessions)
         {
-            int userId = _credentialManager.GetUserIdWithMostRecentLogin();
+            int userId = GetUserIdWithMostRecentLogin();
             List<CodingSessionDTO> codingSessionList = new List<CodingSessionDTO>();
 
             _databaseManager.ExecuteDatabaseOperation(connection =>
@@ -318,7 +312,8 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     SELECT
                             SessionId, 
                             StartTime, 
-                            EndTime 
+                            EndTime,
+                            DurationSeconds
                     FROM 
                             CodingSessions 
                     WHERE 
@@ -336,7 +331,8 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         {
                             SessionId = reader.GetInt32(reader.GetOrdinal("SessionId")),
                             StartTime = reader.GetDateTime(reader.GetOrdinal("StartTime")),
-                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime"))
+                            EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndTime")),
+                            DurationSeconds = reader.IsDBNull(reader.GetOrdinal("DurationSeconds")) ? (double?)null : reader.GetDouble(reader.GetOrdinal("DurationSeconds"))
                         });
                     }
                 }
@@ -408,7 +404,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
                     AND
                             DATE(StartTime) <= DATE(@YearEndTime)
                 ORDER BY
-                            StartTime " 
+                            StartTime "
 
                             + order, connection);
 
@@ -469,7 +465,7 @@ namespace CodingTracker.Data.DatabaseSessionReads
 
 
 
-        public List<(DateTime Date, double TotalDurationSeconds)> ReadTotalSessionDurationByDay()
+        public List<(DateTime Date, double TotalDurationSeconds)> ReadDurationSecondsLast28Days()
         {
             List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = new List<(DateTime Date, double TotalDurationSeconds)>();
             _databaseManager.ExecuteDatabaseOperation(connection =>
@@ -498,10 +494,226 @@ namespace CodingTracker.Data.DatabaseSessionReads
                         dailyDurations.Add((sessionDay, totalDurationSeconds));
                     }
                 }
-            }, nameof(ReadTotalSessionDurationByDay));
+            }, nameof(ReadDurationSecondsLast28Days));
 
-            _appLogger.Info($"Summed DurationSeconds calculated from {DateTime.Now.AddDays(-29):yyyy-MM-dd} to {DateTime.Now.AddDays(-1):yyyy-MM-dd}.");
+            _appLogger.Info($" ReadDurationSecondsLast28Days StartDate: {DateTime.Now.AddDays(-29):yyyy-MM-dd}, EndDate: {DateTime.Now.AddDays(-1):yyyy-MM-dd}.");
             return dailyDurations;
         }
+
+        public int GetSessionIdWithMostRecentLogin()
+        {
+            using (var activity = new Activity(nameof(GetSessionIdWithMostRecentLogin)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetSessionIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                int sessionId = 0;
+
+                try
+                {
+                    _databaseManager.ExecuteDatabaseOperation(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                SELECT
+                        SessionId
+                FROM
+                        CodingSessions
+                WHERE 
+                        EndTime IS NOT NULL
+                ORDER BY
+                        EndTime DESC
+                LIMIT 1",
+                        connection);
+
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            sessionId = Convert.ToInt32(result);
+                        }
+                    }, nameof(GetSessionIdWithMostRecentLogin));
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An error occurred during {nameof(GetSessionIdWithMostRecentLogin)}. Error: {ex.Message}. TraceID: {activity.TraceId}, Elapsed time: {stopwatch.ElapsedMilliseconds}ms.", ex);
+                    throw;
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(GetSessionIdWithMostRecentLogin)} completed. Retrieved SessionId: {sessionId}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                return sessionId;
+            }
+        }
+
+
+
+        public int GetUserIdWithMostRecentLogin()
+        {
+            using (var activity = new Activity(nameof(GetUserIdWithMostRecentLogin)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetUserIdWithMostRecentLogin)}. TraceID: {activity.TraceId}");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                int userId = 0;
+
+                try
+                {
+                    _databaseManager.ExecuteDatabaseOperation(connection =>
+                    {
+                        using var command = new SQLiteCommand(@"
+                SELECT 
+                        UserId
+                FROM
+                        UserCredentials
+                WHERE
+                        LastLogin IS NOT NULL
+                ORDER BY
+                        LastLogin DESC
+                LIMIT
+                        1",
+                        connection);
+
+                        object result = command.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            userId = Convert.ToInt32(result);
+                        }
+                    }, nameof(GetUserIdWithMostRecentLogin));
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"An error occurred during {nameof(GetUserIdWithMostRecentLogin)}. Error: {ex.Message}. TraceID: {activity.TraceId}, Elapsed time: {stopwatch.ElapsedMilliseconds}ms.", ex);
+                    throw;
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(GetUserIdWithMostRecentLogin)} completed. Retrieved UserId: {userId}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                return userId;
+            }
+        }
+
+
+
+
+        public UserCredentialDTO ValidateLogin(string username, string password)
+        {
+            var lastLogin = string.Empty;
+            using (var activity = new Activity(nameof(ValidateLogin)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(ValidateLogin)}. TraceID: {activity.TraceId}, Username: {username}");
+                try
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+
+                    _appLogger.Debug($"Hashing password for {username}. TraceID: {activity.TraceId}");
+                    var hashedPassword = _credentialManager.HashPassword(password);
+                    _appLogger.Debug($"PasswordHash hashed for {username}. TraceID: {activity.TraceId}");
+
+                    UserCredentialDTO userCredential = null;
+
+                    _databaseManager.ExecuteCRUD(connection =>
+                    {
+                        using var command = connection.CreateCommand();
+                        command.CommandText = @"
+                                SELECT 
+                                        UserId, 
+                                        Username, 
+                                        PasswordHash,
+                                        LastLogin
+                                FROM 
+                                        UserCredentials
+                                WHERE 
+                                        Username = @Username";
+
+                        command.Parameters.AddWithValue("@Username", username);
+                        command.Parameters.AddWithValue("@PasswordHash", password);
+                        command.Parameters.AddWithValue("@LastLogin", lastLogin);
+
+                        _appLogger.Debug($"Executing database query for {username}. TraceID: {activity.TraceId}");
+
+
+                        using var reader = command.ExecuteReader();
+                        if (reader.Read())
+                        {
+                            _appLogger.Debug($"User record found for {username}. TraceID: {activity.TraceId}");
+
+                            var storedHash = reader["PasswordHash"].ToString();
+                            if (hashedPassword == storedHash)
+                            {
+                                _appLogger.Debug($"PasswordHash match for {username}. TraceID: {activity.TraceId}");
+
+                                userCredential = new UserCredentialDTO
+                                {
+                                    UserId = Convert.ToInt32(reader["UserId"]),
+                                    Username = reader["Username"].ToString(),
+                                    PasswordHash = password
+                                };
+                            }
+                            else
+                            {
+                                _appLogger.Info($"PasswordHash mismatch for {username}. TraceID: {activity.TraceId}");
+                            }
+                        }
+                        else
+                        {
+                            _appLogger.Info($"No user record found for {username}. TraceID: {activity.TraceId}");
+                        }
+                    });
+
+                    stopwatch.Stop();
+                    if (userCredential != null)
+                    {
+                        _appLogger.Info($"User {username} validated successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        AssignCurrentUserId(userCredential.UserId);
+                        _appLogger.Info($" UserId created in NewUserCredentialDTO {userCredential.UserId} assigned to _currentUserId property {_currentUserId}.");
+                    }
+                    else
+                    {
+                        _appLogger.Info($"User {username} validation failed. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    }
+
+                    return userCredential; // Returns null if no matching user 
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during {nameof(ValidateLogin)} for username {username}. Error: {ex.GetType().Name} - {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    return null;
+                }
+            }
+        }
+
+
+
+
+        public void AssignCurrentUserId(int? userId)
+        {
+            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+
+                _currentUserId = (int)userId;
+            }
+        }
+
+        public int ReturnCurrentUserId()
+        {
+            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+
+                if (_currentUserId == 0)
+                {
+                    _appLogger.Info($"CurrentUserId is 0 (default for not created.");
+                }
+                else
+                {
+                    return _currentUserId;
+                }
+                return _currentUserId;
+            }
+        }
+
+
+
+     
     }
 }

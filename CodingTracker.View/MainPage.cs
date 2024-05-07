@@ -8,7 +8,9 @@ using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Business.SessionCalculators;
+using CodingTracker.Common.CodingSessionDTOManagers;
 using Guna.UI2.WinForms;
+using System.Diagnostics;
 
 
 
@@ -20,35 +22,36 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
-        private readonly IDatabaseSessionRead _databaseRead;
+        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly ICodingSession _codingSession;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
+        private readonly ICodingSessionDTOManager _sessionDTOManager;
 
 
 
-        public MainPage(IApplicationLogger applogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher = null, ISessionCalculator sessionCalculator = null)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSessionDTOManager sessionDTOManager)
         {
             InitializeComponent();
-            _appLogger = applogger;
+            _appLogger = appLogger;
             _formController = formController;
             _panelColorControl = panelControl;
             _errorHandler = errorHandler;
-            _databaseRead = databaseRead;
+            _databaseSessionRead = databaseRead;
             _codingSession = codingSession;
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
             _sessionCalculator = sessionCalculator;
-
-
-
+            _sessionDTOManager = sessionDTOManager;
         }
 
         private void MainPage_Load(object sender, EventArgs e)
         {
             UpdateLabels(Last28DaysPanel);
             UpDateLast28Days(Last28DaysPanel);
+
+            UpdatedateTodaySessionLabel();
         }
 
         private void MainPageCodingSessionButton_Click(object sender, EventArgs e)
@@ -79,11 +82,6 @@ namespace CodingTracker.View
             _formSwitcher.SwitchToEditSessionPage();
         }
 
-        private void MainPageSettingsButton_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-            _formSwitcher.SwitchToSettingsPage();
-        }
 
 
         private void UpdateLabels(Panel parentPanel)
@@ -107,34 +105,47 @@ namespace CodingTracker.View
 
         private void UpDateLast28Days(Panel parentPanel)
         {
-            _appLogger.Debug("UpDateLast28Days method started.");
-            try
+            using (var activity = new Activity(nameof(UpDateLast28Days)))
             {
-                List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
-                List<double> sessionDurations = _databaseRead.ReadSessionDurationSeconds(28);
-                var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
-                for (int i = 0; i < last28Days.Count && i < gradientPanels.Count; i++)
+                _appLogger.Debug($"UpDateLast28Days method started. Trace ID: {activity.TraceId}.");
+                try
                 {
-                    double duration = sessionDurations.ElementAtOrDefault(i);
-                    SessionColor sessionColor = _panelColorControl.DetermineSessionColor(duration);
-                    Color color = _panelColorControl.ConvertSessionColorToColor(sessionColor);
+                    var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
+                    List<Color> panelColors = _panelColorControl.AssignColorsToSessionsInLast28Days();
 
-                    gradientPanels[i].BackColor = color;
-                    gradientPanels[i].Tag = last28Days[i].ToShortDateString();
-
-                    var label = gradientPanels[i].Controls.OfType<Label>().FirstOrDefault();
-                    if (label != null)
+                    for (int i = 0; i < panelColors.Count && i < gradientPanels.Count; i++)
                     {
-                        label.Text = last28Days[i].ToShortDateString();
+                        gradientPanels[i].BackColor = panelColors[i];
                     }
-
-                    _appLogger.Debug($"Panel {i}: Date {last28Days[i].ToShortDateString()}, Duration {duration}, SessionColor {sessionColor}, RGB ({color.R}, {color.G}, {color.B})");
+                    _appLogger.Debug("UpdateSessionPanels method completed successfully.");
                 }
-                _appLogger.Debug("UpDateLast28Days method completed successfully.");
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred in UpdateSessionPanels: {ex.Message}");
+                }
             }
-            catch (Exception ex)
+        }
+
+
+
+
+        private void UpdatedateTodaySessionLabel() 
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using(var activity = new Activity(nameof(UpdatedateTodaySessionLabel))) 
             {
-                _appLogger.Error($"An error occurred in UpDateLast28Days: {ex.Message}");
+                _appLogger.Info($"Starting {nameof(UpdatedateTodaySessionLabel)}, TraceID: {activity.TraceId}.");
+
+          
+
+                double todayDurationSecondsTotal = _sessionCalculator.CalculateTodayTotal();
+
+                string formattedTotal = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(todayDurationSecondsTotal);
+
+                TodaySessionLabel.Text = $"Todays total: {formattedTotal}";
+
+                stopwatch.Stop();
+                _appLogger.Info($"TodaySessionLabel updated, todays total: {formattedTotal}, Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
             }
         }
 

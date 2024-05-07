@@ -190,31 +190,78 @@ namespace CodingTracker.Data.DatabaseManagers
 
         public void CreateTableIfNotExists()
         {
-            using var command = _connection.CreateCommand();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(CreateTableIfNotExists)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(CreateTableIfNotExists)}. TraceID: {activity.TraceId}");
+                using var command = _connection.CreateCommand();
 
 
-            command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS UserCredentials (
-                    UserId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Username TEXT NOT NULL UNIQUE,
-                    PasswordHash TEXT NOT NULL,
-                    LastLogin DATETIME
-                );
+                command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS UserCredentials (
+                        UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Username TEXT,
+                        PasswordHash TEXT,
+                        LastLogin DATETIME
+                    );
 
-                CREATE TABLE IF NOT EXISTS CodingSessions (
-                    SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    UserId INTEGER NOT NULL,
-                    StartTime DATETIME NOT NULL,
-                    EndTime DATETIME,
-                    DurationSeconds REAL,
-                    DurationHHMM STRING,
-                    GoalHHMM STRING,
-                    GoalReached INTEGER,
-                    FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
-                );";
+                         CREATE TABLE IF NOT EXISTS CodingSessions (
+                            SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                            UserId INTEGER NOT NULL,
+                            StartDate DATE,
+                            StartTime DATETIME,
+                            EndDate DATE,
+                            EndTime DATETIME,
+                            DurationSeconds REAL, 
+                            DurationHHMM STRING,
+                            GoalHHMM STRING,
+                            GoalReached INTEGER,
+                            FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+                        
+                            );";
+                command.ExecuteNonQuery();
 
-            command.ExecuteNonQuery();
+                _appLogger.Info($"{nameof(CreateTableIfNotExists)} finished, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+            }
+           
         }
+
+        public List<string> GetTableColumns(string tableName)
+        {
+            List<string> columns = new List<string>();
+            using (var activity = new Activity(nameof(GetTableColumns)).Start())
+            {
+                _appLogger.Debug($"Starting {nameof(GetTableColumns)}. TraceID: {activity.TraceId}");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                try
+                {
+                    string query = $"PRAGMA table_info({tableName});";
+                    using (var command = new SQLiteCommand(query, _connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string columnName = reader["name"].ToString();
+                                columns.Add(columnName);
+                            }
+                        }
+                    }
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Retrieved column names for '{tableName}' successfully. Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Failed to retrieve column names for '{tableName}'. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+            }
+            return columns;
+        }
+
 
         public void UpdateCodingSessionsTable()
         {
@@ -233,7 +280,9 @@ namespace CodingTracker.Data.DatabaseManagers
                     CREATE TABLE CodingSessions (
                         SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
                         UserId INTEGER NOT NULL,
-                        StartTime DATETIME NOT NULL,
+                        StartDate DATE,
+                        StartTime DATETIME,
+                        EndDate DATE,
                         EndTime DATETIME,
                         DurationSeconds REAL, 
                         DurationHHMM STRING,

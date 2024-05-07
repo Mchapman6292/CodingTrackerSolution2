@@ -9,6 +9,7 @@ namespace CodingTracker.Common.IDatabaseSessionDeletes
 {
     public interface IDatabaseSessionDelete
     {
-        void DeleteSession(CodingSessionDTO codingSessionDTO);
+        void DeleteSession(List<int> sessionIds);
+        void DeleteCredentials(int userId);
     }
 }

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Common.INewDatabaseReads;
 using System.Drawing;
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Data.QueryBuilders;
 
 namespace CodingTracker.Business.PanelColorControls
 {
@@ -24,8 +26,8 @@ namespace CodingTracker.Business.PanelColorControls
     public interface IPanelColorControl
     {
 
-        List<SessionColor> AssignColorsToSessionsInLast28Days();
-        Color ConvertSessionColorToColor(SessionColor color);
+        List<Color> AssignColorsToSessionsInLast28Days();
+        Color ConvertSessionColorEnumToColor(SessionColor color);
 
         SessionColor DetermineSessionColor(double? sessionDurationSeconds);
     }
@@ -37,36 +39,56 @@ namespace CodingTracker.Business.PanelColorControls
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
         private readonly IDatabaseSessionRead _databaseSessionRead;
+        private readonly INewDatabaseRead _newDatabaseRead;
         private readonly List<(DateTime Day, double TotalDurationMinutes)> _dailyDurations;
         private readonly List<SessionColor> _sessionColors;
 
 
 
-        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, IDatabaseSessionRead databaseSessionRead)
+        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, IDatabaseSessionRead databaseSessionRead, INewDatabaseRead newDatabaseRead)
         {
             _appLogger = appLogger;
             _errorHandler = errorHandler;
             _databaseSessionRead = databaseSessionRead;
-            _dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
+            _dailyDurations = _databaseSessionRead.ReadDurationSecondsLast28Days();
+            _newDatabaseRead = newDatabaseRead;
         }
 
-        public List<SessionColor> AssignColorsToSessionsInLast28Days()
+        public List<Color> AssignColorsToSessionsInLast28Days()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(AssignColorsToSessionsInLast28Days)))
+            using (var activity = new Activity(nameof(AssignColorsToSessionsInLast28Days)).Start())
             {
                 _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
 
-                List<(DateTime Date, double TotalDurationSeconds)> dailyDurations = _databaseSessionRead.ReadTotalSessionDurationByDay();
-                List<SessionColor> sessionColors = new List<SessionColor>();
+                DateTime startDate = DateTime.Now.AddDays(-28);
+                DateTime endDate = DateTime.Now;
+                List<string> columnsToSelect = new List<string> { "SUM(DurationSeconds) as TotalDuration", "StartTime" };
+                string groupBy = "StartDate";
+                string orderBy = "StartTime";
 
+                List<CodingSessionDTO> aggregatedSessions = _newDatabaseRead.ReadFromCodingSessionsTable(
+                    columnsToSelect,
+                    startDate: startDate,
+                    endDate: endDate,
+                    groupBy: groupBy,
+                    orderBy: orderBy,
+                    ascending: true
+                );
 
-                foreach (var dayDuration in dailyDurations)
+                _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {aggregatedSessions}.");
+
+                List<Color> sessionColors = new List<Color>();
+                foreach (var session in aggregatedSessions)
                 {
-                    SessionColor color = DetermineSessionColor(dayDuration.TotalDurationSeconds);
+                    double totalDurationSeconds = session.DurationSeconds ?? 0; 
+                    DateTime? sessionDate = session.StartDate;  
+
+                    SessionColor colorEnum = DetermineSessionColor(totalDurationSeconds);
+                    Color color = ConvertSessionColorEnumToColor(colorEnum);
                     sessionColors.Add(color);
 
-                    _appLogger.Debug($"Assigned color for day: {dayDuration.Date.ToShortDateString()}, Duration Seconds: {dayDuration.TotalDurationSeconds}, Color: {color}.");
+                    _appLogger.Debug($"Assigned color for day: {sessionDate?.ToString("yyyy-MM-dd")}, DurationSeconds: {totalDurationSeconds}, Color: {color}.");
                 }
 
                 stopwatch.Stop();
@@ -80,12 +102,13 @@ namespace CodingTracker.Business.PanelColorControls
 
 
 
+
         public SessionColor DetermineSessionColor(double? sessionDurationSeconds)
         {
             using (new Activity(nameof(DetermineSessionColor))) { }
             if (!sessionDurationSeconds.HasValue || sessionDurationSeconds <= 0)
             {
-                return SessionColor.Blue;
+                return SessionColor.Green;
             }
             else if (sessionDurationSeconds < 3600) // Less than 60 minutes
             {
@@ -106,14 +129,14 @@ namespace CodingTracker.Business.PanelColorControls
         }
 
 
-        public Color ConvertSessionColorToColor(SessionColor color)
+        public Color ConvertSessionColorEnumToColor(SessionColor color)
         {
-            var activity = new Activity(nameof(ConvertSessionColorToColor)).Start();
+            var activity = new Activity(nameof(ConvertSessionColorEnumToColor)).Start();
             var stopwatch = Stopwatch.StartNew();
 
+            _appLogger.Debug($"Starting {nameof(ConvertSessionColorEnumToColor)} ceID: {activity.TraceId}");
             try
             {
-                _appLogger.Debug($"Getting color for SessionColor: {color}. TraceID: {activity.TraceId}");
 
                 Color result;
                 switch (color)

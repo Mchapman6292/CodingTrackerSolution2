@@ -111,13 +111,29 @@ namespace CodingTracker.Common.InputValidators
 
         public bool IsValidTimeFormatHHMM(string input)
         {
+            using(var activity = new Activity(nameof(IsValidTimeFormatHHMM)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(IsValidTimeFormatHHMM)} for {input}.");
+            }
             if (string.IsNullOrWhiteSpace(input))
             {
+                _appLogger.Error($"Input for {IsValidTimeFormatHHMM} is null or empty. Input: {input}.");
                 return false;
             }
 
             string pattern = @"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
-            return Regex.IsMatch(input, pattern);
+
+            bool isValid = Regex.IsMatch(input, pattern);
+            if (isValid)
+            {
+                _appLogger.Info($"Input {input} is a valid HH:MM format.");
+            }
+            else
+            {
+                _appLogger.Error($"Input {input} is not a valid HH:MM format.");
+            }
+
+            return isValid;
         }
 
         public int? ParseHHMMStringInputToInt(string input)

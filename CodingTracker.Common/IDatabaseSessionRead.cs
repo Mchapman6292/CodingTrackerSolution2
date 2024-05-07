@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentialDTOs;
 
 namespace CodingTracker.Common.IDatabaseSessionReads
@@ -15,11 +16,12 @@ namespace CodingTracker.Common.IDatabaseSessionReads
 
         List<UserCredentialDTO> ReadUserCredentials(bool returnLastLoggedIn);
 
-        List<(DateTime Date, double TotalDurationSeconds)> ReadTotalSessionDurationByDay();
+        List<(DateTime Date, double TotalDurationSeconds)> ReadDurationSecondsLast28Days();
+        int GetUserIdWithMostRecentLogin();
         int GetSessionIdWithMostRecentLogin();
 
         List<CodingSessionDTO> ViewAllSession(bool partialView = false);
-        List<CodingSessionDTO> ViewSpecific(string chosenDate);
+        List<CodingSessionDTO> ViewSpecific(DateTime chosenDate);
         List<CodingSessionDTO> ViewRecentSession(int numberOfSessions);
 
 
@@ -28,6 +30,7 @@ namespace CodingTracker.Common.IDatabaseSessionReads
         List<CodingSessionDTO> SelectAllSessionsForYear(string year, bool isDescending);
 
         void GetLast28DaysSessions();
+
 
 
     }

@@ -18,10 +18,9 @@ using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Data.CredentialManagers;
 using CodingTracker.Data.DatabaseManagers;
-using CodingTracker.Data.LoginManagers;
+using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
-using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.SessionGoalCountDownTimers;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
@@ -44,8 +43,13 @@ using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
-using CodingTracker.Common.SessionCalculators;
+using CodingTracker.Business.SessionCalculators;
 using CodingTracker.Common.DataTypeHelpers;
+using CodingTracker.Common.UserCredentialDTOManagers;
+using CodingTracker.Data.QueryBuilders;
+using CodingTracker.Common.IQueryBuilders;
+using CodingTracker.Data.NewDatabaseReads;
+using CodingTracker.Common.INewDatabaseReads;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -94,14 +98,17 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
+                    .AddSingleton<IApplicationLogger, ApplicationLogger>()
+                    .AddSingleton<IUserCredentialDTOManager, UserCredentialDTOManager>()
+                    .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IDatabaseSessionDelete, DatabaseSessionDelete>()
                     .AddSingleton<IDatabaseSessionInsert, DatabaseSessionInsert>()
                     .AddSingleton<IDatabaseSessionRead, DatabaseSessionRead>()
+                    .AddSingleton<INewDatabaseRead, NewDatabaseRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
-                    .AddSingleton<ILoginManager, LoginManager>()
-                    .AddSingleton<ICredentialManager, CredentialManager>()
-                    .AddSingleton<IApplicationLogger, ApplicationLogger>()
+                    .AddSingleton<IAuthenticationService, AuthenticationService>()
+                    .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
                     .AddSingleton<IFormController, FormController>()
@@ -114,8 +121,9 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
-                    .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()
+                    .AddSingleton<IQueryBuilder, QueryBuilder>()
+                    
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
@@ -124,7 +132,6 @@ namespace CodingTracker.View.Program
                     .AddTransient<CodingSessionPage>()
                     .AddTransient<EditSessionPage>()
                     .AddTransient<CodingSessionTimerForm>()
-                    .AddTransient<SettingsPage>()
                     .AddTransient<CreateAccountPage>();
 
             var startConfiguration = services.BuildServiceProvider()

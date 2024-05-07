@@ -30,8 +30,8 @@
         {
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditSessionPage));
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditSessionPage));
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -52,19 +52,19 @@
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
-            EditSessionPageBackButton = new Guna.UI2.WinForms.Guna2Button();
+            CodingSessionPageHomeButton = new Guna.UI2.WinForms.Guna2GradientButton();
             EditSessionPageComboBox = new Guna.UI2.WinForms.Guna2ComboBox();
             EditSessionPageSortByLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
             EditSessionPageSessionsLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
             EditSessionsPageSessionsLabel = new Guna.UI2.WinForms.Guna2HtmlLabel();
             MainPageExitControlMinimizeButton = new Guna.UI2.WinForms.Guna2ControlBox();
             MainPageExitControlBox = new Guna.UI2.WinForms.Guna2ControlBox();
-            EditSessionPageDeleteSessionButton = new Guna.UI2.WinForms.Guna2Button();
+            DeleteSessionButton = new Guna.UI2.WinForms.Guna2Button();
             EditSessionPageSaveButton = new Guna.UI2.WinForms.Guna2Button();
-            EditSessionPageEditSessionButton = new Guna.UI2.WinForms.Guna2Button();
+            EditSessionButton = new Guna.UI2.WinForms.Guna2Button();
             guna2Panel2 = new Guna.UI2.WinForms.Guna2Panel();
             EditSessionPageDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
-            DateColumn = new DataGridViewTextBoxColumn();
+            SessionId = new DataGridViewTextBoxColumn();
             GoalHHMM = new DataGridViewTextBoxColumn();
             DurationHHMM = new DataGridViewTextBoxColumn();
             StartTimeColumn = new DataGridViewTextBoxColumn();
@@ -77,7 +77,7 @@
             // 
             // guna2Panel1
             // 
-            guna2Panel1.Controls.Add(EditSessionPageBackButton);
+            guna2Panel1.Controls.Add(CodingSessionPageHomeButton);
             guna2Panel1.Controls.Add(EditSessionPageComboBox);
             guna2Panel1.Controls.Add(EditSessionPageSortByLabel);
             guna2Panel1.Controls.Add(EditSessionPageSessionsLabel);
@@ -92,23 +92,25 @@
             guna2Panel1.Size = new Size(1300, 75);
             guna2Panel1.TabIndex = 0;
             // 
-            // EditSessionPageBackButton
+            // CodingSessionPageHomeButton
             // 
-            EditSessionPageBackButton.BackgroundImage = (Image)resources.GetObject("EditSessionPageBackButton.BackgroundImage");
-            EditSessionPageBackButton.CustomizableEdges = customizableEdges1;
-            EditSessionPageBackButton.DisabledState.BorderColor = Color.DarkGray;
-            EditSessionPageBackButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            EditSessionPageBackButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            EditSessionPageBackButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            EditSessionPageBackButton.FillColor = Color.FromArgb(25, 24, 40);
-            EditSessionPageBackButton.Font = new Font("Segoe UI", 9F);
-            EditSessionPageBackButton.ForeColor = Color.White;
-            EditSessionPageBackButton.Location = new Point(1174, 0);
-            EditSessionPageBackButton.Name = "EditSessionPageBackButton";
-            EditSessionPageBackButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            EditSessionPageBackButton.Size = new Size(45, 29);
-            EditSessionPageBackButton.TabIndex = 32;
-            EditSessionPageBackButton.Click += EditSessionPageBackButton_Click;
+            CodingSessionPageHomeButton.CustomizableEdges = customizableEdges1;
+            CodingSessionPageHomeButton.DisabledState.BorderColor = Color.DarkGray;
+            CodingSessionPageHomeButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            CodingSessionPageHomeButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            CodingSessionPageHomeButton.DisabledState.FillColor2 = Color.FromArgb(169, 169, 169);
+            CodingSessionPageHomeButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            CodingSessionPageHomeButton.FillColor = Color.FromArgb(25, 24, 40);
+            CodingSessionPageHomeButton.FillColor2 = Color.FromArgb(25, 24, 40);
+            CodingSessionPageHomeButton.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageHomeButton.ForeColor = Color.White;
+            CodingSessionPageHomeButton.Image = (Image)resources.GetObject("CodingSessionPageHomeButton.Image");
+            CodingSessionPageHomeButton.Location = new Point(1175, 0);
+            CodingSessionPageHomeButton.Name = "CodingSessionPageHomeButton";
+            CodingSessionPageHomeButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
+            CodingSessionPageHomeButton.Size = new Size(45, 29);
+            CodingSessionPageHomeButton.TabIndex = 32;
+            CodingSessionPageHomeButton.Click += CodingSessionPageHomeButton_Click;
             // 
             // EditSessionPageComboBox
             // 
@@ -195,26 +197,28 @@
             MainPageExitControlBox.Size = new Size(45, 29);
             MainPageExitControlBox.TabIndex = 26;
             // 
-            // EditSessionPageDeleteSessionButton
+            // DeleteSessionButton
             // 
-            EditSessionPageDeleteSessionButton.Animated = true;
-            EditSessionPageDeleteSessionButton.AutoRoundedCorners = true;
-            EditSessionPageDeleteSessionButton.BorderRadius = 15;
-            EditSessionPageDeleteSessionButton.BorderThickness = 2;
-            EditSessionPageDeleteSessionButton.CustomizableEdges = customizableEdges11;
-            EditSessionPageDeleteSessionButton.DisabledState.BorderColor = Color.DarkGray;
-            EditSessionPageDeleteSessionButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            EditSessionPageDeleteSessionButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            EditSessionPageDeleteSessionButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            EditSessionPageDeleteSessionButton.FillColor = Color.FromArgb(193, 20, 137);
-            EditSessionPageDeleteSessionButton.Font = new Font("Segoe UI", 9F);
-            EditSessionPageDeleteSessionButton.ForeColor = Color.White;
-            EditSessionPageDeleteSessionButton.Location = new Point(1032, 590);
-            EditSessionPageDeleteSessionButton.Name = "EditSessionPageDeleteSessionButton";
-            EditSessionPageDeleteSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges12;
-            EditSessionPageDeleteSessionButton.Size = new Size(105, 33);
-            EditSessionPageDeleteSessionButton.TabIndex = 21;
-            EditSessionPageDeleteSessionButton.Text = "Delete Session";
+            DeleteSessionButton.Animated = true;
+            DeleteSessionButton.AutoRoundedCorners = true;
+            DeleteSessionButton.BorderRadius = 15;
+            DeleteSessionButton.BorderThickness = 2;
+            DeleteSessionButton.CustomizableEdges = customizableEdges11;
+            DeleteSessionButton.DisabledState.BorderColor = Color.DarkGray;
+            DeleteSessionButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            DeleteSessionButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            DeleteSessionButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            DeleteSessionButton.FillColor = Color.FromArgb(193, 20, 137);
+            DeleteSessionButton.Font = new Font("Segoe UI", 9F);
+            DeleteSessionButton.ForeColor = Color.White;
+            DeleteSessionButton.Location = new Point(1032, 590);
+            DeleteSessionButton.Name = "DeleteSessionButton";
+            DeleteSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges12;
+            DeleteSessionButton.Size = new Size(105, 33);
+            DeleteSessionButton.TabIndex = 21;
+            DeleteSessionButton.Text = "Delete Session";
+            DeleteSessionButton.Visible = false;
+            DeleteSessionButton.Click += DeleteSessionButton_Click;
             // 
             // EditSessionPageSaveButton
             // 
@@ -237,34 +241,34 @@
             EditSessionPageSaveButton.TabIndex = 21;
             EditSessionPageSaveButton.Text = "Save";
             // 
-            // EditSessionPageEditSessionButton
+            // EditSessionButton
             // 
-            EditSessionPageEditSessionButton.Animated = true;
-            EditSessionPageEditSessionButton.AutoRoundedCorners = true;
-            EditSessionPageEditSessionButton.BorderRadius = 15;
-            EditSessionPageEditSessionButton.BorderThickness = 2;
-            EditSessionPageEditSessionButton.CustomizableEdges = customizableEdges15;
-            EditSessionPageEditSessionButton.DisabledState.BorderColor = Color.DarkGray;
-            EditSessionPageEditSessionButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            EditSessionPageEditSessionButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            EditSessionPageEditSessionButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            EditSessionPageEditSessionButton.FillColor = Color.FromArgb(193, 20, 137);
-            EditSessionPageEditSessionButton.Font = new Font("Segoe UI", 9F);
-            EditSessionPageEditSessionButton.ForeColor = Color.White;
-            EditSessionPageEditSessionButton.Location = new Point(905, 590);
-            EditSessionPageEditSessionButton.Name = "EditSessionPageEditSessionButton";
-            EditSessionPageEditSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges16;
-            EditSessionPageEditSessionButton.Size = new Size(105, 33);
-            EditSessionPageEditSessionButton.TabIndex = 20;
-            EditSessionPageEditSessionButton.Text = "Edit Session";
-            EditSessionPageEditSessionButton.Click += EditSessionPageEditSessionButton_Click;
+            EditSessionButton.Animated = true;
+            EditSessionButton.AutoRoundedCorners = true;
+            EditSessionButton.BorderRadius = 15;
+            EditSessionButton.BorderThickness = 2;
+            EditSessionButton.CustomizableEdges = customizableEdges15;
+            EditSessionButton.DisabledState.BorderColor = Color.DarkGray;
+            EditSessionButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            EditSessionButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            EditSessionButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            EditSessionButton.FillColor = Color.FromArgb(193, 20, 137);
+            EditSessionButton.Font = new Font("Segoe UI", 9F);
+            EditSessionButton.ForeColor = Color.White;
+            EditSessionButton.Location = new Point(905, 590);
+            EditSessionButton.Name = "EditSessionButton";
+            EditSessionButton.ShadowDecoration.CustomizableEdges = customizableEdges16;
+            EditSessionButton.Size = new Size(105, 33);
+            EditSessionButton.TabIndex = 20;
+            EditSessionButton.Text = "Edit Session";
+            EditSessionButton.Click += EditSessionButton_Click;
             // 
             // guna2Panel2
             // 
             guna2Panel2.Controls.Add(EditSessionPageDataGridView);
-            guna2Panel2.Controls.Add(EditSessionPageDeleteSessionButton);
+            guna2Panel2.Controls.Add(DeleteSessionButton);
             guna2Panel2.Controls.Add(EditSessionPageSaveButton);
-            guna2Panel2.Controls.Add(EditSessionPageEditSessionButton);
+            guna2Panel2.Controls.Add(EditSessionButton);
             guna2Panel2.CustomizableEdges = customizableEdges17;
             guna2Panel2.Dock = DockStyle.Bottom;
             guna2Panel2.Location = new Point(0, 81);
@@ -293,7 +297,7 @@
             EditSessionPageDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             EditSessionPageDataGridView.ColumnHeadersHeight = 40;
             EditSessionPageDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            EditSessionPageDataGridView.Columns.AddRange(new DataGridViewColumn[] { DateColumn, GoalHHMM, DurationHHMM, StartTimeColumn, EndTimeColumn, GoalReached });
+            EditSessionPageDataGridView.Columns.AddRange(new DataGridViewColumn[] { SessionId, GoalHHMM, DurationHHMM, StartTimeColumn, EndTimeColumn, GoalReached });
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = Color.FromArgb(37, 46, 81);
             dataGridViewCellStyle3.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -339,12 +343,13 @@
             EditSessionPageDataGridView.ThemeStyle.RowsStyle.Height = 40;
             EditSessionPageDataGridView.ThemeStyle.RowsStyle.SelectionBackColor = Color.FromArgb(231, 229, 255);
             EditSessionPageDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = Color.FromArgb(71, 69, 94);
+            EditSessionPageDataGridView.CellClick += EditModeDataGridView_CellClick;
             // 
-            // DateColumn
+            // SessionId
             // 
-            DateColumn.FillWeight = 101.522842F;
-            DateColumn.HeaderText = "SessionId";
-            DateColumn.Name = "DateColumn";
+            SessionId.FillWeight = 101.522842F;
+            SessionId.HeaderText = "SessionId";
+            SessionId.Name = "SessionId";
             // 
             // GoalHHMM
             // 
@@ -397,16 +402,16 @@
         private Guna.UI2.WinForms.Guna2ControlBox MainPageExitControlBox;
         private Guna.UI2.WinForms.Guna2ControlBox MainPageExitControlMinimizeButton;
         private Guna.UI2.WinForms.Guna2Panel guna2Panel2;
-        private Guna.UI2.WinForms.Guna2Button EditSessionPageEditSessionButton;
-        private Guna.UI2.WinForms.Guna2Button EditSessionPageDeleteSessionButton;
+        private Guna.UI2.WinForms.Guna2Button EditSessionButton;
+        private Guna.UI2.WinForms.Guna2Button DeleteSessionButton;
         private Guna.UI2.WinForms.Guna2DataGridView EditSessionPageDataGridView;
         private Guna.UI2.WinForms.Guna2HtmlLabel EditSessionsPageSessionsLabel;
         private Guna.UI2.WinForms.Guna2HtmlLabel EditSessionPageSortByLabel;
         private Guna.UI2.WinForms.Guna2HtmlLabel EditSessionPageSessionsLabel;
         private Guna.UI2.WinForms.Guna2ComboBox EditSessionPageComboBox;
         private Guna.UI2.WinForms.Guna2Button EditSessionPageSaveButton;
-        private Guna.UI2.WinForms.Guna2Button EditSessionPageBackButton;
-        private DataGridViewTextBoxColumn DateColumn;
+        private Guna.UI2.WinForms.Guna2GradientButton CodingSessionPageHomeButton;
+        private DataGridViewTextBoxColumn SessionId;
         private DataGridViewTextBoxColumn GoalHHMM;
         private DataGridViewTextBoxColumn DurationHHMM;
         private DataGridViewTextBoxColumn StartTimeColumn;
