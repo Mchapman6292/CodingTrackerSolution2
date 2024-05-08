@@ -145,6 +145,7 @@ namespace CodingTracker.Data.NewDatabaseReads
         public List<CodingSessionDTO> ReadFromCodingSessionsTable
         (
             List<string> columnsToSelect,
+            string sqlCommand,
             int sessionId = 0,
             int userId = 0,
             DateTime? startDate = null,
@@ -177,7 +178,7 @@ namespace CodingTracker.Data.NewDatabaseReads
                 {
                     _databaseManager.ExecuteDatabaseOperation(connection =>
                     {
-                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect, sessionId, userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached);
+                        string commandText = _queryBuilder.CreateCommandTextForCodingSessions(columnsToSelect, sqlCommand, sessionId, userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached);
                         using (var command = new SQLiteCommand(commandText, connection)) // Uses the text created by CreatecommandText to generate a new command object.
                         {
                             _queryBuilder.SetCommandParametersForCodingSessions(command, sessionId, userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached);

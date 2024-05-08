@@ -21,6 +21,7 @@ namespace CodingTracker.Common.IQueryBuilders
             string? groupBy = null,
             int? limit = null
         );
+
         void SetCommandParametersForUserCredentials
          (
            SQLiteCommand command,
@@ -31,24 +32,25 @@ namespace CodingTracker.Common.IQueryBuilders
          );
 
         public string CreateCommandTextForCodingSessions
-         (
-             List<string> columnsToSelect,
-             int sessionId = 0,
-             int userId = 0,
-             DateTime? startDate = null,
-             DateTime? startTime = null,
-             DateTime? endDate = null,
-             DateTime? endTime = null,
-             double? durationSeconds = 0,
-             string? durationHHMM = null,
-             string? goalHHMM = null,
-             int goalReached = 0,
-             string? orderBy = null,
-             bool ascending = true,
-             string? groupBy = null,
-             string? sumColumn = null,
-             int? limit = null
-         );
+        (
+            List<string> columnsToSelect,
+            string sqlCommand,
+            int sessionId = 0,
+            int userId = 0,
+            DateTime? startDate = null,
+            DateTime? startTime = null,
+            DateTime? endDate = null,
+            DateTime? endTime = null,
+            double? durationSeconds = 0,
+            string? durationHHMM = null,
+            string? goalHHMM = null,
+            int goalReached = 0,
+            string? orderBy = null,
+            bool ascending = true,
+            string? groupBy = null,
+            string? sumColumn = null,
+            int? limit = null
+        );
 
         void SetCommandParametersForCodingSessions
            (

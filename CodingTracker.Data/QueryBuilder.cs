@@ -1,4 +1,6 @@
-﻿using CodingTracker.Common.IApplicationLoggers;
+﻿// Ignore Spelling: sql
+
+using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IQueryBuilders;
 using System.Data.SQLite;
@@ -18,7 +20,7 @@ namespace CodingTracker.Data.QueryBuilders
             _appLogger = appLogger;
         }
 
-        // Method to construct SQL command, parameters represent table columns & SQL commands.
+        // Method to construct SQL command, parameters represent table commandColumns & SQL commands.
         // Parameters for this method represent various SQL commands, e.g orderBy = ORDER BY.
         // Column names are capitalized while query parameters use @ & lower case. Ex UserId = column name, @userId = query parameter.
         public string CreateCommandTextForUserCredentials
@@ -37,6 +39,10 @@ namespace CodingTracker.Data.QueryBuilders
             using (var activity = new Activity(nameof(CreateCommandTextForUserCredentials)).Start())
             {
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForUserCredentials)}, TraceID: {activity.TraceId}");
+
+                var validCommands = new HashSet<string> { "SELECT", "INSERT", "UPDATE", "DELETE" };
+
+  
 
                 // Checking that orderBy and groupBy parameters are valid column names. 
                 var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin" };
@@ -152,6 +158,7 @@ namespace CodingTracker.Data.QueryBuilders
         public string CreateCommandTextForCodingSessions
         (
             List<string> columnsToSelect,
+            string sqlCommand,
             int sessionId = 0,
             int userId = 0,
             DateTime? startDate = null,
@@ -175,9 +182,21 @@ namespace CodingTracker.Data.QueryBuilders
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForCodingSessions)}, TraceID: {activity.TraceId}");
 
 
+                // sql command checks
+                var validCommands = new HashSet<string> { "SELECT", "INSERT", "UPDATE", "DELETE" };
+
+                if (!validCommands.Contains(sqlCommand.ToUpper()))
+                {
+                    _appLogger.Error($"Invalid SQL command for {nameof(CreateCommandTextForUserCredentials)}. sqlCommand = {sqlCommand}.");
+                    throw new ArgumentException("Invalid SQL command specified.", nameof(sqlCommand));
+                }
+                // valid commandColumns checks
                 var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached." };
 
-                // Checks that valid columns are selected.
+                if (!columnsToSelect.All(col => validColumns.Contains(col)))
+                    throw new ArgumentException("Invalid column(s) specified.", nameof(columnsToSelect));
+
+       
                 if (orderBy != null && !validColumns.Contains(orderBy))
                     throw new ArgumentException("Invalid orderBy column.");
 
@@ -187,6 +206,28 @@ namespace CodingTracker.Data.QueryBuilders
                 if (columnsToSelect == null || columnsToSelect.Count == 0)
                     throw new ArgumentException("At least one column must be specified.", nameof(columnsToSelect));
 
+                var sql = new StringBuilder();
+
+                // switch for sql command
+                switch (sqlCommand)
+                {
+                    case "SELECT":
+                        string commandColumns = string.Join(", ", columnsToSelect);
+                        sql.Append($"SELECT {commandColumns} FROM CodingSessions");
+                        break;
+                    case "INSERT":
+                        sql.Append($"INSERT INTO CodingSessions ({string.Join(", ", columnsToSelect)}) VALUES ({string.Join(", ", columnsToSelect.Select(col => $"@{col}"))})");
+                        break;
+                    case "UPDATE":
+                        sql.Append("UPDATE CodingSessions SET ");
+                        sql.Append(string.Join(", ", columnsToSelect.Select(col => $"{col} = @{col}")));
+                        if (sessionId > 0 || userId > 0) // Using conditions to restrict the update, this part will be detailed in the next section.
+                            sql.Append(" WHERE ");
+                        break;
+                    case "DELETE":
+                        sql.Append("DELETE FROM CodingSessions");
+                        break;
+                }
 
                 try
                 {
@@ -211,27 +252,23 @@ namespace CodingTracker.Data.QueryBuilders
                         conditions.Add("DurationHHMM = @durationHHMM");
                     if (!string.IsNullOrEmpty(goalHHMM))
                         conditions.Add("GoalHHMM = @goalHHMM");
-                    if (sumColumn != null)
-                        conditions.Append($"DATE(StartDate), SUM({sumColumn}) AS Total{sumColumn}");
 
 
                     string columns = string.Join(", ", columnsToSelect);
                     if (!string.IsNullOrEmpty(sumColumn))
                     {
-                        columns = $"SUM({sumColumn}) AS Total{sumColumn}";
+                        columns = $"SUM({sumColumn}) AS Total{sumColumn}";  
                         if (!string.IsNullOrEmpty(groupBy))
                         {
                             columns += $", {groupBy}";
                         }
                     }
-
-
-                    // Constructs the full query, begins with SELECT & adds WHERE if there are any conditions.
-                    var sql = new StringBuilder($"SELECT {columns} FROM CodingSessions ");
-
                     if (conditions.Count > 0)
                     {
-                        sql.Append(" WHERE " + (conditions.Count > 1 ? "1=1 AND " : "") + string.Join(" AND ", conditions));
+                        if (sqlCommand != "INSERT" && sqlCommand != "DELETE")
+                        {
+                            sql.Append(" WHERE " + (conditions.Count > 1 ? "1=1 AND " : "") + string.Join(" AND ", conditions));
+                        }
                     }
 
 

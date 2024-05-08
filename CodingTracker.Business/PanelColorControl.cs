@@ -61,6 +61,7 @@ namespace CodingTracker.Business.PanelColorControls
             {
                 _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
 
+                string selectCommand = "SELECT";
                 DateTime startDate = DateTime.Now.AddDays(-28);
                 DateTime endDate = DateTime.Now;
                 List<string> columnsToSelect = new List<string> { "SUM(DurationSeconds) as TotalDuration", "StartTime" };
@@ -69,6 +70,7 @@ namespace CodingTracker.Business.PanelColorControls
 
                 List<CodingSessionDTO> aggregatedSessions = _newDatabaseRead.ReadFromCodingSessionsTable(
                     columnsToSelect,
+                    sqlCommand: selectCommand,
                     startDate: startDate,
                     endDate: endDate,
                     groupBy: groupBy,
