@@ -83,7 +83,7 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
 
                     _currentUserCredentialDTO = userCredentialDTO;
                     stopwatch.Stop();
-                    _appLogger.Info($"{nameof(SetCurrentUserCredential)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                    _appLogger.Info($"{nameof(SetCurrentUserCredential)} completed successfully. userId: {userCredentialDTO.UserId}, Username:{userCredentialDTO.Username}, PasswordHash: {userCredentialDTO.PasswordHash}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
                 }
                 catch (Exception ex)
                 {
@@ -124,6 +124,7 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
         }
 
 
+
         public void UpdateCurrentUserCredentialDTO(UserCredentialDTO updatedUserCredentialDTO)
         {
             using (var activity = new Activity(nameof(UpdateCurrentUserCredentialDTO)).Start())
@@ -141,7 +142,7 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
                 if (_currentUserCredentialDTO.UserId != updatedUserCredentialDTO.UserId)
                 {
                     _currentUserCredentialDTO.UserId = updatedUserCredentialDTO.UserId;
-                    updates.Add(("UserId", updatedUserCredentialDTO.UserId));
+                    updates.Add(("userId", updatedUserCredentialDTO.UserId));
                 }
                 if (_currentUserCredentialDTO.Username != updatedUserCredentialDTO.Username)
                 {

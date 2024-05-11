@@ -345,38 +345,38 @@
             EditSessionPageDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = Color.FromArgb(71, 69, 94);
             EditSessionPageDataGridView.CellClick += EditModeDataGridView_CellClick;
             // 
-            // SessionId
+            // sessionId
             // 
             SessionId.FillWeight = 101.522842F;
-            SessionId.HeaderText = "SessionId";
-            SessionId.Name = "SessionId";
+            SessionId.HeaderText = "sessionId";
+            SessionId.Name = "sessionId";
             // 
-            // GoalHHMM
+            // goalHHMM
             // 
-            GoalHHMM.HeaderText = "GoalHHMM";
-            GoalHHMM.Name = "GoalHHMM";
+            GoalHHMM.HeaderText = "goalHHMM";
+            GoalHHMM.Name = "goalHHMM";
             // 
-            // DurationHHMM
+            // durationHHMM
             // 
-            DurationHHMM.HeaderText = "DurationHHMM";
-            DurationHHMM.Name = "DurationHHMM";
+            DurationHHMM.HeaderText = "durationHHMM";
+            DurationHHMM.Name = "durationHHMM";
             // 
             // StartTimeColumn
             // 
             StartTimeColumn.FillWeight = 99.4923859F;
-            StartTimeColumn.HeaderText = "StartTime";
+            StartTimeColumn.HeaderText = "startTime";
             StartTimeColumn.Name = "StartTimeColumn";
             // 
             // EndTimeColumn
             // 
             EndTimeColumn.FillWeight = 99.4923859F;
-            EndTimeColumn.HeaderText = "EndTime";
+            EndTimeColumn.HeaderText = "endTime";
             EndTimeColumn.Name = "EndTimeColumn";
             // 
-            // GoalReached
+            // goalReached
             // 
             GoalReached.HeaderText = "Achieved goal";
-            GoalReached.Name = "GoalReached";
+            GoalReached.Name = "goalReached";
             // 
             // EditSessionPage
             // 

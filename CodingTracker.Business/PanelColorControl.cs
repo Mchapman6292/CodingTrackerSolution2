@@ -64,11 +64,11 @@ namespace CodingTracker.Business.PanelColorControls
                 string selectCommand = "SELECT";
                 DateTime startDate = DateTime.Now.AddDays(-28);
                 DateTime endDate = DateTime.Now;
-                List<string> columnsToSelect = new List<string> { "SUM(DurationSeconds) as TotalDuration", "StartTime" };
-                string groupBy = "StartDate";
-                string orderBy = "StartTime";
+                List<string> columnsToSelect = new List<string> { "SUM(durationSeconds) as TotalDuration", "startTime" };
+                string groupBy = "startDate";
+                string orderBy = "startTime";
 
-                List<CodingSessionDTO> aggregatedSessions = _newDatabaseRead.ReadFromCodingSessionsTable(
+                List<CodingSessionDTO> aggregatedSessions = _newDatabaseRead.HandleCodingSessionsTableOperations(
                     columnsToSelect,
                     sqlCommand: selectCommand,
                     startDate: startDate,
@@ -78,19 +78,19 @@ namespace CodingTracker.Business.PanelColorControls
                     ascending: true
                 );
 
-                _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {aggregatedSessions}.");
+                _appLogger.Debug($"Sessions returned by HandleCodingSessionsTableOperations for {nameof(AssignColorsToSessionsInLast28Days)}: {aggregatedSessions}.");
 
                 List<Color> sessionColors = new List<Color>();
                 foreach (var session in aggregatedSessions)
                 {
-                    double totalDurationSeconds = session.DurationSeconds ?? 0; 
-                    DateTime? sessionDate = session.StartDate;  
+                    double totalDurationSeconds = session.durationSeconds ?? 0; 
+                    DateTime? sessionDate = session.startDate;  
 
                     SessionColor colorEnum = DetermineSessionColor(totalDurationSeconds);
                     Color color = ConvertSessionColorEnumToColor(colorEnum);
                     sessionColors.Add(color);
 
-                    _appLogger.Debug($"Assigned color for day: {sessionDate?.ToString("yyyy-MM-dd")}, DurationSeconds: {totalDurationSeconds}, Color: {color}.");
+                    _appLogger.Debug($"Assigned color for day: {sessionDate?.ToString("yyyy-MM-dd")}, durationSeconds: {totalDurationSeconds}, Color: {color}.");
                 }
 
                 stopwatch.Stop();

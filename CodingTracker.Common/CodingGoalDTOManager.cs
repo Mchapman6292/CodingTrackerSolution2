@@ -13,6 +13,8 @@ namespace CodingTracker.Common.CodingGoalDTOManagers
         int ReturnCodingGoalTotalMinutes();
         string FormatCodingGoalHoursMinsToString();
 
+ 
+
         void UpdateCodingGoalDTO(int codingGoalHours, int codingGoalMinutes);
     }
 
@@ -133,6 +135,9 @@ namespace CodingTracker.Common.CodingGoalDTOManagers
                 _appLogger.Info($"UpdateCodingGoalDTO completed in {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
             }
         }
+
+   
+
 
     }
 }

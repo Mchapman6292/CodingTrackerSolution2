@@ -6,8 +6,9 @@ namespace CodingTracker.Common.IApplicationLoggers
 {
     public interface IApplicationLogger
     {
-        void LogActivity(string methodName, Action<Activity> logAction, Action action);
+        void LogActivity(string methodName, Action<Activity> logAction, Action<Activity> action, Action<Activity> postAction = null);
         void LogUpdates(string methodName, params (string Name, object Value)[] updates);
+        void LogDatabaseError(Exception ex, string operationName, Stopwatch stopwatch);
         void Info(string message);
         void Info(string message, params object[] propertyValues); 
         void Debug(string message);

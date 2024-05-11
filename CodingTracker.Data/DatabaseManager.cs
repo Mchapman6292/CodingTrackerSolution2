@@ -199,24 +199,24 @@ namespace CodingTracker.Data.DatabaseManagers
 
                 command.CommandText = @"
                     CREATE TABLE IF NOT EXISTS UserCredentials (
-                        UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        userId INTEGER PRIMARY KEY AUTOINCREMENT,
                         Username TEXT,
                         PasswordHash TEXT,
                         LastLogin DATETIME
                     );
 
                          CREATE TABLE IF NOT EXISTS CodingSessions (
-                            SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                            UserId INTEGER NOT NULL,
-                            StartDate DATE,
-                            StartTime DATETIME,
-                            EndDate DATE,
-                            EndTime DATETIME,
-                            DurationSeconds REAL, 
-                            DurationHHMM STRING,
-                            GoalHHMM STRING,
-                            GoalReached INTEGER,
-                            FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+                            sessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                            userId INTEGER NOT NULL,
+                            startDate DATE,
+                            startTime DATETIME,
+                            endDate DATE,
+                            endTime DATETIME,
+                            durationSeconds REAL, 
+                            durationHHMM STRING,
+                            goalHHMM STRING,
+                            goalReached INTEGER,
+                            FOREIGN KEY(userId) REFERENCES UserCredentials(userId)
                         
                             );";
                 command.ExecuteNonQuery();
@@ -278,17 +278,17 @@ namespace CodingTracker.Data.DatabaseManagers
 
                 command.CommandText = @"
                     CREATE TABLE CodingSessions (
-                        SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                        UserId INTEGER NOT NULL,
-                        StartDate DATE,
-                        StartTime DATETIME,
-                        EndDate DATE,
-                        EndTime DATETIME,
-                        DurationSeconds REAL, 
-                        DurationHHMM STRING,
-                        GoalHHMM STRING,
-                        GoalReached INTEGER,
-                        FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+                        sessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        userId INTEGER NOT NULL,
+                        startDate DATE,
+                        startTime DATETIME,
+                        endDate DATE,
+                        endTime DATETIME,
+                        durationSeconds REAL, 
+                        durationHHMM STRING,
+                        goalHHMM STRING,
+                        goalReached INTEGER,
+                        FOREIGN KEY(userId) REFERENCES UserCredentials(userId)
                         
                         );";
                         command.ExecuteNonQuery();
@@ -314,7 +314,7 @@ namespace CodingTracker.Data.DatabaseManagers
 
                 command.CommandText = @"
                     CREATE TABLE UserCredentials (
-                        UserId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        userId INTEGER PRIMARY KEY AUTOINCREMENT,
                         Username TEXT NOT NULL UNIQUE,
                         PasswordHash TEXT NOT NULL,
                         LastLogin DATETIME 
@@ -336,8 +336,8 @@ namespace CodingTracker.Data.DatabaseManagers
                 FROM
                         CodingSessions
                 WHERE
-                        SessionId = @SessionId";
-            command.Parameters.AddWithValue("@SessionId", sessionId);
+                        sessionId = @sessionId";
+            command.Parameters.AddWithValue("@sessionId", sessionId);
 
             var result = (long)command.ExecuteScalar();
             return result > 0;

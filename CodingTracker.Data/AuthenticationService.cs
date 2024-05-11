@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 using CodingTracker.Common.INewDatabaseReads;
 using System.Text;
 using System.Security.Cryptography;
+using CodingTracker.Common.CodingSessionDTOManagers;
 
 
 // resetPassword, updatePassword, rememberUser 
@@ -27,9 +28,10 @@ namespace CodingTracker.Common.IAuthenticationServices
         private readonly IUserCredentialDTOManager _userCredentialDTOManager;
         private readonly IQueryBuilder _queryBuilder;
         private readonly INewDatabaseRead _newDatabaseRead;
+        private readonly ICodingSessionDTOManager _codingSessionDTOManager;
 
         private int _currentUserId;
-        public AuthenticationService(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager, IUserCredentialDTOManager userCredentialDTOManager, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead)
+        public AuthenticationService(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager, IUserCredentialDTOManager userCredentialDTOManager, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead, ICodingSessionDTOManager codingSessionDTOManager)
         {
             _databaseManager = databaseManager;
             _credentialManager = credentialManager;
@@ -37,71 +39,64 @@ namespace CodingTracker.Common.IAuthenticationServices
             _userCredentialDTOManager = userCredentialDTOManager;
             _queryBuilder = queryBuilder;
             _newDatabaseRead = newDatabaseRead;
+            _codingSessionDTOManager = codingSessionDTOManager;
         }
 
 
         public bool AuthenticateLogin(string username, string password)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(AuthenticateLogin)).Start())
+            bool isValid = false; 
+
+            // Use LogActivity method to encapsulate the entire operation
+            _appLogger.LogActivity(nameof(AuthenticateLogin), activity =>
             {
-                _appLogger.Debug($"Starting {nameof(AuthenticateLogin)} TraceId: {activity.TraceId}. ");
-                try
+                // Pre-action logging
+                _appLogger.Debug($"Starting {nameof(AuthenticateLogin)}. TraceID: {activity.TraceId}.");
+            },
+             activity =>
+            {
+                // Main action
+                string hashedInputPassword = HashPassword(password);
+                List<UserCredentialDTO> credentials = _newDatabaseRead.HandleUserCredentialsOperations(
+                    columnsToSelect: new List<string> { "userId", "PasswordHash" },
+                    username: username);
+
+                if (credentials.Any())
                 {
-                    _appLogger.Debug($"Hashing password for {username}. TraceId: {activity.TraceId}. ");
-                    var hashedPassword = HashPassword(password);  // Hash the input password
-                    _appLogger.Debug($"Password hash computed for {username}. TraceId: {activity.TraceId}. Hashed password = {hashedPassword} ");
+                    UserCredentialDTO currentCredentials = credentials.First();
+                    _appLogger.Info($"UserCredentials read for {nameof(AuthenticateLogin)} UserId: {currentCredentials.UserId}, Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}. TraceID: {activity.TraceId}");
 
-                    List<UserCredentialDTO> credentials = _newDatabaseRead.ReadFromUserCredentialsTable(
-                        columnsToSelect: new List<string> { "Username", "PasswordHash" },
-                        username: username,
-                        passwordHash: hashedPassword);
+                    string storedHash = currentCredentials.PasswordHash;
+                    isValid = storedHash == hashedInputPassword;
 
-                    if (credentials.Any())
+                    if (!isValid)
                     {
-                        UserCredentialDTO currentCredentials = credentials.First<UserCredentialDTO>();
-
-                        foreach (var credential in credentials)
-                        {
-                            if (credential.PasswordHash != null)
-                            {
-                                break;
-                            }
-                        }
-
-                        _appLogger.Debug($"Current credentials retrieved - Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}, UserId: {currentCredentials.UserId}, LastLogin: {currentCredentials.LastLogin}, TraceId: {activity.TraceId}");
-
-                        string? storedHash = currentCredentials.PasswordHash;
-
-                        _appLogger.Debug($"Current credentials retrieved - Username: {currentCredentials.Username}, PasswordHash: {currentCredentials.PasswordHash}, UserId: {currentCredentials.UserId}, LastLogin: {currentCredentials.LastLogin}, TraceId: {activity.TraceId}");
-                        bool isValid = storedHash == hashedPassword;  
-
-                        if (!isValid)
-                        {
-                            _appLogger.Info($"Password mismatch for {username}. StoredHash does not match input hash. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                        }
-
-                        stopwatch.Stop();
-                        _appLogger.Info($"{nameof(AuthenticateLogin)} complete for {username} isValid: {isValid}, TraceID:{activity.TraceId}.");
-
-                        return isValid;
+                        _appLogger.Info($"Password mismatch for {username}. StoredHash does not match input hash. TraceID: {activity.TraceId}");
                     }
                     else
                     {
-                        stopwatch.Stop();
-                        _appLogger.Info($"No credentials found for {username}. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
+                        _userCredentialDTOManager.SetCurrentUserCredential(currentCredentials);
+                        _userCredentialDTOManager.AssignCurrentUserId(currentCredentials.UserId);
+                        _codingSessionDTOManager.SetCodingSessionUserId(currentCredentials.UserId);
 
-                        return false;
+                        _appLogger.Info($"UserId set for DTO managers {currentCredentials.UserId}, TraceID: {activity.TraceId}");
+                        
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Error in {nameof(AuthenticateLogin)}: {ex.Message}. TraceID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
-                    throw;
+                    _appLogger.Info($"No credentials found for {username}. TraceID: {activity.TraceId}");
                 }
-            }
+            },
+            activity =>
+            {
+                _appLogger.Info($"{nameof(AuthenticateLogin)} complete for {username} isValid: {isValid}, TraceID: {activity.TraceId}");
+            });
+
+            return isValid;
         }
+
+
 
 
 
@@ -113,7 +108,7 @@ namespace CodingTracker.Common.IAuthenticationServices
             _databaseManager.ExecuteDatabaseOperation(connection =>
             {
                 var commandText = _queryBuilder.CreateCommandTextForUserCredentials(
-                    new List<string> { "UserId", "Username", "PasswordHash", "LastLogin" }, username: username);
+                    new List<string> { "userId", "Username", "PasswordHash", "LastLogin" }, username: username);
 
                 using (var command = new SQLiteCommand(commandText, connection))
                 {
@@ -124,7 +119,7 @@ namespace CodingTracker.Common.IAuthenticationServices
                     {
                         userCredential = new UserCredentialDTO
                         {
-                            UserId = Convert.ToInt32(reader["UserId"]),
+                            UserId = Convert.ToInt32(reader["userId"]),
                             Username = reader["Username"].ToString(),
                             PasswordHash = reader["PasswordHash"].ToString(),
                             LastLogin = reader.IsDBNull(reader.GetOrdinal("LastLogin")) ? null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("LastLogin"))

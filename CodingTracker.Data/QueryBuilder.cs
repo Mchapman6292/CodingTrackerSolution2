@@ -22,7 +22,7 @@ namespace CodingTracker.Data.QueryBuilders
 
         // Method to construct SQL command, parameters represent table commandColumns & SQL commands.
         // Parameters for this method represent various SQL commands, e.g orderBy = ORDER BY.
-        // Column names are capitalized while query parameters use @ & lower case. Ex UserId = column name, @userId = query parameter.
+        // Column names are capitalized while query parameters use @ & lower case. Ex userId = column name, @userId = query parameter.
         public string CreateCommandTextForUserCredentials
             (
             List<string> columnsToSelect,
@@ -45,7 +45,7 @@ namespace CodingTracker.Data.QueryBuilders
   
 
                 // Checking that orderBy and groupBy parameters are valid column names. 
-                var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin" };
+                var validColumns = new HashSet<string> { "userId", "Username", "PasswordHash", "LastLogin" };
 
                 if (orderBy != null && !validColumns.Contains(orderBy))
                     throw new ArgumentException("Invalid orderBy column.");
@@ -60,7 +60,7 @@ namespace CodingTracker.Data.QueryBuilders
                 {
                     var conditions = new List<string>();
                     if (userId > 0)
-                        conditions.Add("UserId = @userId");
+                        conditions.Add("userId = @userId");
                     if (!string.IsNullOrEmpty(username))
                         conditions.Add("Username = @username");
                     if (!string.IsNullOrEmpty(passwordHash))
@@ -121,7 +121,7 @@ namespace CodingTracker.Data.QueryBuilders
                     if (userId > 0)
                     {
                         command.Parameters.AddWithValue("@userId", userId);
-                        _appLogger.Debug($"Binding @UserId with value: {userId}");
+                        _appLogger.Debug($"Binding @userId with value: {userId}");
                     }
                     if (!string.IsNullOrEmpty(username))
                     {
@@ -191,10 +191,10 @@ namespace CodingTracker.Data.QueryBuilders
                     throw new ArgumentException("Invalid SQL command specified.", nameof(sqlCommand));
                 }
                 // valid commandColumns checks
-                var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached." };
+                var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached" };
 
                 if (!columnsToSelect.All(col => validColumns.Contains(col)))
-                    throw new ArgumentException("Invalid column(s) specified.", nameof(columnsToSelect));
+                    throw new ArgumentException($"Invalid column(s) specified.", nameof(columnsToSelect));
 
        
                 if (orderBy != null && !validColumns.Contains(orderBy))
@@ -229,29 +229,31 @@ namespace CodingTracker.Data.QueryBuilders
                         break;
                 }
 
+                _appLogger.Info($"Current sql: {sql}");
+
                 try
                 {
                     // building the conditions for the query.
                     var conditions = new List<string>();
 
                     if (sessionId > 0)
-                        conditions.Add("SessionId = @sessionId");
+                        conditions.Add("sessionId = @sessionId");
                     if (userId > 0)
-                        conditions.Add("UserId = @userId");
+                        conditions.Add("userId = @userId");
                     if (startDate.HasValue)
-                        conditions.Add("StartDate = @startDate");
+                        conditions.Add("startDate = @startDate");
                     if (startTime.HasValue)
-                        conditions.Add("StartTime = @startTime");
+                        conditions.Add("startTime = @startTime");
                     if (endDate.HasValue)
-                        conditions.Add("EndDate = @endDate");
+                        conditions.Add("endDate = @endDate");
                     if (endTime.HasValue)
-                        conditions.Add("EndTime = @endTime");
+                        conditions.Add("endTime = @endTime");
                     if (durationSeconds > 0)
-                        conditions.Add("DurationSeconds = @durationSeconds");
+                        conditions.Add("durationSeconds = @durationSeconds");
                     if (!string.IsNullOrEmpty(durationHHMM))
-                        conditions.Add("DurationHHMM = @durationHHMM");
+                        conditions.Add("durationHHMM = @durationHHMM");
                     if (!string.IsNullOrEmpty(goalHHMM))
-                        conditions.Add("GoalHHMM = @goalHHMM");
+                        conditions.Add("goalHHMM = @goalHHMM");
 
 
                     string columns = string.Join(", ", columnsToSelect);
@@ -366,7 +368,7 @@ namespace CodingTracker.Data.QueryBuilders
                     }
                     if (goalReached != 0)
                     {
-                        command.Parameters.AddWithValue("@GoalReached", goalReached);
+                        command.Parameters.AddWithValue("@goalReached", goalReached);
                         _appLogger.Debug($"Binding @goalReached with value: {goalReached}");
                     }
 

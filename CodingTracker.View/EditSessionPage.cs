@@ -14,8 +14,11 @@ using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.IDatabaseSessionDeletes;
+using CodingTracker.Common.IQueryBuilders;
+using CodingTracker.Common.INewDatabaseReads;
 using System.Diagnostics;
 using Guna.UI2.WinForms;
+using System.Runtime.CompilerServices;
 
 namespace CodingTracker.View
 {
@@ -28,10 +31,12 @@ namespace CodingTracker.View
         private readonly IApplicationLogger _appLogger;
         private readonly ICodingGoalDTOManager _codingGoalDTOManager;
         private readonly IDatabaseSessionDelete _databaseSessionDelete;
+        private readonly IQueryBuilder _queryBuilder;
+        private readonly INewDatabaseRead _databaseRead;
         private List<int> deletionSessionIds = new List<int>();
         private bool isEditSessionOn = false;
 
-        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager, IDatabaseSessionDelete databaseSessionDelete)
+        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager, IDatabaseSessionDelete databaseSessionDelete, IQueryBuilder queryBuilder, INewDatabaseRead databaseRead)
         {
             _appLogger = appLogger;
             _appControl = appControl;
@@ -39,6 +44,8 @@ namespace CodingTracker.View
             _databaseSessionRead = databaseSessionRead;
             _codingGoalDTOManager = codingGoalDTOManager;
             _databaseSessionDelete = databaseSessionDelete;
+            _queryBuilder = queryBuilder;
+            _databaseRead = databaseRead;
             InitializeComponent();
             LoadSessionsIntoDataGridView();
         }
@@ -58,6 +65,7 @@ namespace CodingTracker.View
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
+                    List<string> columnstoSelect = new List<string> { "sessionId", "goalHHMM", "durationHHMM", "startTime", "endTime" };
                     int numberOfSessions = 20;
                     var sessions = _databaseSessionRead.ViewRecentSession(numberOfSessions);
 
@@ -66,13 +74,13 @@ namespace CodingTracker.View
                     foreach (var session in sessions)
                     {
                         int rowIndex = EditSessionPageDataGridView.Rows.Add();
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.SessionId;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.GoalHHMM;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.DurationHHMM;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartTime?.ToString("g");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.sessionId;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.goalHHMM;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.durationHHMM;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.startTime?.ToString("g");
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.endTime?.ToString("g");
 
-                        _appLogger.Debug($"Added session to DataGridView: SessionID={session.SessionId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
+                        _appLogger.Debug($"Added session to DataGridView: SessionID={session.sessionId}, startTime={session.startTime}, endTime={session.endTime}, durationSeconds={session.durationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
                     }
 
                     stopwatch.Stop();
@@ -98,7 +106,7 @@ namespace CodingTracker.View
                     if (isEditSessionOn && e.RowIndex >= 0)
                     {
                         DataGridViewRow row = EditSessionPageDataGridView.Rows[e.RowIndex];
-                        int sessionId = Convert.ToInt32(row.Cells["SessionId"].Value);
+                        int sessionId = Convert.ToInt32(row.Cells["sessionId"].Value);
 
                         bool highlight = !deletionSessionIds.Contains(sessionId);
                         if (highlight)
