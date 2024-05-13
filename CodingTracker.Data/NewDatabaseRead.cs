@@ -11,6 +11,9 @@ using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using System.Diagnostics;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using CodingTracker.Common.ICodingSessions;
 
 namespace CodingTracker.Data.NewDatabaseReads
 {
@@ -238,6 +241,58 @@ namespace CodingTracker.Data.NewDatabaseReads
             }
 
 
+        public void InsertIntoCodingSessionTable
+        (
+            int userId,
+            DateTime startDate,
+            DateTime startTime,
+            DateTime endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
+            int goalReached
+        )
+        {
+            ActivityTraceId traceId = default;
+            _appLogger.LogActivity(nameof(InsertIntoCodingSessionTable), activity =>
+            {
+                ActivityTraceId traceId = activity.TraceId;
+                _appLogger.Info($"Starting {nameof(InsertIntoCodingSessionTable)}. TraceId: {activity.TraceId}.");
+                _appLogger.Debug($"Parameters: userId = {userId}, StartDate = {startDate}, StartTime = {startTime}, EndDate = {endDate}, EndTime = {endTime}, DurationSeconds = {durationSeconds}, DurationHHMM = {durationHHMM}, GoalHHMM = {goalHHMM}, GoalReached = {goalReached}. TraceID: {activity.TraceId}.");
+            },
+            activity =>
+            {
+                var stopwatch = Stopwatch.StartNew();
+                try
+                {
+                    _databaseManager.ExecuteDatabaseOperation(connection =>
+                    {
+                        string commandText = _queryBuilder.CreateInsertTextForCodingSessions(userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached);
+                        using (var command = new SQLiteCommand(commandText, connection))
+                        {
+                            _queryBuilder.SetCommandParametersForInsertCodingSessions(command, userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached);
+
+                            int affectedRows = command.ExecuteNonQuery();
+                            _appLogger.Debug($"Affected rows: {affectedRows}, TraceId: {activity.TraceId} ");
+                        }
+                    }, nameof(InsertIntoCodingSessionTable));
+
+
+                    stopwatch.Stop();
+                    _appLogger.Info($"Completed {nameof(InsertIntoCodingSessionTable)}.Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {traceId}");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Error in {nameof(HandleCodingSessionsTableOperations)}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {traceId}");
+                    throw;
+                }
+            });
+        }
+            
+
+   
 
 
         private CodingSessionDTO ExtractCodingSessionFromReader(SQLiteDataReader reader)
@@ -267,6 +322,8 @@ namespace CodingTracker.Data.NewDatabaseReads
                     _appLogger.Debug($"CodingSessionDTO created - sessionId: {dto.sessionId}, userId: {dto.userId}, startDate: {dto.startDate}, startTime: {dto.startTime}, " +
                                      $"endDate: {dto.endDate}, endTime: {dto.endTime}, durationSeconds: {dto.durationSeconds}, durationHHMM: {dto.durationHHMM}, " +
                                      $"goalHHMM: {dto.goalHHMM}, goalReached: {dto.goalReached}. TraceID: {activity.TraceId}");
+
+                    _codingSessionDTOManager.UpdateCurrentSessionDTO(dto.sessionId, dto.userId, dto.startDate, dto.startTime, dto.endDate, dto.endTime, dto.durationSeconds, dto.durationHHMM, dto.goalHHMM, dto.goalReached);
 
                     stopwatch.Stop();
                     _appLogger.Info($"{nameof(ExtractCodingSessionFromReader)} completed successfully. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");

@@ -22,7 +22,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
 
         string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null, DateTime? startTime = null, DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
+        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null, DateTime? startTime = null, DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null, int goalReached = 0);
         TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
@@ -55,7 +55,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
             _credentialManager = credentialManager;
-            _userId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             CurrentSessionUserId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _inputValidator = inputValidator;
         }
@@ -332,7 +331,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null,  DateTime? startTime = null,  DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
+        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null,  DateTime? startTime = null,  DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null, int goalReached = 0)
         {
             using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
             {
@@ -395,7 +394,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
                 _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO), updates.ToArray());
 
-                _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. TraceID: {activity.TraceId}");
+                _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. _currentSessionDTOUserId: {_currentSessionDTO.userId} TraceID: {activity.TraceId}");
             }
         }
 

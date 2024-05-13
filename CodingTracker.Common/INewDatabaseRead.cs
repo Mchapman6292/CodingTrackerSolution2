@@ -16,7 +16,7 @@ namespace CodingTracker.Common.INewDatabaseReads
     public interface INewDatabaseRead
     {
 
-        public List<UserCredentialDTO> HandleUserCredentialsOperations
+        List<UserCredentialDTO> HandleUserCredentialsOperations
         (
              List<string> columnsToSelect,
              int userId = 0,
@@ -29,7 +29,7 @@ namespace CodingTracker.Common.INewDatabaseReads
              int? limit = null
         );
 
-        public List<CodingSessionDTO> HandleCodingSessionsTableOperations
+        List<CodingSessionDTO> HandleCodingSessionsTableOperations
         (
 
             List<string> columnsToSelect,
@@ -50,5 +50,7 @@ namespace CodingTracker.Common.INewDatabaseReads
             string? sumColumn = null, // New parameter to specify which column to sum
             int? limit = null
         );
+
+
     }
 }

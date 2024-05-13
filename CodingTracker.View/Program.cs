@@ -94,7 +94,7 @@ namespace CodingTracker.View.Program
 
             IConfiguration configuration = configurationBuilder.Build();
 
-            services.AddSingleton<IConfiguration>(configuration)
+            services.AddSingleton<IConfiguration>(configuration) //Singleton, it retains its state across the entire application 
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
@@ -125,7 +125,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
                     
 
-                    // Transient services.
+                    // New instance created each time it is requested. 
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()

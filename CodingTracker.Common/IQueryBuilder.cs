@@ -67,7 +67,21 @@ namespace CodingTracker.Common.IQueryBuilders
                int goalReached = 0
            );
 
+        public void SetCommandParametersForInsertCodingSessions
+        (
+            SQLiteCommand command,
+            int userId,
+            DateTime startDate,
+            DateTime startTime,
+            DateTime endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
+            int goalReached
+        );
 
+        string CreateInsertTextForCodingSessions(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached);
 
 
     }

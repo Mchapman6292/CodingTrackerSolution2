@@ -13,7 +13,7 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
         UserCredentialDTO GetCurrentUserCredential();
         void UpdateCurrentUserCredentialDTO(UserCredentialDTO userCredentialDTO);
 
-        void AssignCurrentUserId(int? userId);
+        void SetUserCredentialUserId(int? userId);
 
         int ReturnCurrentUserId();
     }
@@ -22,7 +22,7 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
 
     public class UserCredentialDTOManager : IUserCredentialDTOManager
     {
-        public UserCredentialDTO _currentUserCredentialDTO;
+        public UserCredentialDTO _currentUserCredentialDTO = new UserCredentialDTO();
 
         private readonly IApplicationLogger _appLogger;
         private int _currentUserId;
@@ -131,12 +131,6 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
             {
                 _appLogger.Info($"Starting {nameof(UpdateCurrentUserCredentialDTO)}. TraceID: {activity.TraceId}");
 
-                if (_currentUserCredentialDTO == null)
-                {
-                    _appLogger.Info("No current user credential DTO found. Creating new one.");
-                    _currentUserCredentialDTO = new UserCredentialDTO();
-                }
-
                 var updates = new List<(string Name, object Value)>();
 
                 if (_currentUserCredentialDTO.UserId != updatedUserCredentialDTO.UserId)
@@ -170,12 +164,12 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
         }
 
 
-        public void AssignCurrentUserId(int? userId)
+        public void SetUserCredentialUserId(int? userId)
         {
-            using (var activity = new Activity(nameof(ReturnCurrentUserId)).Start())
+            using (var activity = new Activity(nameof(SetUserCredentialUserId)).Start())
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
+                _appLogger.Debug($"Starting {nameof(SetUserCredentialUserId)}. TraceID: {activity.TraceId}.");
 
                 if (_currentUserId >0)
                 {
@@ -196,15 +190,15 @@ namespace CodingTracker.Common.UserCredentialDTOManagers
             {
                 _appLogger.Debug($"Starting {nameof(ReturnCurrentUserId)}. TraceID: {activity.TraceId}.");
 
-                if (_currentUserId == 0)
+                if (_currentUserCredentialDTO.UserId == 0)
                 {
-                    _appLogger.Info($"CurrentUserId is 0 (default for not created.");
+                    _appLogger.Info($"CurrentUserId is {_currentUserCredentialDTO.UserId} (default for not created.");
                 }
                 else
                 {
-                    return _currentUserId;
+                    return _currentUserCredentialDTO.UserId;
                 }
-                return _currentUserId;
+                return _currentUserCredentialDTO.UserId;
             }
         }
     }

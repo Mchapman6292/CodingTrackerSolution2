@@ -58,7 +58,7 @@ namespace CodingTracker.Common.IAuthenticationServices
                 // Main action
                 string hashedInputPassword = HashPassword(password);
                 List<UserCredentialDTO> credentials = _newDatabaseRead.HandleUserCredentialsOperations(
-                    columnsToSelect: new List<string> { "userId", "PasswordHash" },
+                    columnsToSelect: new List<string> { "UserId", "Username", "PasswordHash" },
                     username: username);
 
                 if (credentials.Any())
@@ -75,9 +75,7 @@ namespace CodingTracker.Common.IAuthenticationServices
                     }
                     else
                     {
-                        _userCredentialDTOManager.SetCurrentUserCredential(currentCredentials);
-                        _userCredentialDTOManager.AssignCurrentUserId(currentCredentials.UserId);
-                        _codingSessionDTOManager.SetCodingSessionUserId(currentCredentials.UserId);
+                        _userCredentialDTOManager.UpdateCurrentUserCredentialDTO(currentCredentials);
 
                         _appLogger.Info($"UserId set for DTO managers {currentCredentials.UserId}, TraceID: {activity.TraceId}");
                         
