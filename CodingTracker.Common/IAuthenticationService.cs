@@ -1,20 +1,18 @@
-﻿using CodingTracker.Common.UserCredentialDTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.ILoginManagers
+namespace CodingTracker.Common.IAuthenticationServices
 {
     public interface IAuthenticationService
     {
         bool AuthenticateLogin(string username, string password);
-        UserCredentialDTO GetUserDetails(string username);
+        void UpdateCurrentUserId(int UserId);
+        void UpdatePasswordHash(string passwordHash);
+        void UpdateLastLogin(DateTime lastLogin);
 
-        void ResetPassword(string username, string newPassword);
-
-        string HashPassword(string password);
 
     }
 }

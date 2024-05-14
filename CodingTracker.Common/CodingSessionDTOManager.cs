@@ -22,7 +22,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
 
         string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null, DateTime? startTime = null, DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null, int goalReached = 0);
+        void UpdateCurrentSessionDTO(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0);
         TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
@@ -331,72 +331,50 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null,  DateTime? startTime = null,  DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null, int goalReached = 0)
+        public void UpdateCurrentSessionDTO(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0)
         {
-            using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
+            _appLogger.LogActivity(nameof(UpdateCurrentSessionDTO), activity =>
             {
                 _appLogger.Info($"Starting {nameof(UpdateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
-
+            },
+            activity =>
+            {
                 if (_currentSessionDTO == null)
                 {
                     _appLogger.Info("No current session DTO found. Creating new one.");
                     _currentSessionDTO = CreateCodingSessionDTO();
                 }
 
-                _currentSessionDTO.sessionId = sessionId;
                 _currentSessionDTO.userId = userId;
+                _currentSessionDTO.startDate = startDate;
+                _currentSessionDTO.startTime = startTime;
+                _currentSessionDTO.endDate = endDate;
+                _currentSessionDTO.endTime = endTime;
+                _currentSessionDTO.durationSeconds = durationSeconds;
+                _currentSessionDTO.durationHHMM = _inputValidator.IsValidTimeFormatHHMM(durationHHMM) ? durationHHMM : "";
+                _currentSessionDTO.goalHHMM = goalHHMM;
+                _currentSessionDTO.goalReached = goalReached;
 
-                if (startDate.HasValue) 
+                List<(string Name, object Value)> updates = new List<(string Name, object Value)>
                 {
-                    _currentSessionDTO.startDate = startDate.Value;
-                }
-                if (startTime.HasValue)
-                {
-                    _currentSessionDTO.startTime = startTime.Value;
-                }
-                if (endDate.HasValue) 
-                {
-                    _currentSessionDTO.endDate = endDate.Value;
-                }
-                if (endTime.HasValue)
-                {
-                    _currentSessionDTO.endTime = endTime.Value;
-                }
-                if (durationSeconds.HasValue)
-                {
-                    _currentSessionDTO.durationSeconds = durationSeconds.Value;
-                }
-                if (_inputValidator.IsValidTimeFormatHHMM(durationHHMM))
-                {
-                    _currentSessionDTO.durationHHMM = durationHHMM;
-                }
-                if(durationHHMM != null) 
-                {
-                    _currentSessionDTO.durationHHMM = durationHHMM;
-                }
-                if (goalHHMM != null) 
-                {
-                    _currentSessionDTO.goalHHMM = goalHHMM;
-                }
-
-                List<(string Name, object Value)> updates = new List<(string Name, object Value)>();
-
-                updates.Add(("sessionId", (object)sessionId));
-                updates.Add(("userId", (object)userId));
-
-                if (startDate.HasValue) updates.Add(("startDate", (object)startDate));
-                if (startTime.HasValue) updates.Add(("startTime", (object)startTime));
-                if (endDate.HasValue) updates.Add(("endDate", ((object)endDate)));
-                if (endTime.HasValue) updates.Add(("endTime", (object)endTime));
-                if (durationSeconds.HasValue) updates.Add(("durationSeconds", (object)durationSeconds));
-                if (durationHHMM != null) updates.Add(("durationHHMM", (object)durationHHMM));
-                if (goalHHMM !=  null) updates.Add(("goalHHMM", (object)goalHHMM));
+                    ("userId", userId),
+                    ("startDate", startDate),
+                    ("startTime", startTime),
+                    ("endDate", endDate),
+                    ("endTime", endTime),
+                    ("durationSeconds", durationSeconds),
+                    ("durationHHMM", durationHHMM),
+                    ("goalHHMM", goalHHMM),
+                    ("goalReached", goalReached)
+                };
 
                 _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO), updates.ToArray());
-
+            }, activity =>
+            {
                 _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. _currentSessionDTOUserId: {_currentSessionDTO.userId} TraceID: {activity.TraceId}");
-            }
+            });
         }
+        
 
         public void SetCodingSessionUserId(int userId)
         {

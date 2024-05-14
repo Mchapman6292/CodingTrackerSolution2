@@ -208,14 +208,14 @@ namespace CodingTracker.Data.DatabaseManagers
                          CREATE TABLE IF NOT EXISTS CodingSessions (
                             sessionId INTEGER PRIMARY KEY AUTOINCREMENT,
                             userId INTEGER NOT NULL,
-                            startDate DATE,
-                            startTime DATETIME,
-                            endDate DATE,
-                            endTime DATETIME,
-                            durationSeconds REAL, 
-                            durationHHMM STRING,
-                            goalHHMM STRING,
-                            goalReached INTEGER,
+                            startDate DATE NOT NULL,
+                            startTime DATETIME NOT NULL,
+                            endDate DATE NOT NULL,
+                            endTime DATETIME NOT NULL,
+                            durationSeconds REAL NOT NULL, 
+                            durationHHMM STRING NOT NULL,
+                            goalHHMM STRING NOT NULL,
+                            goalReached INTEGER NOT NULL,
                             FOREIGN KEY(userId) REFERENCES UserCredentials(userId)
                         
                             );";
@@ -280,14 +280,14 @@ namespace CodingTracker.Data.DatabaseManagers
                     CREATE TABLE CodingSessions (
                         sessionId INTEGER PRIMARY KEY AUTOINCREMENT,
                         userId INTEGER NOT NULL,
-                        startDate DATE,
-                        startTime DATETIME,
-                        endDate DATE,
-                        endTime DATETIME,
-                        durationSeconds REAL, 
-                        durationHHMM STRING,
-                        goalHHMM STRING,
-                        goalReached INTEGER,
+                        startDate DATE NOT NULL,
+                        startTime DATETIME NOT NULL,
+                        endDate DATE NOT NULL,
+                        endTime DATETIME NOT NULL,
+                        durationSeconds REAL NOT NULL, 
+                        durationHHMM STRING NOT NULL,
+                        goalHHMM STRING NOT NULL,
+                        goalReached INTEGER NOT NULL,
                         FOREIGN KEY(userId) REFERENCES UserCredentials(userId)
                         
                         );";

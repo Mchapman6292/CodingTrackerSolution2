@@ -8,6 +8,6 @@ namespace CodingTracker.Common.IDatabaseSessionInserts
 {
     public interface IDatabaseSessionInsert
     {
-        void InsertSession();
+
     }
 }

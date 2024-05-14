@@ -51,6 +51,19 @@ namespace CodingTracker.Common.INewDatabaseReads
             int? limit = null
         );
 
+        void InsertIntoCodingSessionTable
+        (
+            int userId,
+            DateTime startDate,
+            DateTime startTime,
+            DateTime endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
+            int goalReached
+        );
+
 
     }
 }

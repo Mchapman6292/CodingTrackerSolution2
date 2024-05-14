@@ -290,55 +290,57 @@ namespace CodingTracker.Data.NewDatabaseReads
                 }
             });
         }
-            
 
-   
+
+
 
 
         private CodingSessionDTO ExtractCodingSessionFromReader(SQLiteDataReader reader)
         {
+            CodingSessionDTO dto = null;  // Declare dto outside the LogActivity scope
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            using (var activity = new Activity(nameof(ExtractCodingSessionFromReader)).Start())
-            {
-                _appLogger.Debug($"Starting {nameof(ExtractCodingSessionFromReader)}. TraceID: {activity.TraceId}");
-
-                try
-                {
-                    var dto = new CodingSessionDTO
+            _appLogger.LogActivity(nameof(ExtractCodingSessionFromReader),
+                activity => {
+                    _appLogger.Debug($"Starting {nameof(ExtractCodingSessionFromReader)}. TraceID: {activity.TraceId}");
+                    stopwatch.Start();
+                },
+                activity => {
+                    dto = new CodingSessionDTO
                     {
-                        sessionId = reader.IsDBNull(reader.GetOrdinal("sessionId")) ? 0 : reader.GetInt32(reader.GetOrdinal("sessionId")),
-                        userId = reader.IsDBNull(reader.GetOrdinal("userId")) ? 0 : reader.GetInt32(reader.GetOrdinal("userId")),
-                        startDate = reader.IsDBNull(reader.GetOrdinal("startDate")) ? null : reader.GetDateTime(reader.GetOrdinal("startDate")),
-                        startTime = reader.IsDBNull(reader.GetOrdinal("startTime")) ? null : reader.GetDateTime(reader.GetOrdinal("startTime")),
-                        endDate = reader.IsDBNull(reader.GetOrdinal("endDate")) ? null : reader.GetDateTime(reader.GetOrdinal("endDate")),
-                        endTime = reader.IsDBNull(reader.GetOrdinal("endTime")) ? null : reader.GetDateTime(reader.GetOrdinal("endTime")),
-                        durationSeconds = reader.IsDBNull(reader.GetOrdinal("durationSeconds")) ? 0 : reader.GetDouble(reader.GetOrdinal("durationSeconds")),
-                        durationHHMM = reader.IsDBNull(reader.GetOrdinal("durationHHMM")) ? null : reader.GetString(reader.GetOrdinal("durationHHMM")),
-                        goalHHMM = reader.IsDBNull(reader.GetOrdinal("goalHHMM")) ? null : reader.GetString(reader.GetOrdinal("goalHHMM")),
-                        goalReached = reader.IsDBNull(reader.GetOrdinal("goalReached")) ? 0 : reader.GetInt32(reader.GetOrdinal("goalReached"))
+                        sessionId = reader.GetInt32(reader.GetOrdinal("sessionId")),
+                        userId = reader.GetInt32(reader.GetOrdinal("userId")),
+                        startDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
+                        startTime = reader.GetDateTime(reader.GetOrdinal("startTime")),
+                        endDate = reader.GetDateTime(reader.GetOrdinal("endDate")),
+                        endTime = reader.GetDateTime(reader.GetOrdinal("endTime")),
+                        durationSeconds = reader.GetDouble(reader.GetOrdinal("durationSeconds")),
+                        durationHHMM = reader.GetString(reader.GetOrdinal("durationHHMM")),
+                        goalHHMM = reader.GetString(reader.GetOrdinal("goalHHMM")),
+                        goalReached = reader.GetInt32(reader.GetOrdinal("goalReached"))
                     };
 
-                    _appLogger.Debug($"CodingSessionDTO created - sessionId: {dto.sessionId}, userId: {dto.userId}, startDate: {dto.startDate}, startTime: {dto.startTime}, " +
-                                     $"endDate: {dto.endDate}, endTime: {dto.endTime}, durationSeconds: {dto.durationSeconds}, durationHHMM: {dto.durationHHMM}, " +
-                                     $"goalHHMM: {dto.goalHHMM}, goalReached: {dto.goalReached}. TraceID: {activity.TraceId}");
+                    _appLogger.LogUpdates(nameof(ExtractCodingSessionFromReader),
+                        ("sessionId", dto.sessionId),
+                        ("userId", dto.userId),
+                        ("startDate", dto.startDate),
+                        ("startTime", dto.startTime),
+                        ("endDate", dto.endDate),
+                        ("endTime", dto.endTime),
+                        ("durationSeconds", dto.durationSeconds),
+                        ("durationHHMM", dto.durationHHMM),
+                        ("goalHHMM", dto.goalHHMM),
+                        ("goalReached", dto.goalReached)
+                    );
 
-                    _codingSessionDTOManager.UpdateCurrentSessionDTO(dto.sessionId, dto.userId, dto.startDate, dto.startTime, dto.endDate, dto.endTime, dto.durationSeconds, dto.durationHHMM, dto.goalHHMM, dto.goalReached);
-
+                },
+                activity => {
                     stopwatch.Stop();
                     _appLogger.Info($"{nameof(ExtractCodingSessionFromReader)} completed successfully. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
+                }
+            );
 
-                    
-                    return dto;
-                    
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Error in {nameof(ExtractCodingSessionFromReader)}: {ex.Message}. TraceID: {activity.TraceId}, Duration: {stopwatch.ElapsedMilliseconds}ms");
-                    throw;
-                }
-            }
+            return dto;
         }
     }
 }
