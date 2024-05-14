@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using CodingTracker.Business.ApplicationControls;
@@ -10,10 +9,8 @@ using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Common.IUtilityServices;
-using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Data.CredentialManagers;
@@ -50,6 +47,8 @@ using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Data.NewDatabaseReads;
 using CodingTracker.Common.INewDatabaseReads;
+using CodingTracker.Common.CurrentUserCredentials;
+using CodingTracker.Common.IUserRepositorys;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -94,7 +93,7 @@ namespace CodingTracker.View.Program
 
             IConfiguration configuration = configurationBuilder.Build();
 
-            services.AddSingleton<IConfiguration>(configuration)
+            services.AddSingleton<IConfiguration>(configuration) //Singleton, it retains its state across the entire application 
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IDatabaseManager, DatabaseManager>()
@@ -107,7 +106,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<INewDatabaseRead, NewDatabaseRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
-                    .AddSingleton<IAuthenticationService, AuthenticationService>()
+                    .AddSingleton<IUserRepository, UserRepository>()
                     .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
                     .AddSingleton<ICodingSession, CodingSession>()
@@ -123,9 +122,10 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
+                    .AddSingleton<CurrentUserCredentials, CurrentUserCredentials>()
                     
 
-                    // Transient services.
+                    // New instance created each time it is requested. 
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()

@@ -83,7 +83,7 @@ namespace CodingTracker.Business.SessionCalculators
                     DateTime todaysDate = DateTime.UtcNow;
                     List<CodingSessionDTO> curentDayDTOS = _databaseSessionRead.ViewSpecific(todaysDate);
 
-                    double totalDurationSeconds = curentDayDTOS.Sum(dto => dto.DurationSeconds ?? 0);
+                    double totalDurationSeconds = curentDayDTOS.Sum(dto => dto.durationSeconds ?? 0);
 
                     stopwatch.Stop();
                     _appLogger.Info($"Calculated today's total minutes successfully. Total: {totalDurationSeconds}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
@@ -175,12 +175,12 @@ namespace CodingTracker.Business.SessionCalculators
 
                 try
                 {
-                    if (!currentSessionDTO.StartTime.HasValue || !currentSessionDTO.EndTime.HasValue)
+                    if (!currentSessionDTO.startTime.HasValue || !currentSessionDTO.endTime.HasValue)
                     {
-                        _appLogger.Error("start Time or End Time is not set.");
+                        _appLogger.Error($"start Time or End Time is not set. TraceID: {activity.TraceId}. ");
                     }
 
-                    TimeSpan duration = currentSessionDTO.EndTime.Value - currentSessionDTO.StartTime.Value;
+                    TimeSpan duration = currentSessionDTO.endTime.Value - currentSessionDTO.startTime.Value;
                     durationSeconds = (double)duration.TotalSeconds;
                     
 

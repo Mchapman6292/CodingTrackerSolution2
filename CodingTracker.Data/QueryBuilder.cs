@@ -1,4 +1,6 @@
-﻿using CodingTracker.Common.IApplicationLoggers;
+﻿// Ignore Spelling: sql
+
+using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IQueryBuilders;
 using System.Data.SQLite;
@@ -18,9 +20,9 @@ namespace CodingTracker.Data.QueryBuilders
             _appLogger = appLogger;
         }
 
-        // Method to construct SQL command, parameters represent table columns & SQL commands.
+        // Method to construct SQL command, parameters represent table commandColumns & SQL commands.
         // Parameters for this method represent various SQL commands, e.g orderBy = ORDER BY.
-        // Column names are capitalized while query parameters use @ & lower case. Ex UserId = column name, @userId = query parameter.
+        // Column names are capitalized while query parameters use @ & lower case. Ex userId = column name, @userId = query parameter.
         public string CreateCommandTextForUserCredentials
             (
             List<string> columnsToSelect,
@@ -38,8 +40,12 @@ namespace CodingTracker.Data.QueryBuilders
             {
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForUserCredentials)}, TraceID: {activity.TraceId}");
 
+                var validCommands = new HashSet<string> { "SELECT", "INSERT", "UPDATE", "DELETE" };
+
+
+
                 // Checking that orderBy and groupBy parameters are valid column names. 
-                var validColumns = new HashSet<string> { "UserId", "Username", "PasswordHash", "LastLogin" };
+                var validColumns = new HashSet<string> { "userId", "Username", "PasswordHash", "LastLogin" };
 
                 if (orderBy != null && !validColumns.Contains(orderBy))
                     throw new ArgumentException("Invalid orderBy column.");
@@ -54,7 +60,7 @@ namespace CodingTracker.Data.QueryBuilders
                 {
                     var conditions = new List<string>();
                     if (userId > 0)
-                        conditions.Add("UserId = @userId");
+                        conditions.Add("userId = @userId");
                     if (!string.IsNullOrEmpty(username))
                         conditions.Add("Username = @username");
                     if (!string.IsNullOrEmpty(passwordHash))
@@ -115,7 +121,7 @@ namespace CodingTracker.Data.QueryBuilders
                     if (userId > 0)
                     {
                         command.Parameters.AddWithValue("@userId", userId);
-                        _appLogger.Debug($"Binding @UserId with value: {userId}");
+                        _appLogger.Debug($"Binding @userId with value: {userId}");
                     }
                     if (!string.IsNullOrEmpty(username))
                     {
@@ -152,6 +158,7 @@ namespace CodingTracker.Data.QueryBuilders
         public string CreateCommandTextForCodingSessions
         (
             List<string> columnsToSelect,
+            string sqlCommand,
             int sessionId = 0,
             int userId = 0,
             DateTime? startDate = null,
@@ -165,7 +172,7 @@ namespace CodingTracker.Data.QueryBuilders
             string? orderBy = null,
             bool ascending = true,
             string? groupBy = null,
-            string? sumColumn = null, 
+            string? sumColumn = null,
             int? limit = null
         )
         {
@@ -175,9 +182,21 @@ namespace CodingTracker.Data.QueryBuilders
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForCodingSessions)}, TraceID: {activity.TraceId}");
 
 
-                var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached." };
+                // sql command checks
+                var validCommands = new HashSet<string> { "SELECT", "INSERT", "UPDATE", "DELETE" };
 
-                // Checks that valid columns are selected.
+                if (!validCommands.Contains(sqlCommand.ToUpper()))
+                {
+                    _appLogger.Error($"Invalid SQL command for {nameof(CreateCommandTextForUserCredentials)}. sqlCommand = {sqlCommand}.");
+                    throw new ArgumentException("Invalid SQL command specified.", nameof(sqlCommand));
+                }
+                // valid commandColumns checks
+                var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached" };
+
+                if (!columnsToSelect.All(col => validColumns.Contains(col)))
+                    throw new ArgumentException($"Invalid column(s) specified.", nameof(columnsToSelect));
+
+
                 if (orderBy != null && !validColumns.Contains(orderBy))
                     throw new ArgumentException("Invalid orderBy column.");
 
@@ -187,6 +206,30 @@ namespace CodingTracker.Data.QueryBuilders
                 if (columnsToSelect == null || columnsToSelect.Count == 0)
                     throw new ArgumentException("At least one column must be specified.", nameof(columnsToSelect));
 
+                var sql = new StringBuilder();
+
+                // switch for sql command
+                switch (sqlCommand)
+                {
+                    case "SELECT":
+                        string commandColumns = string.Join(", ", columnsToSelect);
+                        sql.Append($"SELECT {commandColumns} FROM CodingSessions");
+                        break;
+                    case "INSERT":
+                        sql.Append($"INSERT INTO CodingSessions ({string.Join(", ", columnsToSelect)}) VALUES ({string.Join(", ", columnsToSelect.Select(col => $"@{col}"))})");
+                        break;
+                    case "UPDATE":
+                        sql.Append("UPDATE CodingSessions SET ");
+                        sql.Append(string.Join(", ", columnsToSelect.Select(col => $"{col} = @{col}")));
+                        if (sessionId > 0 || userId > 0) // Using conditions to restrict the update, this part will be detailed in the next section.
+                            sql.Append(" WHERE ");
+                        break;
+                    case "DELETE":
+                        sql.Append("DELETE FROM CodingSessions");
+                        break;
+                }
+
+                _appLogger.Info($"Current sql: {sql}");
 
                 try
                 {
@@ -194,25 +237,23 @@ namespace CodingTracker.Data.QueryBuilders
                     var conditions = new List<string>();
 
                     if (sessionId > 0)
-                        conditions.Add("SessionId = @sessionId");
+                        conditions.Add("sessionId = @sessionId");
                     if (userId > 0)
-                        conditions.Add("UserId = @userId");
+                        conditions.Add("userId = @userId");
                     if (startDate.HasValue)
-                        conditions.Add("StartDate = @startDate");
+                        conditions.Add("startDate = @startDate");
                     if (startTime.HasValue)
-                        conditions.Add("StartTime = @startTime");
+                        conditions.Add("startTime = @startTime");
                     if (endDate.HasValue)
-                        conditions.Add("EndDate = @endDate");
+                        conditions.Add("endDate = @endDate");
                     if (endTime.HasValue)
-                        conditions.Add("EndTime = @endTime");
+                        conditions.Add("endTime = @endTime");
                     if (durationSeconds > 0)
-                        conditions.Add("DurationSeconds = @durationSeconds");
+                        conditions.Add("durationSeconds = @durationSeconds");
                     if (!string.IsNullOrEmpty(durationHHMM))
-                        conditions.Add("DurationHHMM = @durationHHMM");
+                        conditions.Add("durationHHMM = @durationHHMM");
                     if (!string.IsNullOrEmpty(goalHHMM))
-                        conditions.Add("GoalHHMM = @goalHHMM");
-                    if (sumColumn != null)
-                        conditions.Append($"DATE(StartDate), SUM({sumColumn}) AS Total{sumColumn}");
+                        conditions.Add("goalHHMM = @goalHHMM");
 
 
                     string columns = string.Join(", ", columnsToSelect);
@@ -224,14 +265,12 @@ namespace CodingTracker.Data.QueryBuilders
                             columns += $", {groupBy}";
                         }
                     }
-
-
-                    // Constructs the full query, begins with SELECT & adds WHERE if there are any conditions.
-                    var sql = new StringBuilder($"SELECT {columns} FROM CodingSessions ");
-
                     if (conditions.Count > 0)
                     {
-                        sql.Append(" WHERE " + (conditions.Count > 1 ? "1=1 AND " : "") + string.Join(" AND ", conditions));
+                        if (sqlCommand != "INSERT" && sqlCommand != "DELETE")
+                        {
+                            sql.Append(" WHERE " + (conditions.Count > 1 ? "1=1 AND " : "") + string.Join(" AND ", conditions));
+                        }
                     }
 
 
@@ -257,6 +296,127 @@ namespace CodingTracker.Data.QueryBuilders
                 }
             }
         }
+
+
+        public string CreateInsertTextForCodingSessions(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached)
+        {
+            ActivityTraceId traceId = default;
+            string sqlCommand = "";
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            _appLogger.LogActivity(nameof(CreateInsertTextForCodingSessions), activity =>
+            {
+                ActivityTraceId traceId = activity.TraceId;
+                _appLogger.Info($"Starting {nameof(CreateInsertTextForCodingSessions)}, TraceID:{activity.TraceId}.");
+                _appLogger.Info($"Parameters for {nameof(CreateInsertTextForCodingSessions)}: UserId = {userId}, StartDate = {startDate}, StartTime = {startTime}, EndDate = {endDate}, EndTime = {endTime}, DurationSeconds = {durationSeconds}, DurationHHMM = {durationHHMM}, GoalHHMM = {goalHHMM}, GoalReached = {goalReached}");
+
+            }, activity =>
+            {
+                try
+                {
+                    sqlCommand = $"INSERT INTO CodingSessions (UserId, StartDate, StartTime, EndDate, EndTime, DurationSeconds, DurationHHMM, GoalHHMM, GoalReached) VALUES (@UserId, @StartDate, @StartTime, @EndDate, @EndTime, @DurationSeconds, @DurationHHMM, @GoalHHMM, @GoalReached);";
+                    _appLogger.Info($"CommandText for {nameof(CreateInsertTextForCodingSessions)}: {sqlCommand}. TraceID:{activity.TraceId}.");
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _appLogger.Error($"Error in {nameof(CreateInsertTextForCodingSessions)}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {traceId}");
+                    throw;
+                }
+            }, activity =>
+            {
+                stopwatch.Stop();
+                _appLogger.Info($"Completed {nameof(CreateInsertTextForCodingSessions)} Execution Time: {stopwatch.ElapsedMilliseconds}. TraceID: {activity.TraceId}.");
+            });
+            return sqlCommand;
+        }
+
+        public void SetCommandParametersForInsertCodingSessions
+        (
+            SQLiteCommand command,
+            int userId,
+            DateTime startDate,
+            DateTime startTime,
+            DateTime endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
+            int goalReached
+        )
+        {
+            _appLogger.LogActivity(nameof(SetCommandParametersForCodingSessions), activity =>
+            {
+                ActivityTraceId traceId = activity.TraceId;
+                _appLogger.Info($"Starting {nameof(SetCommandParametersForCodingSessions)}. TraceID:{activity.TraceId}.");
+            }, 
+            activity => 
+            {
+                try
+                {
+                    if (userId == 0)
+                    {
+                        _appLogger.Error($"Error during {nameof(SetCommandParametersForCodingSessions)}: userId == 0, this is the default for userId not set. TraceID: {activity.TraceId}.");
+                        throw new InvalidOperationException($"Error during {nameof(SetCommandParametersForCodingSessions)}: userId == 0, this is the default for userId not set");
+                    }
+                    else
+                    {
+                        if (userId > 0)
+                        {
+                            command.Parameters.AddWithValue("@userId", userId);
+                            _appLogger.Debug($"Binding @userId with value: {userId}");
+
+                            command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"));
+                            _appLogger.Debug($"Binding @startDate with value: {startDate.ToString("yyyy-MM-dd")}");
+
+                            command.Parameters.AddWithValue("@startTime", startTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                            _appLogger.Debug($"Binding @startTime with value: {startTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+
+                            command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"));
+                            _appLogger.Debug($"Binding @endDate with value: {endDate.ToString("yyyy-MM-dd")}");
+
+                            command.Parameters.AddWithValue("@endTime", endTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                            _appLogger.Debug($"Binding @endTime with value: {endTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+
+
+                            command.Parameters.AddWithValue("@durationSeconds", durationSeconds);
+                            _appLogger.Debug($"Binding @durationSeconds with value: {durationSeconds}");
+
+                            if (durationHHMM != null) // Checking for possible null strings(empty strings).
+                            {
+                                command.Parameters.AddWithValue("@durationHHMM", durationHHMM);
+                                _appLogger.Debug($"Binding @durationHHMM with value: {durationHHMM}");
+                            }
+                            else
+                            {
+                                command.Parameters.AddWithValue("@durationHHMM", DBNull.Value); // in SQL null = a missing or undefined value in a database column. C# null = absence of an object or initialized variable. 
+                                                                                                // This means c# null types must be converted to db null.
+                                _appLogger.Debug("Binding @durationHHMM with value: NULL");
+                            }
+                            if (goalHHMM != null)
+                            {
+                                command.Parameters.AddWithValue("@goalHHMM", goalHHMM);
+                                _appLogger.Debug($"Binding @goalHHMM with value: {goalHHMM}");
+                            }
+                            else
+                            {
+                                command.Parameters.AddWithValue("@goalHHMM", DBNull.Value);
+                                _appLogger.Debug("Binding @goalHHMM with value: NULL");
+                            }
+
+                            command.Parameters.AddWithValue("@goalReached", goalReached);
+                            _appLogger.Debug($"Binding @goalReached with value: {goalReached}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Exception in {nameof(SetCommandParametersForInsertCodingSessions)}: {ex.Message}. TraceID: {activity.TraceId}");
+                    throw;
+                }
+            });
+        }
+
+
 
         public void SetCommandParametersForCodingSessions
         (
@@ -329,7 +489,7 @@ namespace CodingTracker.Data.QueryBuilders
                     }
                     if (goalReached != 0)
                     {
-                        command.Parameters.AddWithValue("@GoalReached", goalReached);
+                        command.Parameters.AddWithValue("@goalReached", goalReached);
                         _appLogger.Debug($"Binding @goalReached with value: {goalReached}");
                     }
 

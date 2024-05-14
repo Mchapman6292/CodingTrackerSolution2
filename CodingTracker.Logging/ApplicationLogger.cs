@@ -20,14 +20,15 @@ namespace CodingTracker.Logging.ApplicationLoggers
                 .CreateLogger();
         }
 
-        public void LogActivity(string methodName, Action<Activity> logAction, Action action)
+        public void LogActivity(string methodName, Action<Activity> logAction, Action<Activity> action, Action<Activity> postAction = null)
         {
             using (var activity = new Activity(methodName).Start())
             {
                 try
                 {
                     logAction?.Invoke(activity);
-                    action?.Invoke();
+                    action?.Invoke(activity);
+                    postAction?.Invoke(activity);
                 }
                 catch (Exception ex)
                 {
@@ -37,7 +38,7 @@ namespace CodingTracker.Logging.ApplicationLoggers
             }
         }
 
-        private void LogDatabaseError(Exception ex, string operationName, Stopwatch stopwatch)
+        public void LogDatabaseError(Exception ex, string operationName, Stopwatch stopwatch)
         {
             stopwatch.Stop();
             Error($"Error executing {operationName}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {Activity.Current?.TraceId}");

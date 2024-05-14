@@ -8,18 +8,18 @@ namespace CodingTracker.Common.CodingSessionDTOs
 {
     public class CodingSessionDTO
     {
-        public int SessionId { get; set; } = 0; // Default value indicating not set. 
-        public int UserId { get; set; } = 0;
-        public DateTime? StartDate { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndDate { get; set; }
-        public DateTime? EndTime { get; set; }
-        public double? DurationSeconds { get; set; }
+        public int sessionId { get; set; } = 0;// Default value indicating not set. 
+        public int userId { get; set; } = 0;
+        public DateTime startDate { get; set; } = DateTime.MinValue;
+        public DateTime startTime { get; set; } = DateTime.MinValue;
+        public DateTime endDate { get; set; } = DateTime.MinValue;
+        public DateTime endTime { get; set; } = DateTime.MinValue;
+        public double durationSeconds { get; set; } = -1;
 
-        public string? DurationHHMM { get; set; }
+        public string durationHHMM { get; set; } = "00:00";
 
-        public string? GoalHHMM { get; set; }
-        public int? GoalReached { get; set; }
+        public string goalHHMM { get; set; } = "00:00";
+        public int goalReached { get; set; } = 0;
 
 
 

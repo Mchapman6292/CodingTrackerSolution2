@@ -36,9 +36,9 @@ namespace CodingTracker.Data.DatabaseSessionDeletes
                         DELETE FROM
                                     CodingSessions
                           WHERE
-                                    SessionId = @SessionId";
+                                    sessionId = @sessionId";
 
-                            command.Parameters.AddWithValue("@SessionId", sessionId);
+                            command.Parameters.AddWithValue("@sessionId", sessionId);
                             int affectedRows = command.ExecuteNonQuery();
 
                             if (affectedRows == 0)
@@ -80,28 +80,28 @@ namespace CodingTracker.Data.DatabaseSessionDeletes
         {
             using (var activity = new Activity(nameof(DeleteCredentials)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(DeleteCredentials)}. TraceID: {activity.TraceId}, UserId: {userId}");
+                _appLogger.Debug($"Starting {nameof(DeleteCredentials)}. TraceID: {activity.TraceId}, userId: {userId}");
                 _databaseManager.ExecuteCRUD(connection =>
                 {
                     using var command = new SQLiteCommand(@"
                 DELETE FROM 
                     UserCredentials
                 WHERE
-                    UserId = @UserId",
+                    userId = @userId",
                         connection);
 
-                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@userId", userId);
 
                     try
                     {
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         int affectedRows = command.ExecuteNonQuery();
                         stopwatch.Stop();
-                        _appLogger.Info($"Credentials deleted successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        _appLogger.Info($"Credentials deleted successfully for userId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
                     catch (SQLiteException ex)
                     {
-                        _appLogger.Error($"Failed to delete credentials for UserId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                        _appLogger.Error($"Failed to delete credentials for userId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     }
                 });
             }

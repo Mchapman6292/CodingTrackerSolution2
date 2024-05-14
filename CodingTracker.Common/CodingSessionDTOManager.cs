@@ -22,12 +22,14 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
 
         string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null, DateTime? startTime = null, DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
+        void UpdateCurrentSessionDTO(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0);
         TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
 
         List<string> SessionDurationSecondsToHHMM(List<CodingSessionDTO> sessionDTOs);
+
+        void SetCodingSessionUserId(int userId);
 
     }
 
@@ -35,7 +37,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
     public class CodingSessionDTOManager : ICodingSessionDTOManager
     {
-        public CodingSessionDTO _currentSessionDTO;
+        private CodingSessionDTO _currentSessionDTO;
 
         private readonly IErrorHandler _errorHandler;
         private readonly IApplicationLogger _appLogger;
@@ -44,7 +46,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         private readonly IInputValidator _inputValidator;
 
         private int _userId;
-        private int _sessionId;
+        private int CurrentSessionUserId;
         private int _DurationHHMM;
 
         public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, ICredentialManager credentialManager, IInputValidator inputValidator)
@@ -53,8 +55,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _appLogger = appLogger;
             _databaseSessionRead = databaseSessionRead;
             _credentialManager = credentialManager;
-            _userId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
-            _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
+            CurrentSessionUserId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _inputValidator = inputValidator;
         }
 
@@ -76,13 +77,13 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
                 _currentSessionDTO = new CodingSessionDTO
                 {
-                    UserId = _userId,
-                    SessionId = _sessionId
+                    userId = _userId,
+                    sessionId = CurrentSessionUserId,
                 };
 
                 stopwatch.Stop();
 
-                _appLogger.Info($"New CodingSessionDTO created with UserId: {_userId} and SessionId: {_sessionId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+                _appLogger.Info($"New CodingSessionDTO created with userId: {_userId} and sessionId: {CurrentSessionUserId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
 
                 return _currentSessionDTO;
             }
@@ -144,8 +145,8 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 try
                 {
                     DateTime startDate = DateTime.Today; // Use DateTime.Today to get the current date with the time component set to 00:00:00.
-                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, startDate: startDate);
-                    _appLogger.Info($"Start date set through UpdateCurrentSessionDTO, StartDate: {startDate}. Trace ID: {activity.TraceId}");
+                    UpdateCurrentSessionDTO(_currentSessionDTO.sessionId, _currentSessionDTO.userId, startDate: startDate);
+                    _appLogger.Info($"Start date set through UpdateCurrentSessionDTO, startDate: {startDate}. Trace ID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -169,8 +170,8 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 try
                 {
                     DateTime startTime = DateTime.Now;
-                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, startTime: startTime);
-                    _appLogger.Info($"Start time set through UpdateCurrentSessionDTO, StartTime: {startTime}. Trace ID: {activity.TraceId}");
+                    UpdateCurrentSessionDTO(_currentSessionDTO.sessionId, _currentSessionDTO.userId, startTime: startTime);
+                    _appLogger.Info($"Start time set through UpdateCurrentSessionDTO, startTime: {startTime}. Trace ID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -194,8 +195,8 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 try
                 {
                     DateTime endDate = DateTime.Today; // Using DateTime.Today to get the current date without the time part.
-                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, endDate: endDate);
-                    _appLogger.Info($"End date set through UpdateCurrentSessionDTO, EndDate: {endDate}. Trace ID: {activity.TraceId}");
+                    UpdateCurrentSessionDTO(_currentSessionDTO.sessionId, _currentSessionDTO.userId, endDate: endDate);
+                    _appLogger.Info($"End date set through UpdateCurrentSessionDTO, endDate: {endDate}. Trace ID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -221,10 +222,10 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 {
                     DateTime endTime = DateTime.Now;
 
-                    UpdateCurrentSessionDTO(_currentSessionDTO.SessionId, _currentSessionDTO.UserId, endTime: endTime);
+                    UpdateCurrentSessionDTO(_currentSessionDTO.sessionId, _currentSessionDTO.userId, endTime: endTime);
                     stopwatch.Stop();
 
-                    _appLogger.Info($"End time set through UpdateCurrentSessionDTO, EndTime: {endTime}. TraceID: {activity.TraceId}");
+                    _appLogger.Info($"End time set through UpdateCurrentSessionDTO, endTime: {endTime}. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -242,7 +243,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
                 if (!durationSeconds.HasValue)
                 {
-                    _appLogger.Debug("DurationSeconds has no value.");
+                    _appLogger.Debug("durationSeconds has no value.");
                     stopwatch.Stop();
                     return TimeSpan.Zero;
                 }
@@ -251,10 +252,37 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
                 stopwatch.Stop();
 
-                _appLogger.Info($"Converted DurationSeconds to TimeSpan. Result: {result}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+                _appLogger.Info($"Converted durationSeconds to TimeSpan. Result: {result}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
                 return result;
             }
         }
+
+        public string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            using (var activity = new Activity(nameof(ConvertDurationSecondsIntoStringHHMM)).Start())
+            {
+                _appLogger.Info($"Converting {durationSeconds} durationSeconds into HH:MM. TraceID: {activity.TraceId}");
+                try
+                {
+
+                    string result = FormatTimeSpanToHHMM(ConvertDurationSecondsToTimeSpan(durationSeconds));
+
+
+                    stopwatch.Stop();
+
+                    _appLogger.Info($"Conversion successful. HH:MM: {result}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"An error occurred during conversion. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    stopwatch.Stop();
+                    return null;
+                }
+            }
+        }
+
         public string FormatTimeSpanToHHMM(TimeSpan timeSpan)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -268,30 +296,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
                 _appLogger.Info($"Formatted TimeSpan to HHMM: {formattedTime}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
                 return formattedTime;
-            }
-        }
-
-        public string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(ConvertDurationSecondsIntoStringHHMM)).Start())
-            {
-                _appLogger.Info($"Converting {durationSeconds} DurationSeconds into HH:MM. TraceID: {activity.TraceId}");
-                try
-                {
-                    string result = FormatTimeSpanToHHMM(ConvertDurationSecondsToTimeSpan(durationSeconds));
-
-                    stopwatch.Stop();
-
-                    _appLogger.Info($"Conversion successful. HH:MM: {result}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during conversion. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                    stopwatch.Stop();
-                    return null;
-                }
             }
         }
 
@@ -327,71 +331,75 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null,  DateTime? startTime = null,  DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
+        public void UpdateCurrentSessionDTO(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0)
         {
-            using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
+            _appLogger.LogActivity(nameof(UpdateCurrentSessionDTO), activity =>
             {
                 _appLogger.Info($"Starting {nameof(UpdateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
-
+            },
+            activity =>
+            {
                 if (_currentSessionDTO == null)
                 {
                     _appLogger.Info("No current session DTO found. Creating new one.");
                     _currentSessionDTO = CreateCodingSessionDTO();
                 }
 
-                _currentSessionDTO.SessionId = sessionId;
-                _currentSessionDTO.UserId = userId;
+                _currentSessionDTO.userId = userId;
+                _currentSessionDTO.startDate = startDate;
+                _currentSessionDTO.startTime = startTime;
+                _currentSessionDTO.endDate = endDate;
+                _currentSessionDTO.endTime = endTime;
+                _currentSessionDTO.durationSeconds = durationSeconds;
+                _currentSessionDTO.durationHHMM = _inputValidator.IsValidTimeFormatHHMM(durationHHMM) ? durationHHMM : "";
+                _currentSessionDTO.goalHHMM = goalHHMM;
+                _currentSessionDTO.goalReached = goalReached;
 
-                if (startDate.HasValue) 
+                List<(string Name, object Value)> updates = new List<(string Name, object Value)>
                 {
-                    _currentSessionDTO.StartDate = startDate.Value;
-                }
-                if (startTime.HasValue)
-                {
-                    _currentSessionDTO.StartTime = startTime.Value;
-                }
-                if (endDate.HasValue) 
-                {
-                    _currentSessionDTO.EndDate = endDate.Value;
-                }
-                if (endTime.HasValue)
-                {
-                    _currentSessionDTO.EndTime = endTime.Value;
-                }
-                if (durationSeconds.HasValue)
-                {
-                    _currentSessionDTO.DurationSeconds = durationSeconds.Value;
-                }
-                if (_inputValidator.IsValidTimeFormatHHMM(durationHHMM))
-                {
-                    _currentSessionDTO.DurationHHMM = durationHHMM;
-                }
-                if(durationHHMM != null) 
-                {
-                    _currentSessionDTO.DurationHHMM = durationHHMM;
-                }
-                if (goalHHMM != null) 
-                {
-                    _currentSessionDTO.GoalHHMM = goalHHMM;
-                }
-
-                List<(string Name, object Value)> updates = new List<(string Name, object Value)>();
-
-                updates.Add(("SessionId", (object)sessionId));
-                updates.Add(("UserId", (object)userId));
-
-                if (startDate.HasValue) updates.Add(("StartDate", (object)startDate));
-                if (startTime.HasValue) updates.Add(("StartTime", (object)startTime));
-                if (endDate.HasValue) updates.Add(("EndDate", ((object)endDate)));
-                if (endTime.HasValue) updates.Add(("EndTime", (object)endTime));
-                if (durationSeconds.HasValue) updates.Add(("DurationSeconds", (object)durationSeconds));
-                if (durationHHMM != null) updates.Add(("DurationHHMM", (object)durationHHMM));
-                if (goalHHMM !=  null) updates.Add(("goalHHMM", (object)goalHHMM));
+                    ("userId", userId),
+                    ("startDate", startDate),
+                    ("startTime", startTime),
+                    ("endDate", endDate),
+                    ("endTime", endTime),
+                    ("durationSeconds", durationSeconds),
+                    ("durationHHMM", durationHHMM),
+                    ("goalHHMM", goalHHMM),
+                    ("goalReached", goalReached)
+                };
 
                 _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO), updates.ToArray());
+            }, activity =>
+            {
+                _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. _currentSessionDTOUserId: {_currentSessionDTO.userId} TraceID: {activity.TraceId}");
+            });
+        }
+        
 
-                _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. TraceID: {activity.TraceId}");
-            }
+        public void SetCodingSessionUserId(int userId)
+        {
+            _appLogger.LogActivity(nameof(SetCodingSessionUserId), activity =>
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                _appLogger.Info($"Starting {nameof(SetCodingSessionUserId)}, TraceID:{activity.TraceId}.");
+            },
+            activity =>
+            {
+
+                if (userId > 0)
+                {
+                    CurrentSessionUserId = userId;
+                    _appLogger.Info($"CodingSessionUserId set to {userId} TraceID:{activity.TraceId}");
+                }
+                else
+                {
+                    _appLogger.Info($"CurrentSessionUserID is not greater than 0 (0 is default for not set) TraceID:{activity.TraceId}");
+                }
+            },
+            activity =>
+            {
+                _appLogger.Info($"{nameof(SetCodingSessionUserId)} complete TraceID:{activity.TraceId}");
+            });
         }
     }
 }

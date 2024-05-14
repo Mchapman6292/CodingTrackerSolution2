@@ -33,7 +33,7 @@ namespace CodingTracker.Data
         {
             using (var activity = new Activity(nameof(UpdateUserName)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(UpdateUserName)}. TraceID: {activity.TraceId}, UserId: {userId}, NewUserName: {newUserName}");
+                _appLogger.Debug($"Starting {nameof(UpdateUserName)}. TraceID: {activity.TraceId}, userId: {userId}, NewUserName: {newUserName}");
                 _databaseManager.ExecuteCRUD(connection =>
                 {
                     using var command = new SQLiteCommand(@"
@@ -42,11 +42,11 @@ namespace CodingTracker.Data
                             SET
                                 Username = @Username
                             WHERE
-                                UserId = @UserId",
+                                userId = @userId",
 
                                     connection);
 
-                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@userId", userId);
                     command.Parameters.AddWithValue("@Username", newUserName);
 
                     try
@@ -54,11 +54,11 @@ namespace CodingTracker.Data
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         int affectedRows = command.ExecuteNonQuery();
                         stopwatch.Stop();
-                        _appLogger.Info($"Username updated successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        _appLogger.Info($"Username updated successfully for userId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
                     catch (SQLiteException ex)
                     {
-                        _appLogger.Error($"Failed to update username for UserId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}");
+                        _appLogger.Error($"Failed to update username for userId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}");
                     }
                 });
             }
@@ -70,7 +70,7 @@ namespace CodingTracker.Data
         {
             using (var activity = new Activity(nameof(UpdatePassword)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(UpdatePassword)}. TraceID: {activity.TraceId}, UserId: {userId}");
+                _appLogger.Debug($"Starting {nameof(UpdatePassword)}. TraceID: {activity.TraceId}, userId: {userId}");
                 string hashedPassword = _credentialManager.HashPassword(newPassword);
                 _databaseManager.ExecuteCRUD(connection =>
                 {
@@ -80,10 +80,10 @@ namespace CodingTracker.Data
                         SET 
                             PasswordHash = @PasswordHash
                         WHERE
-                            UserId = @UserId",
+                            userId = @userId",
                         connection);
 
-                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@userId", userId);
                     command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
                     try
@@ -91,11 +91,11 @@ namespace CodingTracker.Data
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         int affectedRows = command.ExecuteNonQuery();
                         stopwatch.Stop();
-                        _appLogger.Info($"PasswordHash updated successfully for UserId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                        _appLogger.Info($"PasswordHash updated successfully for userId {userId}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                     }
                     catch (SQLiteException ex)
                     {
-                        _appLogger.Error($"Failed to update password for UserId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                        _appLogger.Error($"Failed to update password for userId {userId}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     }
                 });
             }
