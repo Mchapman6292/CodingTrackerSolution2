@@ -1,0 +1,83 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CodingTracker.Common.IApplicationLogger;
+
+namespace CodingTracker.Common.CurrentCodingSessions
+{
+    public class CodingSession
+    {
+        private int _sessionId;
+        private int _userId;
+        private DateTime _startDate;
+        private DateTime _startTime;
+        private DateTime _endDate;
+        private DateTime _endTime;
+        private double _durationSeconds;
+        private string _durationHHMM;
+        private string _goalHHMM;
+        private int _goalReached;
+
+        public int SessionId
+        {
+            get { return _sessionId; }
+            set { _sessionId = value; } 
+        }
+
+        public int UserId
+        {
+            get { return _userId; }
+            set { _userId = value; } 
+        }
+
+        public DateTime StartDate
+        {
+            get { return _startDate; }
+            set { _startDate = value; } 
+        }
+
+        public DateTime StartTime
+        {
+            get { return _startTime; }
+            set { _startTime = value; } 
+        }
+
+        public DateTime EndDate
+        {
+            get { return _endDate; }
+            set { _endDate = value; } 
+        }
+
+        public DateTime EndTime
+        {
+            get { return _endTime; } 
+            set { _endTime = value; } 
+        }
+
+        public double DurationSeconds
+        {
+            get { return _durationSeconds; }
+            set { _durationSeconds = value; }
+        }
+
+        public string DurationHHMM
+        {
+            get { return _durationHHMM; }
+            set { _durationHHMM = value; }
+        }
+
+        public string GoalHHMM
+        {
+            get { return _goalHHMM; }
+            set { _goalHHMM = value; }
+        }
+
+        public int GoalReached
+        {
+            get { return _goalReached; }
+            set { _goalReached = value; }
+        }
+    }
+}

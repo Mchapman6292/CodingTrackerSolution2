@@ -15,6 +15,7 @@ using CodingTracker.Data.DatabaseSessionInserts;
 using CodingTracker.Business.SessionCalculators;
 using CodingTracker.Common.INewDatabaseReads;
 using CodingTracker.Common.IQueryBuilders;
+using CodingTracker.Business.IAuthenticationService;
 
 
 // method to record start & end time
@@ -53,10 +54,11 @@ namespace CodingTracker.Business.CodingSessions
         private readonly ISessionCalculator _sessionCalculator;
         private readonly IQueryBuilder _queryBuilder;
         private readonly INewDatabaseRead _newDatabaseRead;
+        private readonly IAuthenticationService _authenticationService;
 
   
 
-        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead)
+        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead, IAuthenticationService authenticationService)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
@@ -70,6 +72,7 @@ namespace CodingTracker.Business.CodingSessions
             _sessionCalculator = sessionCalculator;
             _queryBuilder = queryBuilder;
             _newDatabaseRead = newDatabaseRead;
+            _authenticationService = authenticationService;
         }
 
 

@@ -76,9 +76,10 @@ namespace CodingTracker.Business.AuthenticationServices
                      }
                      else
                      {
-                         _userCredentialDTOManager.UpdateCurrentUserCredentialDTO(currentCredentials);
-
-                         _appLogger.Info($"UserId set for DTO managers {currentCredentials.UserId}, TraceID: {activity.TraceId}");
+                         _currentUserCredentials.UserId = currentCredentials.UserId;
+                         _currentUserCredentials.username = currentCredentials.Username;
+                         _currentUserCredentials.PasswordHash = currentUserCredentials.PasswordHash; 
+                         _appLogger.Info($"UserId set for _currentUserCredentials: {currentCredentials.UserId}, TraceID: {activity.TraceId}");
 
                      }
                  }
