@@ -77,8 +77,8 @@ namespace CodingTracker.Business.AuthenticationServices
                      else
                      {
                          _currentUserCredentials.UserId = currentCredentials.UserId;
-                         _currentUserCredentials.username = currentCredentials.Username;
-                         _currentUserCredentials.PasswordHash = currentUserCredentials.PasswordHash; 
+                         _currentUserCredentials.Username = currentCredentials.Username;
+                         _currentUserCredentials.PasswordHash = currentCredentials.PasswordHash; 
                          _appLogger.Info($"UserId set for _currentUserCredentials: {currentCredentials.UserId}, TraceID: {activity.TraceId}");
 
                      }

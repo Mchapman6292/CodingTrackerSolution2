@@ -22,7 +22,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         CodingSessionDTO CreateAndReturnCurrentSessionDTO();
 
         string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
-        void UpdateCurrentSessionDTO(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0);
+        void UpdateCurrentSessionDTO(int userId, DateOnly startDate, DateTime startTime, DateOnly endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0);
         TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
@@ -331,7 +331,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
 
 
-        public void UpdateCurrentSessionDTO(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0)
+        public void UpdateCurrentSessionDTO(int userId, DateOnly startDate, DateTime startTime, DateOnly endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached = 0)
         {
             _appLogger.LogActivity(nameof(UpdateCurrentSessionDTO), activity =>
             {

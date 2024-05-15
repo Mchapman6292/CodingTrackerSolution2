@@ -134,11 +134,6 @@ namespace CodingTracker.Data.NewDatabaseReads
         }
 
 
-
-
-
-
-
         public List<CodingSessionDTO> HandleCodingSessionsTableOperations
         (
 
@@ -146,9 +141,9 @@ namespace CodingTracker.Data.NewDatabaseReads
             string sqlCommand,
             int sessionId = 0,
             int userId = 0,
-            DateTime? startDate = null,
+            DateOnly? startDate = null,
             DateTime? startTime = null,
-            DateTime? endDate = null,
+            DateOnly? endDate = null,
             DateTime? endTime = null,
             double? durationSeconds = null,
             string? durationHHMM = null,
@@ -244,9 +239,9 @@ namespace CodingTracker.Data.NewDatabaseReads
         public void InsertIntoCodingSessionTable
         (
             int userId,
-            DateTime startDate,
+            DateOnly startDate,
             DateTime startTime,
-            DateTime endDate,
+            DateOnly endDate,
             DateTime endTime,
             double durationSeconds,
             string durationHHMM,

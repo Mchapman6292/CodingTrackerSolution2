@@ -37,9 +37,9 @@ namespace CodingTracker.Common.IQueryBuilders
             string sqlCommand,
             int sessionId = 0,
             int userId = 0,
-            DateTime? startDate = null,
+            DateOnly? startDate = null,
             DateTime? startTime = null,
-            DateTime? endDate = null,
+            DateOnly? endDate = null,
             DateTime? endTime = null,
             double? durationSeconds = 0,
             string? durationHHMM = null,
@@ -57,9 +57,9 @@ namespace CodingTracker.Common.IQueryBuilders
                SQLiteCommand command,
                int sessionId = 0,
                int userId = 0,
-               DateTime? startDate = null,
+               DateOnly? startDate = null,
                DateTime? startTime = null,
-               DateTime? endDate = null,
+               DateOnly? endDate = null,
                DateTime? endTime = null,
                double? durationSeconds = null,
                string? durationHHMM = null,
@@ -71,9 +71,9 @@ namespace CodingTracker.Common.IQueryBuilders
         (
             SQLiteCommand command,
             int userId,
-            DateTime startDate,
+            DateOnly startDate,
             DateTime startTime,
-            DateTime endDate,
+            DateOnly endDate,
             DateTime endTime,
             double durationSeconds,
             string durationHHMM,
@@ -81,7 +81,18 @@ namespace CodingTracker.Common.IQueryBuilders
             int goalReached
         );
 
-        string CreateInsertTextForCodingSessions(int userId, DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime, double durationSeconds, string durationHHMM, string goalHHMM, int goalReached);
+        string CreateInsertTextForCodingSessions
+        (   
+            int userId,
+            DateOnly startDate,
+            DateTime startTime, 
+            DateOnly endDate, 
+            DateTime endTime, 
+            double durationSeconds, 
+            string durationHHMM, 
+            string goalHHMM, 
+            int goalReached
+        );
 
 
     }

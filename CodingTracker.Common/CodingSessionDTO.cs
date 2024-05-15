@@ -10,15 +10,15 @@ namespace CodingTracker.Common.CodingSessionDTOs
     {
         public int sessionId { get; set; } = 0;// Default value indicating not set. 
         public int userId { get; set; } = 0;
-        public DateTime startDate { get; set; } = DateTime.MinValue;
+        public DateOnly startDate { get; set; } = DateOnly.MinValue;
         public DateTime startTime { get; set; } = DateTime.MinValue;
-        public DateTime endDate { get; set; } = DateTime.MinValue;
+        public DateOnly endDate { get; set; } = DateOnly.MinValue;
         public DateTime endTime { get; set; } = DateTime.MinValue;
         public double durationSeconds { get; set; } = -1;
 
-        public string durationHHMM { get; set; } = "00:00";
+        public string durationHHMM { get; set; } = "";
 
-        public string goalHHMM { get; set; } = "00:00";
+        public string goalHHMM { get; set; } = "";
         public int goalReached { get; set; } = 0;
 
 

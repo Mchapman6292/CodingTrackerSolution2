@@ -11,9 +11,9 @@ namespace CodingTracker.Common.ICodingSessions
     {
         int CurrentSessionId { get; set; }
         int CurrentUserId { get; set; }
-        DateTime CurrentStartDate { get; set; }
+        DateOnly CurrentStartDate { get; set; }
         DateTime CurrentStartTime { get; set; }
-        DateTime CurrentEndDate { get; set; }
+        DateOnly CurrentEndDate { get; set; }
         DateTime CurrentEndTime { get; set; }
         double CurrentDurationSeconds { get; set; }
         string CurrentDurationHHMM { get; set; }

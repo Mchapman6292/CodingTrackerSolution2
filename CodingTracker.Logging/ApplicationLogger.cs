@@ -37,6 +37,27 @@ namespace CodingTracker.Logging.ApplicationLoggers
                 }
             }
         }
+        // For methods that return a value
+        public T LogActivity<T>(string methodName, Func<Activity, T> action, Action<Activity> preAction = null, Action<Activity, T> postAction = null)
+        {
+            using (var activity = new Activity(methodName).Start())
+            {
+                T result = default(T);
+                try
+                {
+                    preAction?.Invoke(activity);
+                    result = action.Invoke(activity);
+                    postAction?.Invoke(activity, result);
+                }
+                catch (Exception ex)
+                {
+                    Error($"Exception in {methodName}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+                return result;
+            }
+        }
+
 
         public void LogDatabaseError(Exception ex, string operationName, Stopwatch stopwatch)
         {

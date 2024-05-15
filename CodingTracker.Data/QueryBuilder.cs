@@ -161,9 +161,9 @@ namespace CodingTracker.Data.QueryBuilders
             string sqlCommand,
             int sessionId = 0,
             int userId = 0,
-            DateTime? startDate = null,
+            DateOnly? startDate = null,
             DateTime? startTime = null,
-            DateTime? endDate = null,
+            DateOnly? endDate = null,
             DateTime? endTime = null,
             double? durationSeconds = 0,
             string? durationHHMM = null,
@@ -330,13 +330,66 @@ namespace CodingTracker.Data.QueryBuilders
             return sqlCommand;
         }
 
+        public bool CheckValuesForInsertParametersAreValid(
+            int userId,
+            DateOnly startDate,
+            DateTime startTime,
+            DateOnly endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
+            int goalReached)
+        {
+            return _appLogger.LogActivity(nameof(CheckValuesForInsertParametersAreValid), activity =>
+            {
+                List<string> errorMessages = new List<string>();
+
+                if (userId == 0)
+                    errorMessages.Add($"UserId is set to 0, which is the default for not set.");
+
+                if (startDate == DateOnly.MinValue)
+                    errorMessages.Add($"StartDate is set to MinValue, which is the default for not set.");
+
+                if (startTime == DateTime.MinValue)
+                    errorMessages.Add($"StartTime is set to MinValue, which is the default for not set.");
+
+                if (endDate == DateOnly.MaxValue)
+                    errorMessages.Add($"EndDate is set to MaxValue, which is the default for not set.");
+
+                if (endTime == DateTime.MaxValue)
+                    errorMessages.Add($"EndTime is set to MaxValue, which is the default for not set.");
+
+                if (durationSeconds < 0)
+                    errorMessages.Add($"DurationSeconds is negative, which indicates it is not properly set.");
+
+                if (string.IsNullOrEmpty(durationHHMM))
+                    errorMessages.Add($"DurationHHMM is empty or null, which is not expected.");
+
+                if (string.IsNullOrEmpty(goalHHMM))
+                    errorMessages.Add($"GoalHHMM is empty or null, which is not expected.");
+
+                if (goalReached == 0)
+                    errorMessages.Add($"GoalReached is set to 0, which is the default for not set.");
+
+                if (errorMessages.Count > 0)
+                {
+                    string fullErrorMessage = string.Join(Environment.NewLine, errorMessages);
+                    _appLogger.Error($"Validation errors: {fullErrorMessage}. TraceID: {activity.TraceId}");
+                    return false;
+                }
+                return true; 
+            });
+        }
+
+
         public void SetCommandParametersForInsertCodingSessions
         (
             SQLiteCommand command,
             int userId,
-            DateTime startDate,
+            DateOnly startDate,
             DateTime startTime,
-            DateTime endDate,
+            DateOnly endDate,
             DateTime endTime,
             double durationSeconds,
             string durationHHMM,
@@ -344,68 +397,47 @@ namespace CodingTracker.Data.QueryBuilders
             int goalReached
         )
         {
-            _appLogger.LogActivity(nameof(SetCommandParametersForCodingSessions), activity =>
+            _appLogger.LogActivity(nameof(SetCommandParametersForInsertCodingSessions), activity =>
             {
                 ActivityTraceId traceId = activity.TraceId;
-                _appLogger.Info($"Starting {nameof(SetCommandParametersForCodingSessions)}. TraceID:{activity.TraceId}.");
+                _appLogger.Info($"Starting {nameof(SetCommandParametersForInsertCodingSessions)}. TraceID:{activity.TraceId}.");
             }, 
             activity => 
             {
                 try
                 {
-                    if (userId == 0)
+                    if (CheckValuesForInsertParametersAreValid(userId, startDate, startTime, endDate, endTime, durationSeconds, durationHHMM, goalHHMM, goalReached) == false)
                     {
-                        _appLogger.Error($"Error during {nameof(SetCommandParametersForCodingSessions)}: userId == 0, this is the default for userId not set. TraceID: {activity.TraceId}.");
-                        throw new InvalidOperationException($"Error during {nameof(SetCommandParametersForCodingSessions)}: userId == 0, this is the default for userId not set");
+                        throw new InvalidOperationException("Invalid values for CheckValuesForInsertParametersAreValid");
                     }
                     else
                     {
-                        if (userId > 0)
-                        {
-                            command.Parameters.AddWithValue("@userId", userId);
-                            _appLogger.Debug($"Binding @userId with value: {userId}");
+                        command.Parameters.AddWithValue("@userId", userId);
+                        _appLogger.Info($"Binding @userId with value: {userId}");
 
-                            command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"));
-                            _appLogger.Debug($"Binding @startDate with value: {startDate.ToString("yyyy-MM-dd")}");
+                        command.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"));
+                        _appLogger.Info($"Binding @startDate with value: {startDate.ToString("yyyy-MM-dd")}");
 
-                            command.Parameters.AddWithValue("@startTime", startTime.ToString("yyyy-MM-dd HH:mm:ss"));
-                            _appLogger.Debug($"Binding @startTime with value: {startTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+                        command.Parameters.AddWithValue("@startTime", startTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                        _appLogger.Info($"Binding @startTime with value: {startTime.ToString("yyyy-MM-dd HH:mm:ss")}");
 
-                            command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"));
-                            _appLogger.Debug($"Binding @endDate with value: {endDate.ToString("yyyy-MM-dd")}");
+                        command.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"));
+                        _appLogger.Info($"Binding @endDate with value: {endDate.ToString("yyyy-MM-dd")}");
 
-                            command.Parameters.AddWithValue("@endTime", endTime.ToString("yyyy-MM-dd HH:mm:ss"));
-                            _appLogger.Debug($"Binding @endTime with value: {endTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+                        command.Parameters.AddWithValue("@endTime", endTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                        _appLogger.Info($"Binding @endTime with value: {endTime.ToString("yyyy-MM-dd HH:mm:ss")}");
 
+                        command.Parameters.AddWithValue("@durationSeconds", durationSeconds);
+                        _appLogger.Info($"Binding @durationSeconds with value: {durationSeconds}");
 
-                            command.Parameters.AddWithValue("@durationSeconds", durationSeconds);
-                            _appLogger.Debug($"Binding @durationSeconds with value: {durationSeconds}");
+                        command.Parameters.AddWithValue("@durationHHMM", durationHHMM);
+                        _appLogger.Info($"Binding @durationHHMM with value: {durationHHMM}");
 
-                            if (durationHHMM != null) // Checking for possible null strings(empty strings).
-                            {
-                                command.Parameters.AddWithValue("@durationHHMM", durationHHMM);
-                                _appLogger.Debug($"Binding @durationHHMM with value: {durationHHMM}");
-                            }
-                            else
-                            {
-                                command.Parameters.AddWithValue("@durationHHMM", DBNull.Value); // in SQL null = a missing or undefined value in a database column. C# null = absence of an object or initialized variable. 
-                                                                                                // This means c# null types must be converted to db null.
-                                _appLogger.Debug("Binding @durationHHMM with value: NULL");
-                            }
-                            if (goalHHMM != null)
-                            {
-                                command.Parameters.AddWithValue("@goalHHMM", goalHHMM);
-                                _appLogger.Debug($"Binding @goalHHMM with value: {goalHHMM}");
-                            }
-                            else
-                            {
-                                command.Parameters.AddWithValue("@goalHHMM", DBNull.Value);
-                                _appLogger.Debug("Binding @goalHHMM with value: NULL");
-                            }
+                        command.Parameters.AddWithValue("@goalHHMM", goalHHMM);
+                        _appLogger.Info($"Binding goalHHMM with value: {goalHHMM}");
 
-                            command.Parameters.AddWithValue("@goalReached", goalReached);
-                            _appLogger.Debug($"Binding @goalReached with value: {goalReached}");
-                        }
+                        command.Parameters.AddWithValue("@goalReached", goalReached);
+                        _appLogger.Info($"Binding goalReached with value: {goalReached}.");
                     }
                 }
                 catch (Exception ex)
@@ -417,15 +449,14 @@ namespace CodingTracker.Data.QueryBuilders
         }
 
 
-
         public void SetCommandParametersForCodingSessions
         (
             SQLiteCommand command,
             int sessionId = 0,
             int userId = 0,
-            DateTime? startDate = null,
+            DateOnly? startDate = null,
             DateTime? startTime = null,
-            DateTime? endDate = null,
+            DateOnly? endDate = null,
             DateTime? endTime = null,
             double? durationSeconds = null,
             string? durationHHMM = null,

@@ -1,6 +1,5 @@
-﻿// Ignore Spelling: sql
-
-using CodingTracker.Common.CodingSessionDTOs;
+﻿
+ using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentialDTOs;
 using System;
@@ -36,9 +35,9 @@ namespace CodingTracker.Common.INewDatabaseReads
             string sqlCommand,
             int sessionId = 0,
             int userId = 0,
-            DateTime? startDate = null,
+            DateOnly? startDate = null,
             DateTime? startTime = null,
-            DateTime? endDate = null,
+            DateOnly? endDate = null,
             DateTime? endTime = null,
             double? durationSeconds = null,
             string? durationHHMM = null,
@@ -54,9 +53,9 @@ namespace CodingTracker.Common.INewDatabaseReads
         void InsertIntoCodingSessionTable
         (
             int userId,
-            DateTime startDate,
+            DateOnly startDate,
             DateTime startTime,
-            DateTime endDate,
+            DateOnly endDate,
             DateTime endTime,
             double durationSeconds,
             string durationHHMM,
