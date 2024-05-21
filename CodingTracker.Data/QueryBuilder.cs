@@ -3,6 +3,7 @@
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IQueryBuilders;
+using CodingTracker.Logging.AcitivtyExtensions;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Text;
@@ -152,8 +153,54 @@ namespace CodingTracker.Data.QueryBuilders
         }
 
 
+        public bool CheckSQLCommandForCodingSession(string sqlCommand, string traceId, string parentId)
+        {
+            using (var activity = new Activity(nameof(CheckSQLCommandForCodingSession)).Start()) 
+            {
+                _appLogger.Info($"Starting {nameof(CheckSQLCommandForCodingSession)} ParentID: {parentId}, TraceID: {traceId}."); 
 
+                var validCommands = new HashSet<string> { "SELECT", "UPDATE", "DELETE" }; // HashSet instead of list to ensure no duplicates.
 
+                if (!validCommands.Contains(sqlCommand)) 
+                {
+                    _appLogger.Error($" Error during {nameof(CheckSQLCommandForCodingSession)} sql command must be one of SELECT, UPDATE, DELETE. Command used: {sqlCommand}. ParentId{parentId}.");
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        public bool CheckValidColumnsForCodingSession(List<string> columnsToSelect, string parentId)
+        {
+            using (var activity = new Activity(nameof(CheckValidColumnsForCodingSession)).Start())
+            {
+                _appLogger.Info($"Starting {nameof(CheckValidColumnsForCodingSession)} ParentID: {parentId}");
+
+                var validColumns = new HashSet<string> { "SessionId", "UserId", "StartDate", "StartTime", "EndDate", "EndTime", "DurationSeconds", "DurationHHMM", "GoalHHMM", "GoalReached" };
+
+                List<string> invalidColumns = new List<string>();
+
+                bool allValid = columnsToSelect.All(column => validColumns.Contains(column));
+
+                foreach(var column in columnsToSelect) 
+                {
+                    if(!validColumns.Contains(column))
+                    {
+                        invalidColumns.Add(column);
+                    }
+                }
+                if(invalidColumns.Any())
+                {
+                    string invalidColumnsString = string.Join(", ", invalidColumns);
+                    _appLogger.Error($"Invalid columns selected for coding Session table. Invalid columns: {invalidColumnsString}. ParentID: {parentId}.");
+                    return false;
+                }
+                return true;
+            }
+        }
 
         public string CreateCommandTextForCodingSessions
         (
@@ -181,7 +228,9 @@ namespace CodingTracker.Data.QueryBuilders
             {
                 _appLogger.Debug($"Starting {nameof(CreateCommandTextForCodingSessions)}, TraceID: {activity.TraceId}");
 
-
+                bool isvalidCommands = CheckSQLCommandForCodingSession(sqlCommand, activity.TraceId.ToString(), activity.TraceId.ToString());
+                bool isValidColumns = CheckValidColumnsForCodingSession(columnsToSelect, activity.ParentId.ToString());
+                
                 // sql command checks
                 var validCommands = new HashSet<string> { "SELECT", "INSERT", "UPDATE", "DELETE" };
 

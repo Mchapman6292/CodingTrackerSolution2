@@ -20,9 +20,9 @@ namespace CodingTracker.Logging.ApplicationLoggers
                 .CreateLogger();
         }
 
-        public void LogActivity(string methodName, Action<Activity> logAction, Action<Activity> action, Action<Activity> postAction = null)
+        public void LogActivity(string methodName, Action<Activity> logAction, Action<Activity> action, Action<Activity> postAction = null) // Each Activity automatically generates a new Span, ParentID etc
         {
-            using (var activity = new Activity(methodName).Start())
+            using (var activity = new Activity(methodName).Start()) // .Start() must be called for trace,parent & span ids to be created. 
             {
                 try
                 {
