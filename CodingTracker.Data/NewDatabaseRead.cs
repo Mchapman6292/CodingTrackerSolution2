@@ -134,6 +134,11 @@ namespace CodingTracker.Data.NewDatabaseReads
         }
 
 
+
+
+
+
+
         public List<CodingSessionDTO> HandleCodingSessionsTableOperations
         (
 
@@ -305,9 +310,9 @@ namespace CodingTracker.Data.NewDatabaseReads
                     {
                         sessionId = reader.GetInt32(reader.GetOrdinal("sessionId")),
                         userId = reader.GetInt32(reader.GetOrdinal("userId")),
-                        startDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
+                        startDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("startDate"))),
                         startTime = reader.GetDateTime(reader.GetOrdinal("startTime")),
-                        endDate = reader.GetDateTime(reader.GetOrdinal("endDate")),
+                        endDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("endDate"))),
                         endTime = reader.GetDateTime(reader.GetOrdinal("endTime")),
                         durationSeconds = reader.GetDouble(reader.GetOrdinal("durationSeconds")),
                         durationHHMM = reader.GetString(reader.GetOrdinal("durationHHMM")),

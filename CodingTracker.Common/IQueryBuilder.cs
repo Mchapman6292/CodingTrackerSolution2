@@ -54,17 +54,17 @@ namespace CodingTracker.Common.IQueryBuilders
 
         void SetCommandParametersForCodingSessions
            (
-               SQLiteCommand command,
-               int sessionId = 0,
-               int userId = 0,
-               DateOnly? startDate = null,
-               DateTime? startTime = null,
-               DateOnly? endDate = null,
-               DateTime? endTime = null,
-               double? durationSeconds = null,
-               string? durationHHMM = null,
-               string? goalHHMM = null,
-               int goalReached = 0
+              SQLiteCommand command,
+            int sessionId,
+            int userId,
+            DateOnly startDate,
+            DateTime startTime,
+            DateOnly endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
+            int goalReached
            );
 
         public void SetCommandParametersForInsertCodingSessions
