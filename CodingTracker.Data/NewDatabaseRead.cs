@@ -141,24 +141,23 @@ namespace CodingTracker.Data.NewDatabaseReads
 
         public List<CodingSessionDTO> HandleCodingSessionsTableOperations
         (
-
             List<string> columnsToSelect,
             string sqlCommand,
+            DateOnly startDate,
+            DateTime startTime,
+            DateOnly endDate,
+            DateTime endTime,
+            double durationSeconds,
+            string durationHHMM,
+            string goalHHMM,
             int sessionId = 0,
             int userId = 0,
-            DateOnly? startDate = null,
-            DateTime? startTime = null,
-            DateOnly? endDate = null,
-            DateTime? endTime = null,
-            double? durationSeconds = null,
-            string? durationHHMM = null,
-            string? goalHHMM = null,
             int goalReached = 0,
-            string? orderBy = null,
+            string orderBy = "",
             bool ascending = true,
-            string? groupBy = null,
-            string? sumColumn = null, // New parameter to specify which column to sum
-            int? limit = null
+            string groupBy = "",
+            string sumColumn = "",
+            int limit = 10
         )
         {
             List<CodingSessionDTO> codingSessions = new List<CodingSessionDTO>();
@@ -167,6 +166,8 @@ namespace CodingTracker.Data.NewDatabaseReads
             {
                 traceId = activity.TraceId;
                 _appLogger.Info($"Starting {nameof(HandleCodingSessionsTableOperations)}. TraceID: {activity.TraceId}");
+
+
                 _appLogger.Debug($"Parameters: sessionId={sessionId}, userId={userId}, startDate={startDate}, startTime={startTime}, " +
                 $"endDate={endDate}, endTime={endTime}, durationSeconds={durationSeconds}, durationHHMM={durationHHMM}, " +
                 $"goalHHMM={goalHHMM}, goalReached={goalReached}, OrderBy={orderBy}, Ascending={ascending}, GroupBy={groupBy}, " +
@@ -199,11 +200,10 @@ namespace CodingTracker.Data.NewDatabaseReads
                                                 _appLogger.Debug($"Column {column}: {columnValue}");
                                             }
                                             codingSessions.Add(ExtractCodingSessionFromReader(reader));
-                                        }
+                                        
                                     }
                                 }
                                 else
-                                {
                                     command.Parameters.AddWithValue(@"SessionId", sessionId);
                                     command.Parameters.AddWithValue("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value);
                                     command.Parameters.AddWithValue("@StartTime", startTime.HasValue ? (object)startTime.Value : DBNull.Value);

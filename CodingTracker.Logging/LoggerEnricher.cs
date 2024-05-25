@@ -21,6 +21,8 @@ namespace CodingTracker.Logging.LoggerEnrichers
             var activity = Activity.Current;
             if (activity != null)
             {
+                // TraceId & SpanId must be converted to string when used as parameters. ParentId is a string property of the Activity class, this directly returns the parent spans identifier  as a string. 
+
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("SpanId", activity.GetSpanId()));
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("TraceId", activity.GetTraceId()));
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ParentId", activity.GetParentId()));

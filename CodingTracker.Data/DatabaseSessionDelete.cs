@@ -1,6 +1,7 @@
 ﻿using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IDatabaseSessionDeletes;
+using CodingTracker.Common.IQueryBuilders;
 
 using CodingTracker.Common.IApplicationLoggers;
 using System.Data.SQLite;
@@ -12,12 +13,38 @@ namespace CodingTracker.Data.DatabaseSessionDeletes
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
+        private readonly IQueryBuilder _queryBuilder;
 
-        public DatabaseSessionDelete(IDatabaseManager databaseManager, IApplicationLogger appLogger)
+        public DatabaseSessionDelete(IDatabaseManager databaseManager, IApplicationLogger appLogger, IQueryBuilder queryBuilder)
         {
             _databaseManager = databaseManager;
             _appLogger = appLogger;
+            _queryBuilder = queryBuilder;
         }
+
+
+        public void DeleteFromCodingSessionsTable(CodingSessionDTO codingSessionDTO)
+        {
+            _appLogger.LogActivity(nameof(DeleteFromCodingSessionsTable), activity =>
+            {
+                _appLogger.Info($"Starting {nameof(DeleteFromCodingSessionsTable)} SpanID: {activity.SpanId.ToString()}.");
+
+                _queryBuilder.CreateCommandTextForCodingSessions()
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         public void DeleteSession(List<int> sessionIds)
         {

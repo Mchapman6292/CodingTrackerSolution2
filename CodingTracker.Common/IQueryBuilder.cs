@@ -61,7 +61,7 @@ namespace CodingTracker.Common.IQueryBuilders
             DateTime startTime,
             DateOnly endDate,
             DateTime endTime,
-            double durationSeconds,
+            double durationSeconds, 
             string durationHHMM,
             string goalHHMM,
             int goalReached
