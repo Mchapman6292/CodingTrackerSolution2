@@ -278,17 +278,17 @@ namespace CodingTracker.Data.DatabaseManagers
 
                 command.CommandText = @"
                     CREATE TABLE CodingSessions (
-                        SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                        UserId INTEGER NOT NULL,
-                        StartDate DATE,
-                        StartTime DATETIME,
-                        EndDate DATE,
-                        EndTime DATETIME,
-                        DurationSeconds REAL, 
-                        DurationHHMM STRING,
-                        GoalHHMM STRING,
-                        GoalReached INTEGER,
-                        FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
+                            SessionId INTEGER PRIMARY KEY AUTOINCREMENT,
+                            UserId INTEGER NOT NULL,
+                            StartDate DATE,
+                            StartTime DATETIME,
+                            EndDate DATE,
+                            EndTime DATETIME,
+                            DurationSeconds REAL, 
+                            DurationHHMM STRING,
+                            GoalHHMM STRING,
+                            GoalReached INTEGER,
+                            FOREIGN KEY(UserId) REFERENCES UserCredentials(UserId)
                         
                         );";
                         command.ExecuteNonQuery();

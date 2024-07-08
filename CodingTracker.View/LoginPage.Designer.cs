@@ -10,7 +10,7 @@ namespace CodingTracker.View
         private readonly IDatabaseManager _dbManager;
         private readonly IInputValidator _inputValidator;
         private readonly IUtilityService _utilityService;
-        private readonly CodingSession _codingSession;
+        private readonly SessionLogic _codingSession;
         private Button startSessionButton;
         private Button endSessionButton;
         private Button viewSessionsButton;

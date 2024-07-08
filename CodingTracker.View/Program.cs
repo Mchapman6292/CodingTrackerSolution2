@@ -50,6 +50,10 @@ using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Data.NewDatabaseReads;
 using CodingTracker.Common.INewDatabaseReads;
+using CodingTracker.Data.GenericRepository;
+using CodingTracker.Data.IGenericRepository;
+using CodingTracker.Data.EntityContexts;
+using Microsoft.EntityFrameworkCore;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -110,7 +114,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IAuthenticationService, AuthenticationService>()
                     .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
-                    .AddSingleton<ICodingSession, CodingSession>()
+                    .AddSingleton<ISessionLogic, SessionLogic>()
                     .AddSingleton<IFormController, FormController>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
@@ -127,12 +131,18 @@ namespace CodingTracker.View.Program
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
+                    .AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>))
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()
                     .AddTransient<EditSessionPage>()
                     .AddTransient<CodingSessionTimerForm>()
-                    .AddTransient<CreateAccountPage>();
+                    .AddTransient<CreateAccountPage>()
+
+                    .AddDbContext<EntityContext>(options =>
+                        options.UseSqlite("Data Source=path_to_your_database.db"));
+
+
 
             var startConfiguration = services.BuildServiceProvider()
                                              .GetRequiredService<IStartConfiguration>();

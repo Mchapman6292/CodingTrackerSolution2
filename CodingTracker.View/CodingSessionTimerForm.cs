@@ -22,7 +22,7 @@ namespace CodingTracker.View
     public partial class CodingSessionTimerForm : Form
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingSession _codingSesison;
+        private readonly ISessionLogic _codingSesison;
         private readonly IErrorHandler _errorHandler;
         private readonly IFormSwitcher _formSwitcher;
         private readonly IFormController _formController;
@@ -36,7 +36,7 @@ namespace CodingTracker.View
 
 
 
-        public CodingSessionTimerForm(IApplicationLogger appLogger, ICodingSession codingSession, ICodingGoalDTOManager codingGoalDTOManager, ISessionGoalCountDownTimer countdownTimer, IFormSwitcher formSwitcher, IFormController formController, IFormFactory formFactory)
+        public CodingSessionTimerForm(IApplicationLogger appLogger, ISessionLogic codingSession, ICodingGoalDTOManager codingGoalDTOManager, ISessionGoalCountDownTimer countdownTimer, IFormSwitcher formSwitcher, IFormController formController, IFormFactory formFactory)
         {
             _appLogger = appLogger;
             _codingSesison = codingSession;

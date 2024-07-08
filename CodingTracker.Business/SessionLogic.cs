@@ -21,7 +21,7 @@ using CodingTracker.Business.SessionCalculators;
 
 namespace CodingTracker.Business.CodingSessions
 {
-    public class CodingSession : ICodingSession
+    public class SessionLogic : ISessionLogic
     {
         private readonly IInputValidator _inputValidator;
         private readonly IApplicationLogger _appLogger;
@@ -39,7 +39,7 @@ namespace CodingTracker.Business.CodingSessions
         private bool isCodingSessionActive = false;
 
 
-        public CodingSession(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator)
+        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator)
         {
             _inputValidator = validator;
             _appLogger = appLogger;

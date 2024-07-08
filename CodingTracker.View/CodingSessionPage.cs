@@ -26,7 +26,7 @@ namespace CodingTracker.View
     {
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
-        private readonly ICodingSession _codingSession;
+        private readonly ISessionLogic _codingSession;
         private readonly ISessionGoalCountDownTimer _goalCountDownTimer;
         private readonly IInputValidator _inputValidator;
         private readonly IErrorHandler _errorHandler;
@@ -36,7 +36,7 @@ namespace CodingTracker.View
 
         private int _goalHours;
         private int _goalMinutes;
-        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController, ICodingSession codingSession, ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, ICodingGoalDTOManager goalDTOManager, IApplicationLogger appLogger)
+        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController, ISessionLogic codingSession, ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, ICodingGoalDTOManager goalDTOManager, IApplicationLogger appLogger)
         {
             InitializeComponent();
             _formSwitcher = formSwitcher;

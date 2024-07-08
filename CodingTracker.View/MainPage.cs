@@ -23,7 +23,7 @@ namespace CodingTracker.View
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
         private readonly IDatabaseSessionRead _databaseSessionRead;
-        private readonly ICodingSession _codingSession;
+        private readonly ISessionLogic _codingSession;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
@@ -31,7 +31,7 @@ namespace CodingTracker.View
 
 
 
-        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ICodingSession codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSessionDTOManager sessionDTOManager)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ISessionLogic codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSessionDTOManager sessionDTOManager)
         {
             InitializeComponent();
             _appLogger = appLogger;

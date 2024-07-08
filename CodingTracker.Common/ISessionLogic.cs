@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CodingTracker.Common.ICodingSessions
 {
-    public interface ICodingSession
+    public interface ISessionLogic
     {
         void StartSession();
         void EndSession();

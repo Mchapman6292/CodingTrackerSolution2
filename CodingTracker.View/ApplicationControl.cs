@@ -14,13 +14,13 @@ namespace CodingTracker.Business.ApplicationControls
     public class ApplicationControl : IApplicationControl
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingSession _codingSession;
+        private readonly ISessionLogic _codingSession;
         private readonly IDatabaseManager _databaseManager;
         public bool ApplicationIsRunning { get; private set; }
 
 
 
-        public ApplicationControl(IApplicationLogger appLogger, ICodingSession codingSession, IDatabaseManager databaseManager)
+        public ApplicationControl(IApplicationLogger appLogger, ISessionLogic codingSession, IDatabaseManager databaseManager)
         {
             ApplicationIsRunning = false; // Set to false instead of true to ensure that processes don't run or exit prematurely or unintentionally.
             _appLogger = appLogger;
