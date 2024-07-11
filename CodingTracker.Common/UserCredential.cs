@@ -11,18 +11,14 @@ using CodingTracker.Common.CodingSessions;
 
 namespace CodingTracker.Common.UserCredentials
 {
-    public class UserCredential 
+    public class UserCredential
     {
         [Key]
-        public int UserId { get; set; } = 0;
-        public  string? Username { get; set; } = string.Empty;
-
-        public string? PasswordHash { get; set; } = string.Empty;
-
-        public DateTime? LastLogin { get; set; } = DateTime.MinValue;
+        public int UserId { get; set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
+        public DateTime? LastLogin { get; set; }
 
         public ICollection<CodingSession> CodingSessions { get; set; }
-
-      
     }
 }

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 namespace CodingTracker.Data.Repositories
 {
     public class BaseRepository
+    // Class responsible for abstracting common CRUD operations
+    
     {
         private readonly IApplicationLogger _appLogger;
         

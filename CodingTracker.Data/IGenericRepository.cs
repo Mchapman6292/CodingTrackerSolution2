@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace CodingTracker.Data.IGenericRepository
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericRepository<T> where T : class 
     {
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
-        Task ReadAsync(T entity);
-
         Task<T> GetIdAsync(int id);
 
-        Task<T> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync();
+
+        Task AddAsync(T entity);
+        Task UpdateAsync(T entity);  // Returning Task indicates Async.
+        Task DeleteAsync(int id);
+         
+
+
 
     }
 }
