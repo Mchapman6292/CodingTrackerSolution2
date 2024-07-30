@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodingTracker.Data.IGenericRepository;
 using CodingTracker.Data.EntityContexts;
 using Microsoft.EntityFrameworkCore;
+using CodingTracker.Data.Interfaces;
 
 
-namespace CodingTracker.Data.GenericRepository
+namespace CodingTracker.Data.Repositories.GenericRepository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
@@ -39,20 +39,19 @@ namespace CodingTracker.Data.GenericRepository
 
         public async Task UpdateAsync(T entity)
         {
-              _dbSet.Update(entity);
-             await _context.SaveChangesAsync();
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
-            if(entity != null)
+            if (entity != null)
             {
                 _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
         }
-
 
 
     }

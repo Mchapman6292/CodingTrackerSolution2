@@ -32,12 +32,6 @@ using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ErrorHandlers;
 using CodingTracker.View.FormSwitchers;
-using CodingTracker.Data.DatabaseSessionInserts;
-using CodingTracker.Common.IDatabaseSessionInserts;
-using CodingTracker.Common.IDatabaseSessionDeletes;
-using CodingTracker.Data.DatabaseSessionDeletes;
-using CodingTracker.Data.DatabaseSessionReads;
-using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Common.CodingGoalDTOManagers;
@@ -50,10 +44,11 @@ using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Data.NewDatabaseReads;
 using CodingTracker.Common.INewDatabaseReads;
-using CodingTracker.Data.GenericRepository;
-using CodingTracker.Data.IGenericRepository;
 using CodingTracker.Data.EntityContexts;
 using Microsoft.EntityFrameworkCore;
+using CodingTracker.Data.Interfaces;
+using CodingTracker.Data.Repositories;
+using CodingTracker.Data.Repositories.GenericRepository;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -105,9 +100,6 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
                     .AddSingleton<IUserCredentialDTOManager, UserCredentialDTOManager>()
                     .AddSingleton<ICredentialManager, CredentialManager>()
-                    .AddSingleton<IDatabaseSessionDelete, DatabaseSessionDelete>()
-                    .AddSingleton<IDatabaseSessionInsert, DatabaseSessionInsert>()
-                    .AddSingleton<IDatabaseSessionRead, DatabaseSessionRead>()
                     .AddSingleton<INewDatabaseRead, NewDatabaseRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()

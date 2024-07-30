@@ -48,7 +48,7 @@ namespace CodingTracker.Data.EntityContexts
                 .HasForeignKey(cs => cs.UserId);
 
             modelBuilder.Entity<UserCredential>()
-                .HasIndex(u => u.Username)
+                .HasIndex(u => u.Username)              // Adding an index makes having a unique username a requirement.
                 .IsUnique();
         }
 
