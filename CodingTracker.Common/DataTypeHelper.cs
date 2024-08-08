@@ -4,27 +4,39 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodingTracker.Common.CodingGoalDTOs;
-using CodingTracker.Common.CodingSessionDTOs;
-using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Common.CodingSessions;
+using CodingTracker.Common.IApplicationLoggers;
+using SQLitePCL;
 
-namespace CodingTracker.Common.DataTypeHelpers
+namespace CodingTracker.Common.Helpers
 {
-    public interface IDataTypeHelper
+
+
+    public class DataTypeHelper 
     {
 
 
 
-    }
-
-
-    public class DataTypeHelper : IDataTypeHelper
-    {
-
-
-
-        public DataTypeHelper()
+        public DataTypeHelper(IApplicationLogger appLogger)
         {
+           
+        }
+
+
+        public static string ConvertDurationSecondsIntoStringHHMM(CodingSession session, IApplicationLogger appLogger, string traceId)
+        {
+            appLogger.Info($"Starting {nameof(ConvertDurationSecondsIntoStringHHMM)} for {session.DurationSeconds}, TraceId: {traceId}.");
+
+            if (session.DurationSeconds == null)
+            {
+                appLogger.Warning($"DurationSeconds is null, TraceId: {traceId}.");
+                return "00:00";
+            }
+
+            TimeSpan time = TimeSpan.FromSeconds(session.DurationSeconds.Value);
+            return time.ToString(@"hh\:mm");
+
+            }
         }
 
 

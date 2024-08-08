@@ -3,7 +3,7 @@ using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormSwitchers;
-using CodingTracker.Common.IDatabaseSessionReads;
+
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -26,19 +26,17 @@ namespace CodingTracker.View
         private readonly ICredentialManager _credentialManager;
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly IDatabaseManager _databaseManager;
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager, IDatabaseSessionRead databaseSessionRead)
+        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager)
         {
             _authenticationService = authenticationService;
             _appControl = appControl;
             _appLogger = applogger;
             _credentialManager = credentialManager;
             _formController = formController;
-            _databaseSessionRead = databaseSessionRead;
             _formSwitcher = formSwitcher;
             _databaseManager = databaseManager;
             this.FormBorderStyle = FormBorderStyle.None;
@@ -141,31 +139,41 @@ namespace CodingTracker.View
 
         private void loginPageLoginButton_Click(object sender, EventArgs e)
         {
-            string username = loginPageUsernameTextbox.Text;
-            string password = LoginPagePasswordTextbox.Text;
-
-
-            bool isValidLogin = _authenticationService.AuthenticateLogin(username, password);
-
-            if (isValidLogin)
+            _appLogger.LogActivity(nameof(loginPageLoginButton_Click),
+                activity => _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}"));
             {
-                if (LoginPageRememberMeToggle.Checked)
+                string username = loginPageUsernameTextbox.Text;
+                string password = LoginPagePasswordTextbox.Text;
+
+
+                bool isValidLogin = _authenticationService.AuthenticateLogin(username, password, activity.TraceId);
+
+                if (isValidLogin)
                 {
-                    Properties.Settings.Default.LastUsername = username;
-                    Properties.Settings.Default.Save();
-                }
+                    if (LoginPageRememberMeToggle.Checked)
+                    {
+                        Properties.Settings.Default.LastUsername = username;
+                        Properties.Settings.Default.Save();
+                    }
 
-                this.Hide();
-                _formSwitcher.SwitchToMainPage();
-                _appLogger.Info("User logged in successfully.");
-            }
-            else
-            {
-                LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
-            }
+                    this.Hide();
+                    _formSwitcher.SwitchToMainPage();
+                    _appLogger.Info("User logged in successfully.");
+                }
+                else
+                {
+                    LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
+                    _appLogger.Warning($"Login failed for user '{username}'. TraceID: {Activity.Current?.TraceId}");
+                }
+            });
         }
 
+            
+            
+                
 
+          
+      
         private void AccountCreatedSuccessfully(string message)
         {
             _appLogger.Debug("AccountCreatedSuccessfully method called.");

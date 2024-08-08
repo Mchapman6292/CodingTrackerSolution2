@@ -10,7 +10,7 @@ namespace CodingTracker.Data.Interfaces.ICodingSessionRepository
     public interface ICodingSessionRepository : IGenericRepository<CodingSession>
     {
 
-        public 
+        
 
 
     }

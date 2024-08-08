@@ -9,12 +9,12 @@ namespace CodingTracker.Common.ILoginManagers
 {
     public interface IAuthenticationService
     {
-        bool AuthenticateLogin(string username, string password);
+        Task<bool> AuthenticateLogin(string username, string password, string traceId, string parentId);
         UserCredentialDTO GetUserDetails(string username);
 
         void ResetPassword(string username, string newPassword);
 
-        string HashPassword(string password);
+        string HashPassword(string password, string traceId, string parentId);
 
     }
 }

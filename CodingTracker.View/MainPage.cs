@@ -2,7 +2,6 @@
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
@@ -22,7 +21,6 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly ISessionLogic _codingSession;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
@@ -31,14 +29,13 @@ namespace CodingTracker.View
 
 
 
-        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, IDatabaseSessionRead databaseRead, ISessionLogic codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSessionDTOManager sessionDTOManager)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, ISessionLogic codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSessionDTOManager sessionDTOManager)
         {
             InitializeComponent();
             _appLogger = appLogger;
             _formController = formController;
             _panelColorControl = panelControl;
             _errorHandler = errorHandler;
-            _databaseSessionRead = databaseRead;
             _codingSession = codingSession;
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;

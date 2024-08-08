@@ -38,7 +38,7 @@ using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Business.SessionCalculators;
-using CodingTracker.Common.DataTypeHelpers;
+using CodingTracker.Common.Helpers;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;

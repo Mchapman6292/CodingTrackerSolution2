@@ -21,63 +21,117 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
         }
 
 
-        public async Task<IEnumerable<CodingSession>> GetSessionsByDateRange(int userId, DateOnly startDate, DateOnly endDate, string traceId)
+        public async Task<IEnumerable<CodingSession>> GetSessionsByDateRange(DateOnly startDate, DateOnly endDate, string traceId)
         {
             _appLogger.Info($"Starting {nameof(GetSessionsByDateRange)} for sessions from {startDate} to {endDate}. TraceId: {traceId}.");
             try
             {
                 var result = await _dbSet
-                   .Where(cs => cs.UserId == userId && cs.StartDate >= startDate && cs.EndDate <= endDate)
-                   .OrderByDescending(cs => cs.StartDate)
+                   .Where(cs => cs.StartDate >= startDate && cs.EndDate <= endDate)
                    .OrderByDescending(cs => cs.StartDate)
                    .ThenBy(cs => cs.StartTime)
                    .ToListAsync();
 
-                _appLogger.Info($"Retrieved {result.Count} sessions. TraceId: {traceId}.");
 
+                if (result.Count > 0)
+                {
+                    _appLogger.Info($"Retrieved {result.Count} sessions for {nameof(GetSessionsByDateRange)}. TraceId: {traceId}.");
+                }
+                else
+                {
+                    _appLogger.Info($"No sessions found for for {nameof(GetSessionsByDateRange)} TraceId: {traceId}.");
+                }
                 return result;
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error retrieving sessions for{nameof(GetSessionsByDateRange)}, TraceId: {traceId}.", ex);
-
+                _appLogger.Error($"Error retrieving sessions for {nameof(GetSessionsByDateRange)}, TraceId: {traceId}.", ex);
                 return Enumerable.Empty<CodingSession>();
             }
         }
 
-        public async Task<IEnumerable<CodingSession>> GetDurationSecondsLast28Days(DateOnly startDate, DateOnly endDate, string traceId)
+        public async Task<(bool success,List<int> failedIds)> DeleteSessionsById(List<int> sessionIds, string traceId)
         {
-            _appLogger.Info($"Starting {nameof(GetDurationSecondsLast28Days)} for sessions from {startDate} to {endDate}. TraceId: {traceId}.");
+            _appLogger.Info($"Starting {nameof(DeleteSessionsById)}, for {sessionIds.Count()} TraceId: {traceId}.");
+
+            List<int> failedIds = new List<int>();
+            bool overallSuccess = true;
+
+            try
+            {
+               var entitiesToDelete = await _dbSet
+                        .Where(s => sessionIds.Contains(s.SessionId))
+                        .ToListAsync();
+
+                foreach (var entity in entitiesToDelete)
+                {
+                    _dbSet.Remove(entity);
+                }
+
+                failedIds.AddRange(sessionIds.Except(entitiesToDelete.Select(e => e.SessionId)));  // Adds SessionIds that were not found in the database
+
+                if (entitiesToDelete.Any())
+                {
+                    await _context.SaveChangesAsync();
+                    _appLogger.Info($"Successfully deleted {entitiesToDelete.Count} sessions. TraceId: {traceId}");
+                }
+
+
+                if (failedIds.Any())
+                {
+                    overallSuccess = false;
+                    _appLogger.Warning($"Failed to delete {failedIds.Count} sessions. Session IDs: {string.Join(", ", failedIds)}. TraceId: {traceId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                overallSuccess = false;
+                _appLogger.Error( $"Error occurred while deleting sessions. TraceId: {traceId}.", ex);
+                failedIds = sessionIds; 
+            }
+
+            return (overallSuccess, failedIds);
+        }
+        
+
+
+        public async Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(DateOnly startDate, DateOnly endDate, string traceId)
+        {
+            _appLogger.Info($"Starting {nameof(GetCodingSessionByDateOnly)} TraceId: {traceId}");
+
             try
             {
                 var result = await _dbSet
                     .Where(cs => cs.StartDate >= startDate && cs.EndDate <= endDate)
                     .OrderByDescending(cs => cs.StartDate)
-                    .ThenByDescending(cs => cs.StartTime)
                     .ToListAsync();
 
-                _appLogger.Info($"Retrieved {result.Count} sessions. TraceId: {traceId}.");
-
+                if (result.Count > 0)
+                {
+                    _appLogger.Info($"Retrieved {result.Count} sessions for {nameof(GetCodingSessionByDateOnly)}. TraceId: {traceId}.");
+                }
+                else
+                {
+                    _appLogger.Info($"No sessions found for for {nameof(GetCodingSessionByDateOnly)} TraceId: {traceId}.");
+                }
                 return result;
-
             }
-            catch(Exception ex) 
+            catch(Exception ex)
             {
-                _appLogger.Error($"Error retrieving sessions for {nameof(GetDurationSecondsLast28Days)}, TraceId: {traceId}.", ex);
-
-                return Enumerable.Empty<CodingSession> ();
-            }
-
-
-
+                _appLogger.Error($"Error retrieving sessions for {nameof(GetCodingSessionByDateOnly)}, TraceId: {traceId}.", ex);
+                return Enumerable.Empty<CodingSession>();
             }
         }
 
 
 
 
-
-            }
-
     }
 }
+
+
+
+
+
+
+

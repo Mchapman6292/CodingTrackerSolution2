@@ -3,7 +3,6 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.ICredentialManagers;
 using System.Diagnostics;
-using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.IInputValidators;
 
 namespace CodingTracker.Common.CodingSessionDTOManagers
@@ -39,7 +38,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
         private readonly IErrorHandler _errorHandler;
         private readonly IApplicationLogger _appLogger;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly ICredentialManager _credentialManager;
         private readonly IInputValidator _inputValidator;
 
@@ -47,14 +45,11 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         private int _sessionId;
         private int _DurationHHMM;
 
-        public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, ICredentialManager credentialManager, IInputValidator inputValidator)
+        public CodingSessionDTOManager(IErrorHandler errorHandler, IApplicationLogger appLogger, ICredentialManager credentialManager, IInputValidator inputValidator)
         {
             _errorHandler = errorHandler;
             _appLogger = appLogger;
-            _databaseSessionRead = databaseSessionRead;
             _credentialManager = credentialManager;
-            _userId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
-            _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
             _inputValidator = inputValidator;
         }
 
