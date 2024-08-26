@@ -26,7 +26,6 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
         string FormatTimeSpanToHHMM(TimeSpan timeSpan);
 
-        List<string> SessionDurationSecondsToHHMM(List<CodingSessionDTO> sessionDTOs);
 
     }
 
@@ -291,34 +290,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         }
 
 
-        public List<string> SessionDurationSecondsToHHMM(List<CodingSessionDTO> sessionDTOs)
-        {
-            List<string> formattedDurations = new List<string>();
-            List<double> durationSecondsList = _databaseSessionRead.ReadSessionDurationSeconds(20);
-            Stopwatch stopwatch = Stopwatch.StartNew();
 
-            using (var activity = new Activity(nameof(SessionDurationSecondsToHHMM)).Start())
-            {
-                _appLogger.Info($"Starting conversion of session durations to HH:MM. TraceID: {activity.TraceId}.");
-                foreach (int seconds in durationSecondsList)
-                {
-                    try
-                    {
-                        string formattedDuration = ConvertDurationSecondsIntoStringHHMM(seconds);
-                        formattedDurations.Add(formattedDuration);
-                    }
-                    catch (Exception ex)
-                    {
-                        _appLogger.Error($"Failed to convert {seconds} to HH:MM. Error: {ex.Message}. TraceID: {activity.TraceId}");
-                        formattedDurations.Add("00:00");
-                    }
-                }
-                stopwatch.Stop();
-                _appLogger.Info($"Durations converted successfully. Execution time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-            }
-
-            return formattedDurations;
-        }
 
 
 

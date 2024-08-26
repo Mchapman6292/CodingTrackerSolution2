@@ -49,6 +49,7 @@ using Microsoft.EntityFrameworkCore;
 using CodingTracker.Data.Interfaces;
 using CodingTracker.Data.Repositories;
 using CodingTracker.Data.Repositories.GenericRepository;
+using CodingTracker.Common.IdGenerators;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -119,7 +120,8 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
-                    
+                    .AddSingleTon<IIdGenerators, IdGenerators>()
+
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()

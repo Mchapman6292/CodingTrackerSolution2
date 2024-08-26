@@ -5,14 +5,12 @@ using System.Linq.Expressions;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.CodingSessionDTOManagers;
-using CodingTracker.Common.IDatabaseSessionInserts;
 using CodingTracker.Common.ICredentialManagers;
-using CodingTracker.Data.DatabaseSessionInserts;
 using CodingTracker.Business.SessionCalculators;
+using CodingTracker.Common.IdGenerators;
 
 
 // method to record start & end time
@@ -27,35 +25,29 @@ namespace CodingTracker.Business.CodingSessions
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
         private readonly ICodingSessionTimer _sessionTimer;
-        private readonly ICodingSessionDTOManager _sessionDTOManager;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly ICodingGoalDTOManager _goalDTOManager;
-        private readonly IDatabaseSessionInsert _databaseSessionInsert;
         private readonly ICredentialManager _credentialManager;
         private readonly ISessionCalculator _sessionCalculator;
+        private readonly IIdGenerators _idGenerators;
         private readonly int _userId;
         private readonly int _sessionId;
         public bool IsStopWatchEnabled = false;
         private bool isCodingSessionActive = false;
 
 
-        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator)
+        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IIdGenerators idGenerators)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
             _errorHandler = errorHandler;
             _sessionTimer = sessionTimer;
-            _sessionDTOManager = sessionDTOManager;
-            _databaseSessionRead = databaseSessionRead;
             _credentialManager = credentialManager;
             _goalDTOManager = goalDTOManager;
-            _databaseSessionInsert = databaseSessionInsert;
             _sessionCalculator = sessionCalculator;
-            _userId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
-            _sessionId = _databaseSessionRead.GetSessionIdWithMostRecentLogin();
+            _idGenerators = idGenerators;
             
         }
-
+        
 
         public void StartSession()
         {

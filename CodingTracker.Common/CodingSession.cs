@@ -22,6 +22,24 @@ namespace CodingTracker.Common.CodingSessions
         public string GoalHHMM { get; set; } = string.Empty;
         public int? GoalReached { get; set; }
 
+ 
+
         public UserCredential User { get; set; }
+
+        public CodingSession()
+        {
+            SessionId = AssignCodingSessionId();
+        }
+
+
+
+        public CodingSession CreateNewCodingSession(int sessionId, int userID)
+        { }
+
+
+        public int AssignCodingSessionId()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
