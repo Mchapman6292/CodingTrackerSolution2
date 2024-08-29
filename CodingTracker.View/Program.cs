@@ -34,7 +34,6 @@ using CodingTracker.Common.ErrorHandlers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Business.SessionCalculators;
@@ -115,12 +114,9 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
-                    .AddSingleton<ICodingSessionDTOManager, CodingSessionManager>()
-                    .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
-                    .AddSingleton<IDataTypeHelper, DataTypeHelper>()
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
-                    .AddSingleTon<IIdGenerators, IdGenerators>()
+                    .AddSingleton<IIdGenerators, IdGenerators>()
 
 
                     // Transient services.

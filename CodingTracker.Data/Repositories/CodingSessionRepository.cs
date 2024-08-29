@@ -11,6 +11,9 @@ using CodingTracker.Data.EntityContexts;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
 
+
+// Migrate changes to codingSession(removal of goal) once build errors fixed.
+
 namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 {
     public class CodingSessionRepository : GenericRepository<CodingSession>, ICodingSessionRepository

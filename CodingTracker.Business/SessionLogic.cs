@@ -25,7 +25,7 @@ namespace CodingTracker.Business.CodingSessions
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
         private readonly ICodingSessionTimer _sessionTimer;
-        private readonly ICodingGoalDTOManager _goalDTOManager;
+
         private readonly ICredentialManager _credentialManager;
         private readonly ISessionCalculator _sessionCalculator;
         private readonly IIdGenerators _idGenerators;
@@ -35,77 +35,20 @@ namespace CodingTracker.Business.CodingSessions
         private bool isCodingSessionActive = false;
 
 
-        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSessionDTOManager sessionDTOManager, IDatabaseSessionRead databaseSessionRead, ICodingGoalDTOManager goalDTOManager, IDatabaseSessionInsert databaseSessionInsert, ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IIdGenerators idGenerators)
+        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSession sessionDTOManager, ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IIdGenerators idGenerators)
         {
             _inputValidator = validator;
             _appLogger = appLogger;
             _errorHandler = errorHandler;
             _sessionTimer = sessionTimer;
             _credentialManager = credentialManager;
-            _goalDTOManager = goalDTOManager;
             _sessionCalculator = sessionCalculator;
             _idGenerators = idGenerators;
             
         }
         
 
-        public void StartSession()
-        {
-            using (var activity = new Activity(nameof(StartSession)).Start())
-            {
-                var stopwatch = Stopwatch.StartNew();
-                _appLogger.Debug($"Attempting to start a new session. TraceID: {activity.TraceId}");
 
-                bool sessionAlreadyActive = CheckIfCodingSessionActive();
-                if (sessionAlreadyActive)
-                {
-                    _appLogger.Warning($"Cannot start a new session because another session is already active. TraceID: {activity.TraceId}");
-                    stopwatch.Stop();
-                    return;
-                }
-
-                isCodingSessionActive = true;
-                var sessionDto = _sessionDTOManager.CreateAndReturnCurrentSessionDTO();
-                _sessionDTOManager.SetSessionStartDate();
-                _sessionDTOManager.SetSessionStartTime();
-                _sessionTimer.StartCodingSessionTimer();
-
-                stopwatch.Stop();
-                _appLogger.Info($"New session started successfully for UserId: {sessionDto.UserId}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
-            }
-        }
-
-        public void EndSession()
-        {
-            using (var activity = new Activity(nameof(EndSession)).Start())
-            {
-              
-               CodingSessionDTO currentSessionDTO = _sessionDTOManager.GetCurrentSessionDTO();
-
-                var stopwatch = Stopwatch.StartNew();
-
-                _appLogger.Debug($"Ending {nameof(EndSession)}. TraceID: {activity.TraceId}");
-
-                isCodingSessionActive = false;
-
-                _sessionTimer.EndCodingSessionTimer();
-                _sessionDTOManager.SetSessionEndDate();
-                _sessionDTOManager.SetSessionEndTime();
-
-
-                double durationSeconds = _sessionCalculator.CalculateDurationSeconds();
-                TimeSpan durationTimeSpan = _sessionDTOManager.ConvertDurationSecondsToTimeSpan(durationSeconds);
-                string goalHHMM = _goalDTOManager.FormatCodingGoalHoursMinsToString();
-                string durationHHMM = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(durationSeconds);
-
-
-                _sessionDTOManager.UpdateCurrentSessionDTO(_sessionId, _userId, currentSessionDTO.StartDate,currentSessionDTO.StartTime, currentSessionDTO.EndDate,currentSessionDTO.EndTime, durationSeconds, durationHHMM, goalHHMM);
-                _databaseSessionInsert.InsertSession();
-
-                stopwatch.Stop();
-                _appLogger.Info($"Session ended, IsStopWatchEnabled: {IsStopWatchEnabled}, isCodingSessionActive: {isCodingSessionActive}, Trace ID: {activity.TraceId}, Execution Time: {stopwatch.ElapsedMilliseconds}ms");
-            }
-        }
 
 
 

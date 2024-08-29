@@ -7,35 +7,16 @@ using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.CodingSessions;
 using CodingTracker.Common.IdGenerators;
 using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.ICodingSessionTimers;
+using CodingTracker.Common.ICodingSessionManagers;
 using System.Linq.Expressions;
 
 namespace CodingTracker.Common.CodingSessionDTOManagers
 {
 
-    public interface ICodingSessionDTOManager
-    {
-        CodingSessionDTO CreateCodingSession();
-        CodingSessionDTO GetCurrentSessionDTO();
-
-        void SetSessionStartDate();
-        void SetSessionStartTime();
-        void SetSessionEndDate();
-        void SetSessionEndTime();
-        CodingSessionDTO GetOrCreateCurrentSessionDTO();
-        CodingSessionDTO CreateAndReturnCurrentSessionDTO();
-
-        string ConvertDurationSecondsIntoStringHHMM(double? durationSeconds);
-        void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null, DateTime? startTime = null, DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null);
-        TimeSpan ConvertDurationSecondsToTimeSpan(double? durationSeconds);
-
-        string FormatTimeSpanToHHMM(TimeSpan timeSpan);
 
 
-    }
-
-
-
-    public class CodingSessionManager : ICodingSessionDTOManager
+    public class CodingSessionManager : ICodingSessionManager
     {
         public CodingSession _currentCodingSession;
 
@@ -45,10 +26,11 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         private readonly IInputValidator _inputValidator;
         private readonly IIdGenerators _idGenerators;
         private readonly ICodingSessionRepository _codingSessionRepo;
+        private readonly ICodingSessionTimer _sessionTimer;
 
         private bool IsCodingSessionActive = false;
 
-        public CodingSessionManager(IErrorHandler errorHandler, IApplicationLogger appLogger, ICredentialManager credentialManager, IInputValidator inputValidator, IIdGenerators idGenerators, ICodingSessionRepository codingSessionRepo)
+        public CodingSessionManager(IErrorHandler errorHandler, IApplicationLogger appLogger, ICredentialManager credentialManager, IInputValidator inputValidator, IIdGenerators idGenerators, ICodingSessionRepository codingSessionRepo, ICodingSessionTimer sessionTimer)
         {
             _errorHandler = errorHandler;
             _appLogger = appLogger;
@@ -56,6 +38,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _inputValidator = inputValidator;
             _idGenerators = idGenerators;
             _codingSessionRepo = codingSessionRepo;
+            _sessionTimer = sessionTimer;
         }
 
         public CodingSession ReturnCurrentCodingSession(Activity activity)
@@ -130,13 +113,15 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
 
                 SetCurrentCodingSession(newSession, activity);
 
+                _sessionTimer.StartCodingSessionTimer();
+
                 _appLogger.Info($"Coding session started for {nameof(StartCodingSession)} TraceId: {activity.TraceId}.");
             }
 
             catch (Exception ex)
             {
                 _appLogger.Error($"Critical error during {nameof(StartCodingSession)}", ex);
-                throw;
+                throw new InvalidOperationException("Failed to start coding session. Check logs for details.", ex);
             }
         }
 
@@ -154,13 +139,20 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
                 DateOnly currentendDate = DateOnly.FromDateTime(currentEndTime);
                 int currentDurationSeconds = CalculateDurationSeconds(activity, _currentCodingSession.StartTime, currentEndTime);
                 string currentDurationHHMM = ConvertDurationSecondsToStringHHMM(activity, currentDurationSeconds);
- 
 
-               
+
+
                 _currentCodingSession.EndTime = currentEndTime;
                 _currentCodingSession.EndDate = currentendDate;
                 _currentCodingSession.DurationSeconds = currentDurationSeconds;
                 _currentCodingSession.DurationHHMM = currentDurationHHMM;
+                _sessionTimer.EndCodingSessionTimer();
+
+            }
+            catch(Exception ex)
+            {
+                _appLogger.Error($"Critical error during {nameof(EndCodingSession)}", ex);
+                throw;
             }
         }
 
@@ -207,6 +199,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _currentCodingSession.EndDate = DateOnly.FromDateTime(currentDateTime);
             _currentCodingSession.EndTime = currentDateTime;
 
+            _appLogger.Info($"currentCodingSession endDate & endTime set to {_currentCodingSession.EndDate}, {_currentCodingSession.EndTime} TraceId: {activity.TraceId}");
 
         }
 
@@ -282,131 +275,5 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public void UpdateCurrentSessionDTO(int sessionId, int userId, DateTime? startDate = null,  DateTime? startTime = null,  DateTime? endDate = null, DateTime? endTime = null, double? durationSeconds = null, string? durationHHMM = null, string? goalHHMM = null)
-        {
-            using (var activity = new Activity(nameof(UpdateCurrentSessionDTO)).Start())
-            {
-                _appLogger.Info($"Starting {nameof(UpdateCurrentSessionDTO)}. TraceID: {activity.TraceId}");
-
-                if (_currentCodingSession == null)
-                {
-                    _appLogger.Info("No current session DTO found. Creating new one.");
-                    _currentCodingSession = CreateCodingSession();
-                }
-
-                _currentCodingSession.SessionId = sessionId;
-                _currentCodingSession.UserId = userId;
-
-                if (startDate.HasValue) 
-                {
-                    _currentCodingSession.StartDate = startDate.Value;
-                }
-                if (startTime.HasValue)
-                {
-                    _currentCodingSession.StartTime = startTime.Value;
-                }
-                if (endDate.HasValue) 
-                {
-                    _currentCodingSession.EndDate = endDate.Value;
-                }
-                if (endTime.HasValue)
-                {
-                    _currentCodingSession.EndTime = endTime.Value;
-                }
-                if (durationSeconds.HasValue)
-                {
-                    _currentCodingSession.DurationSeconds = durationSeconds.Value;
-                }
-                if (_inputValidator.IsValidTimeFormatHHMM(durationHHMM))
-                {
-                    _currentCodingSession.DurationHHMM = durationHHMM;
-                }
-                if(durationHHMM != null) 
-                {
-                    _currentCodingSession.DurationHHMM = durationHHMM;
-                }
-                if (goalHHMM != null) 
-                {
-                    _currentCodingSession.GoalHHMM = goalHHMM;
-                }
-
-                List<(string Name, object Value)> updates = new List<(string Name, object Value)>();
-
-                updates.Add(("SessionId", (object)sessionId));
-                updates.Add(("UserId", (object)userId));
-
-                if (startDate.HasValue) updates.Add(("StartDate", (object)startDate));
-                if (startTime.HasValue) updates.Add(("StartTime", (object)startTime));
-                if (endDate.HasValue) updates.Add(("EndDate", ((object)endDate)));
-                if (endTime.HasValue) updates.Add(("EndTime", (object)endTime));
-                if (durationSeconds.HasValue) updates.Add(("DurationSeconds", (object)durationSeconds));
-                if (durationHHMM != null) updates.Add(("DurationHHMM", (object)durationHHMM));
-                if (goalHHMM !=  null) updates.Add(("goalHHMM", (object)goalHHMM));
-
-                _appLogger.LogUpdates(nameof(UpdateCurrentSessionDTO), updates.ToArray());
-
-                _appLogger.Info($"Updated {nameof(UpdateCurrentSessionDTO)} successfully. TraceID: {activity.TraceId}");
-            }
-        }
     }
 }

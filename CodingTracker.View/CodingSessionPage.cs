@@ -36,7 +36,7 @@ namespace CodingTracker.View
 
         private int _goalHours;
         private int _goalMinutes;
-        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController, ISessionLogic codingSession, ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, ICodingGoalDTOManager goalDTOManager, IApplicationLogger appLogger)
+        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController, ISessionLogic codingSession, ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger)
         {
             InitializeComponent();
             _formSwitcher = formSwitcher;

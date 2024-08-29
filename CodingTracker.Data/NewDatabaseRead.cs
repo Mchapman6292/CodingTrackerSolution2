@@ -20,11 +20,11 @@ namespace CodingTracker.Data.NewDatabaseReads
         private readonly IDatabaseManager _databaseManager;
         private readonly IQueryBuilder _queryBuilder;
         private readonly ICodingGoalDTOManager _codingGoalDTOManager;
-        private readonly ICodingSessionDTOManager _codingSessionDTOManager;
+        private readonly ICodingSession _codingSessionDTOManager;
         private readonly IUserCredentialDTOManager _userCredentialDTOManager;
 
 
-        public NewDatabaseRead(IApplicationLogger appLogger, IDatabaseManager databaseManager, IQueryBuilder queryBuilder, ICodingGoalDTOManager codingGoalDTOManager, ICodingSessionDTOManager codingSessionDTOManager)
+        public NewDatabaseRead(IApplicationLogger appLogger, IDatabaseManager databaseManager, IQueryBuilder queryBuilder, ICodingGoalDTOManager codingGoalDTOManager, ICodingSession codingSessionDTOManager)
         {
             _appLogger = appLogger;
             _databaseManager = databaseManager;
