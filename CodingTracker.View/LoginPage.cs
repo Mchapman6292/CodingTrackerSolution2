@@ -140,13 +140,14 @@ namespace CodingTracker.View
         private void loginPageLoginButton_Click(object sender, EventArgs e)
         {
             _appLogger.LogActivity(nameof(loginPageLoginButton_Click),
-                activity => _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}"));
+            activity => _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}"),
+           async activity =>
             {
                 string username = loginPageUsernameTextbox.Text;
                 string password = LoginPagePasswordTextbox.Text;
 
 
-                bool isValidLogin = _authenticationService.AuthenticateLogin(username, password, activity.TraceId);
+                bool isValidLogin = await _authenticationService.AuthenticateLogin(username, password, activity);
 
                 if (isValidLogin)
                 {
@@ -165,15 +166,16 @@ namespace CodingTracker.View
                     LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
                     _appLogger.Warning($"Login failed for user '{username}'. TraceID: {Activity.Current?.TraceId}");
                 }
-            });
+            }
+    );
         }
 
-            
-            
-                
 
-          
-      
+
+
+
+
+
         private void AccountCreatedSuccessfully(string message)
         {
             _appLogger.Debug("AccountCreatedSuccessfully method called.");

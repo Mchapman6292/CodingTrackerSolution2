@@ -2,6 +2,7 @@
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IUtilityServices;
+using CodingTracker.Common.ICodingSessionManagers;
 
 namespace CodingTracker.View
 {

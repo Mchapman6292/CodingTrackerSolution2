@@ -34,7 +34,6 @@ using CodingTracker.Common.ErrorHandlers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Business.SessionCalculators;
@@ -49,6 +48,7 @@ using Microsoft.EntityFrameworkCore;
 using CodingTracker.Data.Interfaces;
 using CodingTracker.Data.Repositories;
 using CodingTracker.Data.Repositories.GenericRepository;
+using CodingTracker.Common.IdGenerators;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -114,12 +114,10 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
-                    .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
-                    .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
-                    .AddSingleton<IDataTypeHelper, DataTypeHelper>()
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
-                    
+                    .AddSingleton<IIdGenerators, IdGenerators>()
+
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()

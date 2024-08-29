@@ -20,14 +20,14 @@ namespace CodingTracker.Logging.ApplicationLoggers
                 .CreateLogger();
         }
 
-        public void LogActivity(string methodName, Action<Activity> logAction, Action action)
+        public void LogActivity(string methodName, Action<Activity> logAction, Action<Activity> action)
         {
             using (var activity = new Activity(methodName).Start())
             {
                 try
                 {
                     logAction?.Invoke(activity);
-                    action?.Invoke();
+                    action?.Invoke(activity);
                 }
                 catch (Exception ex)
                 {
@@ -36,6 +36,27 @@ namespace CodingTracker.Logging.ApplicationLoggers
                 }
             }
         }
+
+
+        public async Task LogActivityAsync(string methodName, Func<Activity, Task> logAction, Func<Task> action)            // Func<Task> allows the method passed to be Async
+        {
+            using (var activity = new Activity(methodName).Start())
+            {
+                try
+                {
+                    if (logAction != null)
+                        await logAction(activity);
+                    if (action != null)
+                        await action();
+                }
+                catch (Exception ex)
+                {
+                    Error($"Exception in {methodName}. TraceID: {activity.TraceId}", ex);
+                    throw;
+                }
+            }
+        }
+
 
         private void LogDatabaseError(Exception ex, string operationName, Stopwatch stopwatch)
         {
@@ -60,9 +81,29 @@ namespace CodingTracker.Logging.ApplicationLoggers
             }
         }
 
+
+        public Task LogUpdatesAsync(string methodName, params (string Name, object Value)[] updates)
+        {
+            using (var activity = new Activity(nameof(LogUpdatesAsync)).Start())
+            {
+                var updateEntries = updates
+                    .Where(update => update.Value != null)
+                    .Select(update => $"{update.Name}={update.Value}")
+                    .ToList();
+                if (updateEntries.Count > 0)
+                {
+                    string message = $"Updated {methodName}: {string.Join(", ", updateEntries)}. TraceID: {activity.TraceId}";
+                    Info(message); 
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+
         // Method overloading, allows multiple methods with same name but different parameter lists. 
         public void Info(string message) => _logger.Information(message); // General information regarding app operations, e.g user login.
         public void Info(string message, params object[] propertyValues) => _logger.Information(message, propertyValues);
+
         public void Debug(string message) => _logger.Debug(message); // Detailed info used for debugging, e.g loaded X variables from database in 200ms/
         public void Debug(string message, params object[] propertyValues) => _logger.Debug(message, propertyValues);
         public void Warning(string message) => _logger.Warning(message); // Unexpected events that might lead to problems in future e.g Disk space running low.

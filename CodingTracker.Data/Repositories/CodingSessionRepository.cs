@@ -9,8 +9,12 @@ using CodingTracker.Common.CodingSessions;
 using CodingTracker.Data.Repositories.GenericRepository;
 using CodingTracker.Data.EntityContexts;
 using CodingTracker.Common.IApplicationLoggers;
+using System.Diagnostics;
 
-namespace CodingTracker.Data.Repositories.CodingSessionRepository
+
+// Migrate changes to codingSession(removal of goal) once build errors fixed.
+
+namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 {
     public class CodingSessionRepository : GenericRepository<CodingSession>, ICodingSessionRepository
     {
@@ -18,6 +22,25 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
         public CodingSessionRepository(EntityContext context, IApplicationLogger appLogger) : base(context)
         {
             _appLogger = appLogger;
+        }
+
+
+        public async Task<bool> AddCodingSession(CodingSession session, string traceId)
+        {
+            _appLogger.Info($"Starting {nameof(AddCodingSession)} for session with ID {session.SessionId}. TraceId: {traceId}.");
+            try
+            {
+                _context.CodingSessions.Add(session);
+                await _context.SaveChangesAsync();
+
+                _appLogger.Info($"Successfully added coding session with ID {session.SessionId}. TraceId: {traceId}.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"Error adding coding session with ID {session.SessionId} for {nameof(AddCodingSession)}, TraceId: {traceId}.", ex);
+                return false;
+            }
         }
 
 
@@ -50,7 +73,7 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
             }
         }
 
-        public async Task<(bool success,List<int> failedIds)> DeleteSessionsById(List<int> sessionIds, string traceId)
+        public async Task<(bool success, List<int> failedIds)> DeleteSessionsById(List<int> sessionIds, string traceId)
         {
             _appLogger.Info($"Starting {nameof(DeleteSessionsById)}, for {sessionIds.Count()} TraceId: {traceId}.");
 
@@ -59,9 +82,9 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
 
             try
             {
-               var entitiesToDelete = await _dbSet
-                        .Where(s => sessionIds.Contains(s.SessionId))
-                        .ToListAsync();
+                var entitiesToDelete = await _dbSet
+                         .Where(s => sessionIds.Contains(s.SessionId))
+                         .ToListAsync();
 
                 foreach (var entity in entitiesToDelete)
                 {
@@ -86,13 +109,13 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
             catch (Exception ex)
             {
                 overallSuccess = false;
-                _appLogger.Error( $"Error occurred while deleting sessions. TraceId: {traceId}.", ex);
-                failedIds = sessionIds; 
+                _appLogger.Error($"Error occurred while deleting sessions. TraceId: {traceId}.", ex);
+                failedIds = sessionIds;
             }
 
             return (overallSuccess, failedIds);
         }
-        
+
 
 
         public async Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(DateOnly startDate, DateOnly endDate, string traceId)
@@ -116,7 +139,7 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
                 }
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _appLogger.Error($"Error retrieving sessions for {nameof(GetCodingSessionByDateOnly)}, TraceId: {traceId}.", ex);
                 return Enumerable.Empty<CodingSession>();
@@ -124,10 +147,31 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepository
         }
 
 
+        public async Task<bool> SaveCodingSessionChanges(Activity activity)
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+                _appLogger.Info($" SaveCodingSessionChanges successful TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                _appLogger.Error($"Database error during {nameof(SaveCodingSessionChanges)}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"Unexpected error during {nameof(SaveCodingSessionChanges)}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
+                throw;
+
+            }
+        }
 
 
     }
 }
+
 
 
 

@@ -5,11 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.CodingSessionDTOs;
-using CodingTracker.Common.CodingGoalDTOs;
-using CodingTracker.Common.CodingGoalDTOManagers;
+
 
 namespace CodingTracker.Business.SessionCalculators
 {
@@ -25,16 +23,12 @@ namespace CodingTracker.Business.SessionCalculators
     public class SessionCalculator : ISessionCalculator
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
-        private readonly ICodingSessionDTOManager _codingSessionDTOManager;
-        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
+        private readonly ICodingSession _codingSessionDTOManager;
 
-        public SessionCalculator(IApplicationLogger appLogger, IDatabaseSessionRead databaseSessionRead, ICodingSessionDTOManager codingSessionDTOManager, ICodingGoalDTOManager codingGoalDTOManager)
+        public SessionCalculator(IApplicationLogger appLogger, ICodingSession codingSessionDTOManager)
         {
             _appLogger = appLogger;
-            _databaseSessionRead = databaseSessionRead;
             _codingSessionDTOManager = codingSessionDTOManager;
-            _codingGoalDTOManager = codingGoalDTOManager;
         }
 
 

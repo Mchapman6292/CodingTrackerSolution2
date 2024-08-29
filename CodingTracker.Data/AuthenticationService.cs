@@ -43,33 +43,33 @@ namespace CodingTracker.Common.IAuthenticationServices
         }
 
 
-        public async Task<bool> AuthenticateLogin(string username, string password, string traceId, string parentId)
+        public async Task<bool> AuthenticateLogin(string username, string password, Activity activity)
         {
-            _appLogger.Info($"Starting {nameof(AuthenticateLogin)} TraceId: {traceId}, ParentId: {parentId}. ");
+            _appLogger.Info($"Starting {nameof(AuthenticateLogin)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}. ");
             try
             {
-                UserCredential loginCredential = await _userCredentialRepository.GetCredentialByUsername(username, traceId, parentId);
+                UserCredential loginCredential = await _userCredentialRepository.GetCredentialByUsername(username, activity);
 
  
 
-                var inputHash = HashPassword(password, traceId, parentId);
+                var inputHash = HashPassword(password, activity);
                 var storedHash = loginCredential.PasswordHash;
 
                 bool isValid = inputHash.Equals(storedHash, StringComparison.Ordinal);
 
                 if (!isValid)
                 {
-                    _appLogger.Info($" Error during {nameof(AuthenticateLogin)} inputHash and storedHash are the not the same. TraceId: {traceId}, ParentId: {parentId}.");
+                    _appLogger.Info($" Error during {nameof(AuthenticateLogin)} inputHash and storedHash are the not the same. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
                     return false;
                 }
 
-                    _appLogger.Info($"{nameof(AuthenticateLogin)} successful. TraceId: {traceId}, ParentId: {parentId}.");
+                    _appLogger.Info($"{nameof(AuthenticateLogin)} successful. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
                     return true;
                    
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error in {nameof(AuthenticateLogin)} TraceId: {traceId}, ParentId: {parentId}.", ex);
+                _appLogger.Error($"Error in {nameof(AuthenticateLogin)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.", ex);
                 return false;
             }
         }
@@ -162,49 +162,47 @@ namespace CodingTracker.Common.IAuthenticationServices
 
 
 
-        public string HashPassword(string password, string traceId, string parentId)
+        public string HashPassword(string password, Activity activity)
         {
-            using (var activity = new Activity(nameof(HashPassword)).Start())
+            _appLogger.Debug($"Starting {nameof(HashPassword)}, TraceId: {activity.TraceId}.");
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            try
             {
-                _appLogger.Debug($"Starting {nameof(HashPassword)}, TraceId: {activity.TraceId}.");
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                try
+                using (SHA256 sha256Hash = SHA256.Create())
                 {
-                    using (SHA256 sha256Hash = SHA256.Create())
+                    byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < bytes.Length; i++)
                     {
-                        byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                        StringBuilder builder = new StringBuilder();
-                        for (int i = 0; i < bytes.Length; i++)
-                        {
-                            builder.Append(bytes[i].ToString("x2"));
-                        }
-
-                        stopwatch.Stop();
-                        _appLogger.Info($"{nameof(HashPassword)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-                        return builder.ToString();
+                        builder.Append(bytes[i].ToString("x2"));
                     }
-                }
-                catch (ArgumentNullException ex)
-                {
+
                     stopwatch.Stop();
-                    _appLogger.Error($"Password cannot be null. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
+                    _appLogger.Info($"{nameof(HashPassword)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                    return builder.ToString();
                 }
-                catch (EncoderFallbackException ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Encoding error while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"An unexpected error occurred while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
+            }
+            catch (ArgumentNullException ex)
+            {
+                stopwatch.Stop();
+                _appLogger.Error($"Password cannot be null. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                throw;
+            }
+            catch (EncoderFallbackException ex)
+            {
+                stopwatch.Stop();
+                _appLogger.Error($"Encoding error while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _appLogger.Error($"An unexpected error occurred while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                throw;
             }
         }
     }
 }
+
