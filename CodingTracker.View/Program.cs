@@ -115,7 +115,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
-                    .AddSingleton<ICodingSessionDTOManager, CodingSessionDTOManager>()
+                    .AddSingleton<ICodingSessionDTOManager, CodingSessionManager>()
                     .AddSingleton<ICodingGoalDTOManager, CodingGoalDTOManager>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IDataTypeHelper, DataTypeHelper>()

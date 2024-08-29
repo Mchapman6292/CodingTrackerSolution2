@@ -56,7 +56,7 @@ namespace CodingTracker.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("codingSessions");
+                    b.ToTable("CodingSessions");
                 });
 
             modelBuilder.Entity("CodingTracker.Common.UserCredentials.UserCredential", b =>
@@ -79,7 +79,7 @@ namespace CodingTracker.Data.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("userCredentials");
+                    b.ToTable("UserCredentials");
                 });
 
             modelBuilder.Entity("CodingTracker.Common.CodingSessions.CodingSession", b =>

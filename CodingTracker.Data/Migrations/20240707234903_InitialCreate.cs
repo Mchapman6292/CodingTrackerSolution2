@@ -12,7 +12,7 @@ namespace CodingTracker.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "userCredentials",
+                name: "UserCredentials",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "INTEGER", nullable: false)
@@ -27,7 +27,7 @@ namespace CodingTracker.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "codingSessions",
+                name: "CodingSessions",
                 columns: table => new
                 {
                     SessionId = table.Column<int>(type: "INTEGER", nullable: false)
@@ -48,19 +48,19 @@ namespace CodingTracker.Data.Migrations
                     table.ForeignKey(
                         name: "FK_codingSessions_userCredentials_UserId",
                         column: x => x.UserId,
-                        principalTable: "userCredentials",
+                        principalTable: "UserCredentials",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_codingSessions_UserId",
-                table: "codingSessions",
+                table: "CodingSessions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_userCredentials_Username",
-                table: "userCredentials",
+                table: "UserCredentials",
                 column: "Username",
                 unique: true);
         }
@@ -69,10 +69,10 @@ namespace CodingTracker.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "codingSessions");
+                name: "CodingSessions");
 
             migrationBuilder.DropTable(
-                name: "userCredentials");
+                name: "UserCredentials");
         }
     }
 }

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.UserCredentials;
+using CodingTracker.Common.IdGenerators;
+using System.Diagnostics;
+using CodingTracker.Common.IApplicationLoggers;
+
 
 namespace CodingTracker.Common.CodingSessions
 {
@@ -17,29 +22,24 @@ namespace CodingTracker.Common.CodingSessions
         public DateTime? StartTime { get; set; }
         public DateOnly? EndDate { get; set; }
         public DateTime? EndTime { get; set; }
-        public double? DurationSeconds { get; set; }
+        public int? DurationSeconds { get; set; }
         public string DurationHHMM { get; set; } = string.Empty;
         public string GoalHHMM { get; set; } = string.Empty;
         public int? GoalReached { get; set; }
 
- 
+
+
+
 
         public UserCredential User { get; set; }
 
         public CodingSession()
         {
-            SessionId = AssignCodingSessionId();
+
         }
 
 
 
-        public CodingSession CreateNewCodingSession(int sessionId, int userID)
-        { }
 
-
-        public int AssignCodingSessionId()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

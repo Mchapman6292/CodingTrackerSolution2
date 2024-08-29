@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.CodingSessions;
 
-namespace CodingTracker.Data.Interfaces.ICodingSessionRepository
+namespace CodingTracker.Common.Interfaces.ICodingSessionRepository
 {
-    public interface ICodingSessionRepository : IGenericRepository<CodingSession>
+    public interface ICodingSessionRepository
     {
+        Task<bool> AddCodingSession(CodingSession codingSession, Activity activity);
+
         Task<IEnumerable<CodingSession>> GetSessionsByDateRange(DateOnly startDate, DateOnly endDate, string traceId);
 
         Task<(bool success, List<int> failedIds)> DeleteSessionsById(List<int> sessionIds, string traceId);

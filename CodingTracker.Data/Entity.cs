@@ -12,8 +12,8 @@ namespace CodingTracker.Data.EntityContexts
 { 
     public class EntityContext : Microsoft.EntityFrameworkCore.DbContext
     {
-        public DbSet<CodingSession> codingSessions { get; set; }
-        public DbSet<UserCredential> userCredentials { get; set; }
+        public DbSet<CodingSession> CodingSessions { get; set; }
+        public DbSet<UserCredential> UserCredentials { get; set; }
 
         public string DbPath { get; }
 
