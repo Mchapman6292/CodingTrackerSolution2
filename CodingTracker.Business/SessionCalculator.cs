@@ -7,185 +7,137 @@ using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 
 
 namespace CodingTracker.Business.SessionCalculators
 {
     public interface ISessionCalculator
     {
-        double CalculateLastSevenDaysAvg();
-        double CalculateTodayTotal();
-        double CalculateTotalAvg();
+        Task<double> CalculateLastSevenDaysAvgInSeconds();
+        Task<int> CalculateTodayTotal();
+        Task<double> CalculateTotalAvg();
         double CalculateDurationSeconds();
     }
-
+    
 
     public class SessionCalculator : ISessionCalculator
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingSession _codingSessionDTOManager;
+        private readonly ICodingSessionRepository _codingSessionRepository;
 
-        public SessionCalculator(IApplicationLogger appLogger, ICodingSession codingSessionDTOManager)
+        public SessionCalculator(IApplicationLogger appLogger, ICodingSessionRepository codingSessionRepository)
         {
             _appLogger = appLogger;
-            _codingSessionDTOManager = codingSessionDTOManager;
+            _codingSessionRepository = codingSessionRepository;
         }
 
 
-        public double CalculateLastSevenDaysAvg()
+        public async Task<double> CalculateLastSevenDaysAvgInSeconds()
         {
-            using (var activity = new Activity(nameof(CalculateLastSevenDaysAvg)).Start())
+            using (var activity = new Activity(nameof(CalculateLastSevenDaysAvgInSeconds)).Start())
             {
-                _appLogger.Debug($"Starting {nameof(CalculateLastSevenDaysAvg)}. TraceID: {activity.TraceId}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Starting {nameof(CalculateLastSevenDaysAvgInSeconds)}. TraceID: {activity.TraceId}");
                 try
                 {
-                    int numberOfDays = 7;
-                    List<double> last7Days = _databaseSessionRead.ReadSessionDurationSeconds(numberOfDays);
+                    DateOnly currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                    DateOnly dateSevenDaysAgo = currentDate.AddDays(-6); // -6 to include today
 
-                    double averageMinutes = 0;
-                    if (last7Days.Count > 0)
+                    var sessions = await _codingSessionRepository.GetCodingSessionByDateOnly(activity, dateSevenDaysAgo, currentDate);
+
+                    if (!sessions.Any())
                     {
-                        double totalMinutes = last7Days.Sum();
-                        averageMinutes = totalMinutes / numberOfDays;
+                        _appLogger.Info($"No sessions found in the last 7 days. TraceID: {activity.TraceId}");
+                        return 0;
                     }
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"Calculated last 7 days average successfully. Average: {averageMinutes}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    var sessionsByDate = sessions
+                        .GroupBy(s => s.StartDate)
+                        .Select(g => new { Date = g.Key, TotalSeconds = g.Sum(s => s.DurationSeconds ?? 0) })
+                        .ToList();
 
-                    return averageMinutes;
+                    double totalSeconds = sessionsByDate.Sum(s => s.TotalSeconds);
+                    int daysWithSessions = sessionsByDate.Count;
+
+                    double averageSeconds = totalSeconds / 7; // Still divide by 7 for a true 7-day average
+
+                    _appLogger.Info($"Calculated last 7 days average successfully. Average: {averageSeconds:F2} seconds per day. Days with sessions: {daysWithSessions}. TraceID: {activity.TraceId}");
+                    return averageSeconds;
                 }
                 catch (Exception ex)
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to calculate last 7 days average. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
+                    _appLogger.Error($"Failed to calculate last 7 days average. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
                     throw;
                 }
             }
         }
-
-        public double CalculateTodayTotal()
+        public async Task<int> CalculateTodayTotal()
         {
             using (var activity = new Activity(nameof(CalculateTodayTotal)).Start())
             {
                 _appLogger.Debug($"Starting {nameof(CalculateTodayTotal)}. TraceID: {activity.TraceId}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
-                    DateTime todaysDate = DateTime.UtcNow;
-                    List<CodingSessionDTO> curentDayDTOS = _databaseSessionRead.ViewSpecific(todaysDate);
+                    DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+                    var sessions = await _codingSessionRepository.GetCodingSessionByDateOnly(activity, today, today);
 
-                    double totalDurationSeconds = curentDayDTOS.Sum(dto => dto.DurationSeconds ?? 0);
+                    if (!sessions.Any())
+                    {
+                        _appLogger.Info($"No sessions found for today. TraceID: {activity.TraceId}");
+                        return 0;
+                    }
 
-                    stopwatch.Stop();
-                    _appLogger.Info($"Calculated today's total minutes successfully. Total: {totalDurationSeconds}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    int totalDurationSeconds = sessions.Sum(s => s.DurationSeconds ?? 0);
 
+                    _appLogger.Info($"Calculated today's total successfully. Total: {totalDurationSeconds} seconds. TraceID: {activity.TraceId}");
                     return totalDurationSeconds;
                 }
                 catch (Exception ex)
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to calculate today's total minutes. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
+                    _appLogger.Error($"Failed to calculate today's total. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    return 0;
                 }
             }
         }
-
-        public double CalculateTotalAvg()
+        
+        
+            
+        public async Task<double> CalculateTotalAvg()
         {
             using (var activity = new Activity(nameof(CalculateTotalAvg)).Start())
             {
                 _appLogger.Debug($"Starting {nameof(CalculateTotalAvg)}. TraceID: {activity.TraceId}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
-                    List<double> totalMins = _databaseSessionRead.ReadSessionDurationSeconds(0, true);
+                    var allSessions = await _codingSessionRepository.GetAllCodingSessions(activity);
 
-                    double averageMinutes = 0;
-                    if (totalMins.Count > 0)
+                    if (!allSessions.Any())
                     {
-                        double totalMinutes = totalMins.Sum();
-                        averageMinutes = totalMinutes / totalMins.Count;
-                    }
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Calculated total average successfully. Average: {averageMinutes}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-
-                    return averageMinutes;
-                }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to calculate total average. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
-            }
-        }
-
-        public int CalculateGoalSeconds()
-        {
-            using (var activity = new Activity(nameof(CalculateGoalSeconds)).Start())
-            {
-                _appLogger.Debug($"Starting {nameof(CalculateGoalSeconds)}. TraceID: {activity.TraceId}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                int totalSeconds = 0;
-                try
-                {
-                    CodingGoalDTO currentGoalDTO = _codingGoalDTOManager.GetCurrentCodingGoalDTO();
-                    if (currentGoalDTO == null)
-                    {
-                        _appLogger.Error($"No current CodingGoalDTO found. TraceID: {activity.TraceId}");
+                        _appLogger.Info($"No sessions found for average calculation. TraceID: {activity.TraceId}");
                         return 0;
                     }
 
-                    totalSeconds = (currentGoalDTO.GoalHours * 3600) + (currentGoalDTO.GoalMinutes * 60);
+                    double totalSeconds = allSessions.Sum(s => s.DurationSeconds ?? 0);
+                    int sessionCount = allSessions.Count();
+                    double averageSeconds = totalSeconds / sessionCount;
 
-                    _appLogger.Info($"Calculated goal seconds successfully. TotalSeconds: {totalSeconds}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Info($"Calculated total average successfully. Average: {averageSeconds:F2} seconds per session. Total sessions: {sessionCount}. TraceID: {activity.TraceId}");
+                    return averageSeconds;
                 }
                 catch (Exception ex)
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to calculate goal seconds. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    throw;
+                    _appLogger.Error($"Failed to calculate total average. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                    return 0;
                 }
-
-                stopwatch.Stop();
-                return totalSeconds;
             }
         }
+
+
 
 
         public double CalculateDurationSeconds()
         {
-            CodingSessionDTO currentSessionDTO = _codingSessionDTOManager.GetCurrentSessionDTO();
-            double durationSeconds = 0;
-            using (var activity = new Activity(nameof(CalculateDurationSeconds)).Start())
-            {
-                _appLogger.Info($"Calculating duration seconds. TraceID: {activity.TraceId}");
-
-                try
-                {
-                    if (!currentSessionDTO.StartTime.HasValue || !currentSessionDTO.EndTime.HasValue)
-                    {
-                        _appLogger.Error("start Time or End Time is not set.");
-                    }
-
-                    TimeSpan duration = currentSessionDTO.EndTime.Value - currentSessionDTO.StartTime.Value;
-                    durationSeconds = (double)duration.TotalSeconds;
-                    
-
-                    _appLogger.Info($"Duration seconds calculated: {durationSeconds}. TraceID: {activity.TraceId}");
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(CalculateDurationSeconds)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
-            }
-            return durationSeconds;
+            throw new NotImplementedException();
         }
     }
 }

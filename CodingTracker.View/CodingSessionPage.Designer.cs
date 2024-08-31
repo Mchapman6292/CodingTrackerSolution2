@@ -31,6 +31,9 @@
             components = new System.ComponentModel.Container();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CodingSessionPage));
+            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
@@ -45,25 +48,19 @@
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges17 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges18 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges19 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges20 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CodingSessionPage));
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             CodingSessionPageTopPanel = new Guna.UI2.WinForms.Guna2Panel();
+            CodingSessionPageHomeButton = new Guna.UI2.WinForms.Guna2GradientButton();
             MainPageExitControlMinimizeButton = new Guna.UI2.WinForms.Guna2ControlBox();
             MainPageExitControlBox = new Guna.UI2.WinForms.Guna2ControlBox();
             CodingSessionPageStartSessionButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSesionPageEndSessionButton = new Guna.UI2.WinForms.Guna2Button();
-            CodingGoalSetHourToggle = new Guna.UI2.WinForms.Guna2NumericUpDown();
             CodingGoalSetMinToggle = new Guna.UI2.WinForms.Guna2NumericUpDown();
             CodingSessionPageCodingGoalToggle = new Guna.UI2.WinForms.Guna2ToggleSwitch();
-            CodingSessionPageConfirmSessionGoalButton = new Guna.UI2.WinForms.Guna2Button();
             CodingSessionPageNotifyIcon = new NotifyIcon(components);
-            CodingSessionPageHomeButton = new Guna.UI2.WinForms.Guna2GradientButton();
+            CodingGoalSetHourToggle = new Guna.UI2.WinForms.Guna2NumericUpDown();
             CodingSessionPageTopPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)CodingGoalSetHourToggle).BeginInit();
             ((System.ComponentModel.ISupportInitialize)CodingGoalSetMinToggle).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)CodingGoalSetHourToggle).BeginInit();
             SuspendLayout();
             // 
             // CodingSessionPageTopPanel
@@ -78,6 +75,26 @@
             CodingSessionPageTopPanel.ShadowDecoration.CustomizableEdges = customizableEdges8;
             CodingSessionPageTopPanel.Size = new Size(1284, 100);
             CodingSessionPageTopPanel.TabIndex = 0;
+            // 
+            // CodingSessionPageHomeButton
+            // 
+            CodingSessionPageHomeButton.CustomizableEdges = customizableEdges1;
+            CodingSessionPageHomeButton.DisabledState.BorderColor = Color.DarkGray;
+            CodingSessionPageHomeButton.DisabledState.CustomBorderColor = Color.DarkGray;
+            CodingSessionPageHomeButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
+            CodingSessionPageHomeButton.DisabledState.FillColor2 = Color.FromArgb(169, 169, 169);
+            CodingSessionPageHomeButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
+            CodingSessionPageHomeButton.FillColor = Color.FromArgb(25, 24, 40);
+            CodingSessionPageHomeButton.FillColor2 = Color.FromArgb(25, 24, 40);
+            CodingSessionPageHomeButton.Font = new Font("Segoe UI", 9F);
+            CodingSessionPageHomeButton.ForeColor = Color.White;
+            CodingSessionPageHomeButton.Image = (Image)resources.GetObject("CodingSessionPageHomeButton.Image");
+            CodingSessionPageHomeButton.Location = new Point(1154, 0);
+            CodingSessionPageHomeButton.Name = "CodingSessionPageHomeButton";
+            CodingSessionPageHomeButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
+            CodingSessionPageHomeButton.Size = new Size(45, 29);
+            CodingSessionPageHomeButton.TabIndex = 28;
+            CodingSessionPageHomeButton.Click += CodingSessionPageHomeButton_Click;
             // 
             // MainPageExitControlMinimizeButton
             // 
@@ -151,34 +168,19 @@
             CodingSesionPageEndSessionButton.Text = "End Session";
             CodingSesionPageEndSessionButton.Click += CodingSesionPageEndSessionButton_Click;
             // 
-            // CodingGoalSetHourToggle
-            // 
-            CodingGoalSetHourToggle.AutoRoundedCorners = true;
-            CodingGoalSetHourToggle.BackColor = Color.Transparent;
-            CodingGoalSetHourToggle.BorderRadius = 17;
-            CodingGoalSetHourToggle.CustomizableEdges = customizableEdges13;
-            CodingGoalSetHourToggle.Enabled = false;
-            CodingGoalSetHourToggle.Font = new Font("Segoe UI", 9F);
-            CodingGoalSetHourToggle.Location = new Point(870, 225);
-            CodingGoalSetHourToggle.Maximum = new decimal(new int[] { 23, 0, 0, 0 });
-            CodingGoalSetHourToggle.Name = "CodingGoalSetHourToggle";
-            CodingGoalSetHourToggle.ShadowDecoration.CustomizableEdges = customizableEdges14;
-            CodingGoalSetHourToggle.Size = new Size(100, 36);
-            CodingGoalSetHourToggle.TabIndex = 22;
-            // 
             // CodingGoalSetMinToggle
             // 
             CodingGoalSetMinToggle.AutoRoundedCorners = true;
             CodingGoalSetMinToggle.BackColor = Color.Transparent;
             CodingGoalSetMinToggle.BorderRadius = 17;
-            CodingGoalSetMinToggle.CustomizableEdges = customizableEdges15;
+            CodingGoalSetMinToggle.CustomizableEdges = customizableEdges13;
             CodingGoalSetMinToggle.Enabled = false;
             CodingGoalSetMinToggle.Font = new Font("Segoe UI", 9F);
             CodingGoalSetMinToggle.Increment = new decimal(new int[] { 2, 0, 0, 0 });
             CodingGoalSetMinToggle.Location = new Point(870, 294);
             CodingGoalSetMinToggle.Maximum = new decimal(new int[] { 50, 0, 0, 0 });
             CodingGoalSetMinToggle.Name = "CodingGoalSetMinToggle";
-            CodingGoalSetMinToggle.ShadowDecoration.CustomizableEdges = customizableEdges16;
+            CodingGoalSetMinToggle.ShadowDecoration.CustomizableEdges = customizableEdges14;
             CodingGoalSetMinToggle.Size = new Size(100, 36);
             CodingGoalSetMinToggle.TabIndex = 23;
             // 
@@ -188,10 +190,10 @@
             CodingSessionPageCodingGoalToggle.CheckedState.FillColor = Color.Maroon;
             CodingSessionPageCodingGoalToggle.CheckedState.InnerBorderColor = Color.White;
             CodingSessionPageCodingGoalToggle.CheckedState.InnerColor = Color.White;
-            CodingSessionPageCodingGoalToggle.CustomizableEdges = customizableEdges17;
+            CodingSessionPageCodingGoalToggle.CustomizableEdges = customizableEdges15;
             CodingSessionPageCodingGoalToggle.Location = new Point(870, 361);
             CodingSessionPageCodingGoalToggle.Name = "CodingSessionPageCodingGoalToggle";
-            CodingSessionPageCodingGoalToggle.ShadowDecoration.CustomizableEdges = customizableEdges18;
+            CodingSessionPageCodingGoalToggle.ShadowDecoration.CustomizableEdges = customizableEdges16;
             CodingSessionPageCodingGoalToggle.Size = new Size(35, 20);
             CodingSessionPageCodingGoalToggle.TabIndex = 24;
             CodingSessionPageCodingGoalToggle.UncheckedState.BorderColor = Color.FromArgb(234, 153, 149);
@@ -201,52 +203,25 @@
             CodingSessionPageCodingGoalToggle.UncheckedState.InnerColor = Color.FromArgb(234, 153, 149);
             CodingSessionPageCodingGoalToggle.CheckedChanged += CodingSessionPageCodingGoalToggle_CheckedChanged;
             // 
-            // CodingSessionPageConfirmSessionGoalButton
-            // 
-            CodingSessionPageConfirmSessionGoalButton.Animated = true;
-            CodingSessionPageConfirmSessionGoalButton.AutoRoundedCorners = true;
-            CodingSessionPageConfirmSessionGoalButton.BorderRadius = 18;
-            CodingSessionPageConfirmSessionGoalButton.BorderThickness = 2;
-            CodingSessionPageConfirmSessionGoalButton.CustomizableEdges = customizableEdges19;
-            CodingSessionPageConfirmSessionGoalButton.DisabledState.BorderColor = Color.DarkGray;
-            CodingSessionPageConfirmSessionGoalButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            CodingSessionPageConfirmSessionGoalButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            CodingSessionPageConfirmSessionGoalButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            CodingSessionPageConfirmSessionGoalButton.FillColor = Color.FromArgb(193, 20, 137);
-            CodingSessionPageConfirmSessionGoalButton.Font = new Font("Segoe UI", 9F);
-            CodingSessionPageConfirmSessionGoalButton.ForeColor = Color.White;
-            CodingSessionPageConfirmSessionGoalButton.Location = new Point(1030, 283);
-            CodingSessionPageConfirmSessionGoalButton.Name = "CodingSessionPageConfirmSessionGoalButton";
-            CodingSessionPageConfirmSessionGoalButton.ShadowDecoration.CustomizableEdges = customizableEdges20;
-            CodingSessionPageConfirmSessionGoalButton.Size = new Size(120, 38);
-            CodingSessionPageConfirmSessionGoalButton.TabIndex = 25;
-            CodingSessionPageConfirmSessionGoalButton.Text = "Confirm session goal";
-            CodingSessionPageConfirmSessionGoalButton.Click += CodingSessionPageConfirmSessionGoalButton_Click;
-            // 
             // CodingSessionPageNotifyIcon
             // 
             CodingSessionPageNotifyIcon.Text = "notifyIcon1";
             CodingSessionPageNotifyIcon.Visible = true;
             // 
-            // CodingSessionPageHomeButton
+            // CodingGoalSetHourToggle
             // 
-            CodingSessionPageHomeButton.CustomizableEdges = customizableEdges1;
-            CodingSessionPageHomeButton.DisabledState.BorderColor = Color.DarkGray;
-            CodingSessionPageHomeButton.DisabledState.CustomBorderColor = Color.DarkGray;
-            CodingSessionPageHomeButton.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
-            CodingSessionPageHomeButton.DisabledState.FillColor2 = Color.FromArgb(169, 169, 169);
-            CodingSessionPageHomeButton.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
-            CodingSessionPageHomeButton.FillColor = Color.FromArgb(25, 24, 40);
-            CodingSessionPageHomeButton.FillColor2 = Color.FromArgb(25, 24, 40);
-            CodingSessionPageHomeButton.Font = new Font("Segoe UI", 9F);
-            CodingSessionPageHomeButton.ForeColor = Color.White;
-            CodingSessionPageHomeButton.Image = (Image)resources.GetObject("CodingSessionPageHomeButton.Image");
-            CodingSessionPageHomeButton.Location = new Point(1154, 0);
-            CodingSessionPageHomeButton.Name = "CodingSessionPageHomeButton";
-            CodingSessionPageHomeButton.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            CodingSessionPageHomeButton.Size = new Size(45, 29);
-            CodingSessionPageHomeButton.TabIndex = 28;
-            CodingSessionPageHomeButton.Click += CodingSessionPageHomeButton_Click;
+            CodingGoalSetHourToggle.AutoRoundedCorners = true;
+            CodingGoalSetHourToggle.BackColor = Color.Transparent;
+            CodingGoalSetHourToggle.BorderRadius = 17;
+            CodingGoalSetHourToggle.CustomizableEdges = customizableEdges17;
+            CodingGoalSetHourToggle.Enabled = false;
+            CodingGoalSetHourToggle.Font = new Font("Segoe UI", 9F);
+            CodingGoalSetHourToggle.Location = new Point(870, 225);
+            CodingGoalSetHourToggle.Maximum = new decimal(new int[] { 23, 0, 0, 0 });
+            CodingGoalSetHourToggle.Name = "CodingGoalSetHourToggle";
+            CodingGoalSetHourToggle.ShadowDecoration.CustomizableEdges = customizableEdges18;
+            CodingGoalSetHourToggle.Size = new Size(100, 36);
+            CodingGoalSetHourToggle.TabIndex = 22;
             // 
             // CodingSessionPage
             // 
@@ -254,7 +229,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 34, 50);
             ClientSize = new Size(1284, 681);
-            Controls.Add(CodingSessionPageConfirmSessionGoalButton);
             Controls.Add(CodingSessionPageCodingGoalToggle);
             Controls.Add(CodingGoalSetMinToggle);
             Controls.Add(CodingGoalSetHourToggle);
@@ -265,8 +239,8 @@
             FormBorderStyle = FormBorderStyle.None;
             Name = "CodingSessionPage";
             CodingSessionPageTopPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)CodingGoalSetHourToggle).EndInit();
             ((System.ComponentModel.ISupportInitialize)CodingGoalSetMinToggle).EndInit();
+            ((System.ComponentModel.ISupportInitialize)CodingGoalSetHourToggle).EndInit();
             ResumeLayout(false);
         }
 
@@ -277,11 +251,10 @@
         private Guna.UI2.WinForms.Guna2ControlBox MainPageExitControlMinimizeButton;
         private Guna.UI2.WinForms.Guna2Button CodingSessionPageStartSessionButton;
         private Guna.UI2.WinForms.Guna2Button CodingSesionPageEndSessionButton;
-        private Guna.UI2.WinForms.Guna2NumericUpDown CodingGoalSetHourToggle;
         private Guna.UI2.WinForms.Guna2NumericUpDown CodingGoalSetMinToggle;
         private Guna.UI2.WinForms.Guna2ToggleSwitch CodingSessionPageCodingGoalToggle;
-        private Guna.UI2.WinForms.Guna2Button CodingSessionPageConfirmSessionGoalButton;
         private NotifyIcon CodingSessionPageNotifyIcon;
         private Guna.UI2.WinForms.Guna2GradientButton CodingSessionPageHomeButton;
+        private Guna.UI2.WinForms.Guna2NumericUpDown CodingGoalSetHourToggle;
     }
 }

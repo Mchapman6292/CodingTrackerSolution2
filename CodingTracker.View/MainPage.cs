@@ -25,11 +25,10 @@ namespace CodingTracker.View
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
-        private readonly ICodingSession _sessionDTOManager;
 
 
 
-        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, ISessionLogic codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ICodingSession sessionDTOManager)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, ISessionLogic codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator)
         {
             InitializeComponent();
             _appLogger = appLogger;
@@ -40,7 +39,7 @@ namespace CodingTracker.View
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
             _sessionCalculator = sessionCalculator;
-            _sessionDTOManager = sessionDTOManager;
+
         }
 
         private void MainPage_Load(object sender, EventArgs e)
@@ -128,22 +127,8 @@ namespace CodingTracker.View
 
         private void UpdatedateTodaySessionLabel() 
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using(var activity = new Activity(nameof(UpdatedateTodaySessionLabel))) 
-            {
-                _appLogger.Info($"Starting {nameof(UpdatedateTodaySessionLabel)}, TraceID: {activity.TraceId}.");
-
-          
-
-                double todayDurationSecondsTotal = _sessionCalculator.CalculateTodayTotal();
-
-                string formattedTotal = _sessionDTOManager.ConvertDurationSecondsIntoStringHHMM(todayDurationSecondsTotal);
-
-                TodaySessionLabel.Text = $"Todays total: {formattedTotal}";
-
-                stopwatch.Stop();
-                _appLogger.Info($"TodaySessionLabel updated, todays total: {formattedTotal}, Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-            }
+            throw new NotImplementedException();
+           
         }
 
         private void Day2Label_Click(object sender, EventArgs e)

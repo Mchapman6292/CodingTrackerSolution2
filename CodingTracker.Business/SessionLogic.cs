@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ICodingSessionTimers;
-using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.ICredentialManagers;
@@ -35,7 +34,7 @@ namespace CodingTracker.Business.CodingSessions
         private bool isCodingSessionActive = false;
 
 
-        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer, ICodingSession sessionDTOManager, ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IIdGenerators idGenerators)
+        public SessionLogic(IInputValidator validator, IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionTimer sessionTimer,  ICredentialManager credentialManager, ISessionCalculator sessionCalculator, IIdGenerators idGenerators)
         {
             _inputValidator = validator;
             _appLogger = appLogger;

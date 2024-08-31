@@ -4,19 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using CodingTracker.Data.Interfaces.ICodingSessionRepository;
 using CodingTracker.Common.CodingSessions;
+using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 using CodingTracker.Data.Repositories.GenericRepository;
+using CodingTracker.Common.DataInterfaces.IGenericRepository;
 using CodingTracker.Data.EntityContexts;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 
 // Migrate changes to codingSession(removal of goal) once build errors fixed.
 
 namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 {
-    public class CodingSessionRepository : GenericRepository<CodingSession>, ICodingSessionRepository
+    public class CodingSessionRepository : ICodingSessionRepository, IGenericRepository<CodingSession, int>
     {
         private readonly IApplicationLogger _appLogger;
         public CodingSessionRepository(EntityContext context, IApplicationLogger appLogger) : base(context)
@@ -25,57 +27,58 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
         }
 
 
-        public async Task<bool> AddCodingSession(CodingSession session, string traceId)
+
+
+        public async Task<bool> AddCodingSession(Activity activity, CodingSession session)
         {
-            _appLogger.Info($"Starting {nameof(AddCodingSession)} for session with ID {session.SessionId}. TraceId: {traceId}.");
+            _appLogger.Info($"Starting {nameof(AddCodingSession)} for session with ID {session.SessionId}. TraceId: {activity.TraceId}.");
             try
             {
                 _context.CodingSessions.Add(session);
                 await _context.SaveChangesAsync();
 
-                _appLogger.Info($"Successfully added coding session with ID {session.SessionId}. TraceId: {traceId}.");
+                _appLogger.Info($"Successfully added coding session with ID {session.SessionId}. TraceId: {activity.TraceId}.");
                 return true;
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error adding coding session with ID {session.SessionId} for {nameof(AddCodingSession)}, TraceId: {traceId}.", ex);
+                _appLogger.Error($"Error adding coding session with ID {session.SessionId} for {nameof(AddCodingSession)}, TraceId: {activity.TraceId}.", ex);
                 return false;
             }
         }
 
-
-        public async Task<IEnumerable<CodingSession>> GetSessionsByDateRange(DateOnly startDate, DateOnly endDate, string traceId)
+        public async Task<IEnumerable<CodingSession>> GetAllCodingSessions(Activity activity)
         {
-            _appLogger.Info($"Starting {nameof(GetSessionsByDateRange)} for sessions from {startDate} to {endDate}. TraceId: {traceId}.");
+            _appLogger.Info($"Starting {nameof(GetAllCodingSessions)}. TraceId: {activity.TraceId}");
             try
             {
                 var result = await _dbSet
-                   .Where(cs => cs.StartDate >= startDate && cs.EndDate <= endDate)
-                   .OrderByDescending(cs => cs.StartDate)
-                   .ThenBy(cs => cs.StartTime)
-                   .ToListAsync();
-
+                    .OrderByDescending(cs => cs.StartDate)
+                    .ToListAsync();
 
                 if (result.Count > 0)
                 {
-                    _appLogger.Info($"Retrieved {result.Count} sessions for {nameof(GetSessionsByDateRange)}. TraceId: {traceId}.");
+                    _appLogger.Info($"Retrieved {result.Count} sessions for {nameof(GetAllCodingSessions)}. TraceId: {activity.TraceId}.");
                 }
                 else
                 {
-                    _appLogger.Info($"No sessions found for for {nameof(GetSessionsByDateRange)} TraceId: {traceId}.");
+                    _appLogger.Info($"No sessions found for {nameof(GetAllCodingSessions)}. TraceId: {activity.TraceId}.");
                 }
                 return result;
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error retrieving sessions for {nameof(GetSessionsByDateRange)}, TraceId: {traceId}.", ex);
+                _appLogger.Error($"Error retrieving sessions for {nameof(GetAllCodingSessions)}, TraceId: {activity.TraceId}.", ex);
                 return Enumerable.Empty<CodingSession>();
             }
         }
 
-        public async Task<(bool success, List<int> failedIds)> DeleteSessionsById(List<int> sessionIds, string traceId)
+
+
+
+        public async Task<(bool success, List<int> failedIds)> DeleteSessionsById(Activity activity, List<int> sessionIds)
         {
-            _appLogger.Info($"Starting {nameof(DeleteSessionsById)}, for {sessionIds.Count()} TraceId: {traceId}.");
+            _appLogger.Info($"Starting {nameof(DeleteSessionsById)}, for {sessionIds.Count()} TraceId: {activity.TraceId}.");
 
             List<int> failedIds = new List<int>();
             bool overallSuccess = true;
@@ -118,30 +121,30 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 
 
 
-        public async Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(DateOnly startDate, DateOnly endDate, string traceId)
+        public async Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(Activity activity, DateOnly startDate, DateOnly endDate) 
         {
-            _appLogger.Info($"Starting {nameof(GetCodingSessionByDateOnly)} TraceId: {traceId}");
+            _appLogger.Info($"Starting {nameof(GetCodingSessionByDateOnly)} TraceId: {activity.TraceId}");
 
             try
             {
                 var result = await _dbSet
-                    .Where(cs => cs.StartDate >= startDate && cs.EndDate <= endDate)
+                    .Where(cs => cs.StartDate <= endDate && cs.EndDate >= startDate)
                     .OrderByDescending(cs => cs.StartDate)
                     .ToListAsync();
 
                 if (result.Count > 0)
                 {
-                    _appLogger.Info($"Retrieved {result.Count} sessions for {nameof(GetCodingSessionByDateOnly)}. TraceId: {traceId}.");
+                    _appLogger.Info($"Retrieved {result.Count} sessions for {nameof(GetCodingSessionByDateOnly)}. TraceId: {activity.TraceId}.");
                 }
                 else
                 {
-                    _appLogger.Info($"No sessions found for for {nameof(GetCodingSessionByDateOnly)} TraceId: {traceId}.");
+                    _appLogger.Info($"No sessions found for for {nameof(GetCodingSessionByDateOnly)} TraceId: {activity.TraceId}.");
                 }
                 return result;
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error retrieving sessions for {nameof(GetCodingSessionByDateOnly)}, TraceId: {traceId}.", ex);
+                _appLogger.Error($"Error retrieving sessions for {nameof(GetCodingSessionByDateOnly)}, TraceId: {activity.TraceId}.", ex);
                 return Enumerable.Empty<CodingSession>();
             }
         }

@@ -9,8 +9,7 @@ namespace CodingTracker.Common.ICodingSessions
 {
     public interface ISessionLogic
     {
-        void StartSession();
-        void EndSession();
+
         bool CheckIfCodingSessionActive();
 
         List<DateTime> GetDatesPrevious28days();
