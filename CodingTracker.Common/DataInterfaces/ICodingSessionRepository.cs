@@ -22,6 +22,8 @@ namespace CodingTracker.Common.Interfaces.ICodingSessionRepository
 
         Task<bool> SaveCodingSessionChanges(Activity activity);
 
+        Task<IEnumerable<CodingSession>> GetRecentSessions(Activity activity, int numberOfSessions);
+
 
 
 

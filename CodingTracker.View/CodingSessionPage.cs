@@ -13,8 +13,6 @@ using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.CodingGoalDTOs;
-using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
 using CodingTracker.Common.CodingSessionDTOs;

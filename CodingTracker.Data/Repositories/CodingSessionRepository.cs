@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CodingTracker.Common.CodingSessions;
 using CodingTracker.Common.Interfaces.ICodingSessionRepository;
-using CodingTracker.Data.Repositories.GenericRepository;
-using CodingTracker.Common.DataInterfaces.IGenericRepository;
 using CodingTracker.Data.EntityContexts;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.DataInterfaces.IEntityContexts;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
@@ -18,15 +17,21 @@ using System.Security.Cryptography;
 
 namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 {
-    public class CodingSessionRepository : ICodingSessionRepository, IGenericRepository<CodingSession, int>
+    public class CodingSessionRepository : ICodingSessionRepository
     {
         private readonly IApplicationLogger _appLogger;
-        public CodingSessionRepository(EntityContext context, IApplicationLogger appLogger) : base(context)
+        private readonly IEntityContext _context;
+        public CodingSessionRepository(IEntityContext context, IApplicationLogger appLogger)
         {
             _appLogger = appLogger;
+            _context = context;
         }
 
 
+        public virtual async Task<CodingSession> GetByIdAsync(Activity activity, int id)
+        {
+            throw new NotImplementedException();
+        }
 
 
         public async Task<bool> AddCodingSession(Activity activity, CodingSession session)
@@ -52,7 +57,7 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
             _appLogger.Info($"Starting {nameof(GetAllCodingSessions)}. TraceId: {activity.TraceId}");
             try
             {
-                var result = await _dbSet
+                var result = await _context.CodingSessions
                     .OrderByDescending(cs => cs.StartDate)
                     .ToListAsync();
 
@@ -85,13 +90,13 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 
             try
             {
-                var entitiesToDelete = await _dbSet
+                var entitiesToDelete = await _context.CodingSessions
                          .Where(s => sessionIds.Contains(s.SessionId))
                          .ToListAsync();
 
                 foreach (var entity in entitiesToDelete)
                 {
-                    _dbSet.Remove(entity);
+                    _context.CodingSessions.Remove(entity);
                 }
 
                 failedIds.AddRange(sessionIds.Except(entitiesToDelete.Select(e => e.SessionId)));  // Adds SessionIds that were not found in the database
@@ -99,27 +104,53 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
                 if (entitiesToDelete.Any())
                 {
                     await _context.SaveChangesAsync();
-                    _appLogger.Info($"Successfully deleted {entitiesToDelete.Count} sessions. TraceId: {traceId}");
+                    _appLogger.Info($"Successfully deleted {entitiesToDelete.Count} sessions. TraceId: {activity.TraceId}");
                 }
 
 
                 if (failedIds.Any())
                 {
                     overallSuccess = false;
-                    _appLogger.Warning($"Failed to delete {failedIds.Count} sessions. Session IDs: {string.Join(", ", failedIds)}. TraceId: {traceId}");
+                    _appLogger.Warning($"Failed to delete {failedIds.Count} sessions. Session IDs: {string.Join(", ", failedIds)}. TraceId: {activity.TraceId}");
                 }
             }
             catch (Exception ex)
             {
                 overallSuccess = false;
-                _appLogger.Error($"Error occurred while deleting sessions. TraceId: {traceId}.", ex);
+                _appLogger.Error($"Error occurred while deleting sessions. TraceId: {activity.TraceId}.", ex);
                 failedIds = sessionIds;
             }
 
             return (overallSuccess, failedIds);
         }
 
+        public async Task<IEnumerable<CodingSession>> GetRecentSessions(Activity activity, int numberOfSessions)
+        {
+            _appLogger.Info($"Starting {nameof(GetRecentSessions)} TraceId: {activity.TraceId}");
 
+            try
+            {
+                var sessions = await _context.CodingSessions
+                            .OrderByDescending(s => s.StartDate)
+                            .Take(numberOfSessions)
+                            .ToListAsync();
+
+                if (sessions.Any())
+                {
+                    _appLogger.Info($"Retrieved {sessions.Count} sessions for {nameof(GetRecentSessions)}. TraceId: {activity.TraceId}.");
+                }
+                else
+                {
+                    _appLogger.Info($"No sessions found for for {nameof(GetRecentSessions)} TraceId: {activity.TraceId}.");
+                }
+                return sessions;
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"Error retrieving sessions for {nameof(GetCodingSessionByDateOnly)}, TraceId: {activity.TraceId}.", ex);
+                return Enumerable.Empty<CodingSession>();
+            }
+        }
 
         public async Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(Activity activity, DateOnly startDate, DateOnly endDate) 
         {
@@ -127,7 +158,7 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
 
             try
             {
-                var result = await _dbSet
+                var result = await _context.CodingSessions
                     .Where(cs => cs.StartDate <= endDate && cs.EndDate >= startDate)
                     .OrderByDescending(cs => cs.StartDate)
                     .ToListAsync();

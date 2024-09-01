@@ -47,7 +47,15 @@ namespace CodingTracker.Business.CodingSessions
         }
         
 
+        public void StartSession()
+        {
+            throw new NotImplementedException();
+        }
 
+        public void EndSession()
+        {
+            throw new NotImplementedException();
+        }
 
 
 
