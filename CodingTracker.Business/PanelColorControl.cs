@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.IDatabaseSessionReads;
 using CodingTracker.Common.INewDatabaseReads;
 using System.Drawing;
 using CodingTracker.Common.CodingSessionDTOs;
@@ -38,19 +37,16 @@ namespace CodingTracker.Business.PanelColorControls
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly INewDatabaseRead _newDatabaseRead;
         private readonly List<(DateTime Day, double TotalDurationMinutes)> _dailyDurations;
         private readonly List<SessionColor> _sessionColors;
 
 
 
-        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, IDatabaseSessionRead databaseSessionRead, INewDatabaseRead newDatabaseRead)
+        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, INewDatabaseRead newDatabaseRead)
         {
             _appLogger = appLogger;
             _errorHandler = errorHandler;
-            _databaseSessionRead = databaseSessionRead;
-            _dailyDurations = _databaseSessionRead.ReadDurationSecondsLast28Days();
             _newDatabaseRead = newDatabaseRead;
         }
 

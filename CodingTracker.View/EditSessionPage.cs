@@ -10,10 +10,8 @@ using System.Windows.Forms;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.View.FormControllers;
-using CodingTracker.Common.IDatabaseSessionReads;
+using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.CodingGoalDTOManagers;
-using CodingTracker.Common.IDatabaseSessionDeletes;
 using System.Diagnostics;
 using Guna.UI2.WinForms;
 
@@ -24,21 +22,17 @@ namespace CodingTracker.View
         private readonly IApplicationControl _appControl;
         private readonly IFormSwitcher _formSwitcher;
         private readonly IFormController _formController;
-        private readonly IDatabaseSessionRead _databaseSessionRead;
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
-        private readonly IDatabaseSessionDelete _databaseSessionDelete;
+        private readonly ICodingSessionRepository _codingSessionRepository;
         private List<int> deletionSessionIds = new List<int>();
         private bool isEditSessionOn = false;
 
-        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IDatabaseSessionRead databaseSessionRead, IApplicationLogger appLogger, ICodingGoalDTOManager codingGoalDTOManager, IDatabaseSessionDelete databaseSessionDelete)
+        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IApplicationLogger appLogger, ICodingSessionRepository codingSessionRepository)
         {
             _appLogger = appLogger;
             _appControl = appControl;
             _formSwitcher = formSwitcher;
-            _databaseSessionRead = databaseSessionRead;
-            _codingGoalDTOManager = codingGoalDTOManager;
-            _databaseSessionDelete = databaseSessionDelete;
+            _codingSessionRepository = codingSessionRepository;
             InitializeComponent();
             LoadSessionsIntoDataGridView();
         }
@@ -49,7 +43,7 @@ namespace CodingTracker.View
         }
 
 
-        private void LoadSessionsIntoDataGridView()
+        private async Task LoadSessionsIntoDataGridView()
         {
             using (var activity = new Activity(nameof(LoadSessionsIntoDataGridView)).Start())
             {
@@ -59,7 +53,7 @@ namespace CodingTracker.View
                 try
                 {
                     int numberOfSessions = 20;
-                    var sessions = _databaseSessionRead.ViewRecentSession(numberOfSessions);
+                    var sessions = await _codingSessionRepository.GetRecentSessions(activity, numberOfSessions);
 
                     EditSessionPageDataGridView.Rows.Clear();
 
@@ -67,7 +61,7 @@ namespace CodingTracker.View
                     {
                         int rowIndex = EditSessionPageDataGridView.Rows.Add();
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.SessionId;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.GoalHHMM;
+                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.SessionId;
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.DurationHHMM;
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartTime?.ToString("g");
                         EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
@@ -76,7 +70,7 @@ namespace CodingTracker.View
                     }
 
                     stopwatch.Stop();
-                    _appLogger.Info($"Loaded sessions into DataGridView successfully. Total sessions loaded: {sessions.Count}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Info($"Loaded sessions into DataGridView successfully. Total sessions loaded: {sessions.Count()}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 }
                 catch (Exception ex)
                 {
@@ -240,23 +234,52 @@ namespace CodingTracker.View
             throw new NotImplementedException();
         }
 
-        
 
-        private void DeleteSessionButton_Click(object sender, EventArgs e)
+
+        private async void DeleteSessionButton_Click(object sender, EventArgs e)
         {
-            if (!isEditSessionOn)
+            using (var activity = new Activity(nameof(DeleteSessionButton_Click)).Start())
             {
-                _appLogger.Error("Error for DeleteSessionButton_Click. isEditSessionOn is set to false, session editing must be enabled to delete sessions");
+                if (!isEditSessionOn)
+                {
+                    _appLogger.Error($"Error for {nameof(DeleteSessionButton_Click)}. isEditSessionOn is set to false, session editing must be enabled to delete sessions. TraceID: {activity.TraceId}");
+                    return;
+                }
+
+                if (deletionSessionIds.Count == 0)
+                {
+                    _appLogger.Error($"Error for {nameof(DeleteSessionButton_Click)}. deletionSessionIds list is empty. TraceID: {activity.TraceId}");
+                    return;
+                }
+
+                try
+                {
+                    DeleteSessionButton.Enabled = false;
+
+                    _appLogger.Info($"Starting deletion of {deletionSessionIds.Count} sessions. TraceID: {activity.TraceId}");
+
+                    var (success, failedIds) = await _codingSessionRepository.DeleteSessionsById(activity, deletionSessionIds);
+
+                    if (success)
+                    {
+                        _appLogger.Info($"Successfully deleted {deletionSessionIds.Count - failedIds.Count} out of {deletionSessionIds.Count} sessions. TraceID: {activity.TraceId}");
+                    }
+                    else
+                    {
+                        _appLogger.Warning($"Failed to delete some sessions. {failedIds.Count} deletions failed. TraceID: {activity.TraceId}");
+                    }
+                    await LoadSessionsIntoDataGridView();
+                    deletionSessionIds.Clear();
+                }
+                catch (Exception ex)
+                {
+                    _appLogger.Error($"Error in {nameof(DeleteSessionButton_Click)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
+                }
+                finally
+                {
+                    DeleteSessionButton.Enabled = true;
+                }
             }
-            else if (deletionSessionIds.Count == 0)
-            {
-            _appLogger.Error($" deletionSessionIds list is 0");
-            }
-            if (isEditSessionOn)
-            {
-                _databaseSessionDelete.DeleteSession(deletionSessionIds);
-                LoadSessionsIntoDataGridView();
-            } 
         }
 
 

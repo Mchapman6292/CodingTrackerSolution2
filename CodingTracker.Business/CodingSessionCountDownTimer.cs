@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.CodingGoalDTOManagers;
 
 namespace CodingTracker.Business.CodingSessionCountDownTimers
 {
@@ -19,7 +18,6 @@ namespace CodingTracker.Business.CodingSessionCountDownTimers
     public class CodingSessionCountDownTimer : ICodingSessionCountDownTimer
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
         public TimeSpan _maxTime;
 
 
@@ -32,12 +30,7 @@ namespace CodingTracker.Business.CodingSessionCountDownTimers
 
         public TimeSpan setMaxTime()
         {
-            var currentGoalDTO = _codingGoalDTOManager.GetCurrentCodingGoalDTO();
-            if (currentGoalDTO != null)
-            {
-                _maxTime = ConvertGoalHoursAndMinsToTimeSpan(currentGoalDTO.GoalHours, currentGoalDTO.GoalMinutes);
-            }
-            return _maxTime;
+            throw new NotImplementedException();
         }
 
 

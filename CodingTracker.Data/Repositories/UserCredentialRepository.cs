@@ -7,20 +7,23 @@ using CodingTracker.Common.UserCredentials;
 using CodingTracker.Data.Repositories.GenericRepository;
 using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Common.ILoginManagers;
+using CodingTracker.Common.DataInterfaces.IEntityContexts; 
 using System.Diagnostics;
 
 namespace CodingTracker.Data.Repositories.UserCredentialRepository
 {
-    public class UserCredentialRepository : GenericRepository<UserCredential>, IUserCredentialRepository
+    public class UserCredentialRepository : IUserCredentialRepository
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IAuthenticationService _authService;
+        private readonly IEntityContext _context;
 
-        public UserCredentialRepository(EntityContext context, IApplicationLogger appLogger, IAuthenticationService authService) : base(context)
+        public UserCredentialRepository(IApplicationLogger appLogger, IAuthenticationService authService, IEntityContext context)
 
         {
             _appLogger = appLogger;
             _authService = authService;
+            _context = context;
         }
 
         public async Task<UserCredential> GetCredentialByUsername(string username, Activity activity)
@@ -28,7 +31,7 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
             _appLogger.Info($"Starting {nameof(GetCredentialByUsername)} TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}.");
             try
             {
-                var user = await _dbSet.FirstOrDefaultAsync(uc => uc.Username == username);
+                var user = await _context.UserCredentials.FirstOrDefaultAsync(uc => uc.Username == username);
 
                 if (user == null)
                 {
@@ -55,7 +58,7 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
 
             try
             {
-                await _dbSet.AddAsync(newUser);
+                await _context.UserCredentials.AddAsync(newUser);
 
                 await _context.SaveChangesAsync();
                 _appLogger.Info($"Successfully created new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");

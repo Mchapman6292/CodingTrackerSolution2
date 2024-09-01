@@ -6,18 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.CodingSessions;
 using CodingTracker.Common.UserCredentials;
+using CodingTracker.Common.DataInterfaces.IEntityContexts;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace CodingTracker.Data.EntityContexts
-{ 
-    public class EntityContext : Microsoft.EntityFrameworkCore.DbContext
+{
+    public class EntityContext : DbContext, IEntityContext
     {
-        public DbSet<CodingSession> CodingSessions { get; set; }
-        public DbSet<UserCredential> UserCredentials { get; set; }
-
+        public DbSet<CodingSession> CodingSessions { get; }
+        public DbSet<UserCredential> UserCredentials { get; }
         public string DbPath { get; }
-
-        public EntityContext()
+        public EntityContext(DbContextOptions<EntityContext> options) : base(options)
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
             var path = Environment.GetFolderPath(folder);

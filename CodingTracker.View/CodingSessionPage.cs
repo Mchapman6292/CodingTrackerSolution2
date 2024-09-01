@@ -13,8 +13,6 @@ using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.CodingGoalDTOs;
-using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
 using CodingTracker.Common.CodingSessionDTOs;
@@ -30,7 +28,6 @@ namespace CodingTracker.View
         private readonly ISessionGoalCountDownTimer _goalCountDownTimer;
         private readonly IInputValidator _inputValidator;
         private readonly IErrorHandler _errorHandler;
-        private readonly ICodingGoalDTOManager _goalDTOManager;
         private readonly IApplicationLogger _appLogger;
 
 
@@ -44,7 +41,6 @@ namespace CodingTracker.View
             _codingSession = codingSession;
             _goalCountDownTimer = goalCountDownTimer;
             _inputValidator = inputValidator;
-            _goalDTOManager = goalDTOManager;
             _appLogger = appLogger;
         }
 
@@ -68,13 +64,7 @@ namespace CodingTracker.View
             int goalHours = Convert.ToInt32(CodingGoalSetHourToggle.Value);
             int goalMinutes = Convert.ToInt32(CodingGoalSetMinToggle.Value);
 
-            _appLogger.Debug($"Starting to confirm session goal with hours: {_goalHours}, minutes: {_goalMinutes}. TraceID: {activity.TraceId}");
 
-            var codingGoalDTO = _goalDTOManager.CreateCodingGoalDTO(goalHours, goalMinutes);
-            _goalCountDownTimer.setMaxTime();
-
-            stopwatch.Stop();
-            _appLogger.Info($"Session goal confirmed and CodingGoalDTO created. Hours: {codingGoalDTO.GoalHours}, Minutes: {codingGoalDTO.GoalMinutes}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
 
             activity.Stop();
         }

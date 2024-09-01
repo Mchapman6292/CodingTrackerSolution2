@@ -4,8 +4,7 @@ using System.Windows.Forms;
 using System;
 using System.Diagnostics;
 using CodingTracker.Business.CodingSessionCountDownTimers;
-using CodingTracker.Common.CodingGoalDTOs;
-using CodingTracker.Common.CodingGoalDTOManagers;
+
 
 namespace CodingTracker.View.SessionGoalCountDownTimers
 {
@@ -13,7 +12,6 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
     {
         private readonly IApplicationLogger _appLogger;
         private readonly ICodingSessionCountDownTimer _sessionCountDownTimer;
-        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private TimeSpan _maxTime;
         private System.Windows.Forms.Timer _timer;
@@ -22,14 +20,13 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
 
         public bool IsRunning => _stopwatch.IsRunning;
 
-        public SessionGoalCountdownTimer(IApplicationLogger appLogger, ICodingSessionCountDownTimer sessionCountDownTimer, ICodingGoalDTOManager codingGoalDTOManager)
+        public SessionGoalCountdownTimer(IApplicationLogger appLogger, ICodingSessionCountDownTimer sessionCountDownTimer)
         {
             _appLogger = appLogger;
             _timer = new System.Windows.Forms.Timer();
             _timer.Interval = 1000;
             _timer.Tick += Timer_Tick; // Event for timer tick
             _sessionCountDownTimer = sessionCountDownTimer;
-            _codingGoalDTOManager = codingGoalDTOManager;
         }
 
         public void SetCountDownTimer(int minutes, int seconds = 0)
@@ -106,12 +103,7 @@ namespace CodingTracker.View.SessionGoalCountDownTimers
 
         public TimeSpan setMaxTime()
         {
-            var currentGoalDTO = _codingGoalDTOManager.GetCurrentCodingGoalDTO();
-            if (currentGoalDTO != null)
-            {
-                _maxTime = ConvertGoalHoursAndMinsToTimeSpan(currentGoalDTO.GoalHours, currentGoalDTO.GoalMinutes);
-            }
-            return _maxTime;
+            throw new NotImplementedException();
         }
 
 

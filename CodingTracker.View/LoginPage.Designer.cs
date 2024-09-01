@@ -360,24 +360,8 @@ namespace CodingTracker.View
             ResumeLayout(false);
         }
 
-        private void EndSessionButton_Click(object sender, EventArgs e)
-        {
-            if (_isSessionActive)
-            {
-                try
-                {
-                    _codingSession.EndSession();
-                    _isSessionActive = false;
-                    endSessionButton.Enabled = true;
-                    MessageBox.Show("Session ended.");
-                }
 
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error: {ex.Message}");
-                }
-            }
-        }
+        
     
 
 

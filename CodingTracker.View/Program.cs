@@ -37,7 +37,6 @@ using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Business.SessionCalculators;
-using CodingTracker.Common.Helpers;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;
@@ -45,10 +44,12 @@ using CodingTracker.Data.NewDatabaseReads;
 using CodingTracker.Common.INewDatabaseReads;
 using CodingTracker.Data.EntityContexts;
 using Microsoft.EntityFrameworkCore;
-using CodingTracker.Data.Interfaces;
-using CodingTracker.Data.Repositories;
-using CodingTracker.Data.Repositories.GenericRepository;
+using CodingTracker.Common.DataInterfaces.CodingSessionRepository;
+using CodingTracker.Common.DataInterfaces.IEntityContexts;
 using CodingTracker.Common.IdGenerators;
+using CodingTracker.Data.Interfaces.IUserCredentialRepository;
+using CodingTracker.Data.Repositories.UserCredentialRepository;
+using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -117,11 +118,14 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
                     .AddSingleton<IIdGenerators, IdGenerators>()
+                    .AddSingleton<IEntityContext, EntityContext>()
+                    .AddSingleton<IUserCredentialRepository, UserCredentialRepository>()
+                    .AddSingleton<ICodingSessionRepository, CodingSessionRepository>()
+                    .AddSingleton<IEntityContext, EntityContext>()
 
 
                     // Transient services.
                     .AddTransient<ISessionGoalCountDownTimer, SessionGoalCountdownTimer>()
-                    .AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>))
                     .AddTransient<LoginPage>()
                     .AddTransient<MainPage>()
                     .AddTransient<CodingSessionPage>()

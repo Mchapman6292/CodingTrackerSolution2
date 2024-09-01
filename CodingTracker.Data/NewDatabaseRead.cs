@@ -6,7 +6,6 @@ using System.Data.SQLite;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.INewDatabaseReads;
-using CodingTracker.Common.CodingGoalDTOManagers;
 using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using System.Diagnostics;
@@ -19,18 +18,14 @@ namespace CodingTracker.Data.NewDatabaseReads
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
         private readonly IQueryBuilder _queryBuilder;
-        private readonly ICodingGoalDTOManager _codingGoalDTOManager;
-        private readonly ICodingSession _codingSessionDTOManager;
         private readonly IUserCredentialDTOManager _userCredentialDTOManager;
 
 
-        public NewDatabaseRead(IApplicationLogger appLogger, IDatabaseManager databaseManager, IQueryBuilder queryBuilder, ICodingGoalDTOManager codingGoalDTOManager, ICodingSession codingSessionDTOManager)
+        public NewDatabaseRead(IApplicationLogger appLogger, IDatabaseManager databaseManager, IQueryBuilder queryBuilder)
         {
             _appLogger = appLogger;
             _databaseManager = databaseManager;
             _queryBuilder = queryBuilder;
-            _codingGoalDTOManager = codingGoalDTOManager;
-            _codingSessionDTOManager = codingSessionDTOManager;
         }
 
 

@@ -9,16 +9,21 @@ using CodingTracker.Common.CodingSessions;
 namespace CodingTracker.Common.Interfaces.ICodingSessionRepository
 {
     public interface ICodingSessionRepository
+
     {
-        Task<bool> AddCodingSession(CodingSession codingSession, Activity activity);
+        Task<bool> AddCodingSession(Activity activity, CodingSession session);
 
-        Task<IEnumerable<CodingSession>> GetSessionsByDateRange(DateOnly startDate, DateOnly endDate, string traceId);
+        Task<IEnumerable<CodingSession>> GetAllCodingSessions(Activity activity);
 
-        Task<(bool success, List<int> failedIds)> DeleteSessionsById(List<int> sessionIds, string traceId);
 
-        Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(DateOnly startDate, DateOnly endDate, string traceId);
+        Task<(bool success, List<int> failedIds)> DeleteSessionsById(Activity activity, List<int> sessionIds);
+
+        Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(Activity activity, DateOnly startDate, DateOnly endDate);
 
         Task<bool> SaveCodingSessionChanges(Activity activity);
+
+        Task<IEnumerable<CodingSession>> GetRecentSessions(Activity activity, int numberOfSessions);
+
 
 
 
