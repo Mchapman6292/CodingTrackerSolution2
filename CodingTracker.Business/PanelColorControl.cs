@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.INewDatabaseReads;
+using CodingTracker.Common.DataInterfaces.CodingSessionRepository;
 using System.Drawing;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Data.QueryBuilders;
+using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 
 namespace CodingTracker.Business.PanelColorControls
 {
@@ -24,11 +25,15 @@ namespace CodingTracker.Business.PanelColorControls
     }
     public interface IPanelColorControl
     {
-
-        List<Color> AssignColorsToSessionsInLast28Days();
+        Task<List<Color>> AssignColorsToSessionsInLast28Days();
         Color ConvertSessionColorEnumToColor(SessionColor color);
 
         SessionColor DetermineSessionColor(double? sessionDurationSeconds);
+
+        List<DateTime> GetDatesPrevious28days();
+
+
+
     }
 
 
@@ -37,48 +42,36 @@ namespace CodingTracker.Business.PanelColorControls
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
-        private readonly INewDatabaseRead _newDatabaseRead;
         private readonly List<(DateTime Day, double TotalDurationMinutes)> _dailyDurations;
         private readonly List<SessionColor> _sessionColors;
+        private readonly ICodingSessionRepository _codingSessionRepository;
 
 
 
-        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, INewDatabaseRead newDatabaseRead)
+        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionRepository codingSessionRepository)
         {
             _appLogger = appLogger;
             _errorHandler = errorHandler;
-            _newDatabaseRead = newDatabaseRead;
+            _codingSessionRepository = codingSessionRepository;
         }
 
-        public List<Color> AssignColorsToSessionsInLast28Days()
+        public async Task<List<Color>> AssignColorsToSessionsInLast28Days()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(AssignColorsToSessionsInLast28Days)).Start())
             {
                 _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
 
-                DateTime startDate = DateTime.Now.AddDays(-28);
-                DateTime endDate = DateTime.Now;
-                List<string> columnsToSelect = new List<string> { "SUM(DurationSeconds) as TotalDuration", "StartTime" };
-                string groupBy = "StartDate";
-                string orderBy = "StartTime";
 
-                List<CodingSessionDTO> aggregatedSessions = _newDatabaseRead.ReadFromCodingSessionsTable(
-                    columnsToSelect,
-                    startDate: startDate,
-                    endDate: endDate,
-                    groupBy: groupBy,
-                    orderBy: orderBy,
-                    ascending: true
-                );
+                var recentSessions = await _codingSessionRepository.GetRecentSessions(activity, 28);
 
-                _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {aggregatedSessions}.");
+  
+                _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {recentSessions}.");
 
                 List<Color> sessionColors = new List<Color>();
-                foreach (var session in aggregatedSessions)
+                foreach (var session in recentSessions)
                 {
                     double totalDurationSeconds = session.DurationSeconds ?? 0; 
-                    DateTime? sessionDate = session.StartDate;  
+                    DateOnly? sessionDate = session.StartDate;  
 
                     SessionColor colorEnum = DetermineSessionColor(totalDurationSeconds);
                     Color color = ConvertSessionColorEnumToColor(colorEnum);
@@ -86,9 +79,7 @@ namespace CodingTracker.Business.PanelColorControls
 
                     _appLogger.Debug($"Assigned color for day: {sessionDate?.ToString("yyyy-MM-dd")}, DurationSeconds: {totalDurationSeconds}, Color: {color}.");
                 }
-
-                stopwatch.Stop();
-                _appLogger.Info($"Completed {nameof(AssignColorsToSessionsInLast28Days)}. Total Duration: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
+                _appLogger.Info($"Completed {nameof(AssignColorsToSessionsInLast28Days)}.TraceID: {activity.TraceId}.");
                 return sessionColors;
             }
         }
@@ -106,21 +97,21 @@ namespace CodingTracker.Business.PanelColorControls
             {
                 return SessionColor.Green;
             }
-            else if (sessionDurationSeconds < 3600) // Less than 60 minutes
+            else if (sessionDurationSeconds < 3600) 
             {
                 return SessionColor.RedGrey;
             }
-            else if (sessionDurationSeconds < 7200) // 1 to less than 2 hours
+            else if (sessionDurationSeconds < 7200) 
             {
                 return SessionColor.Red;
             }
-            else if (sessionDurationSeconds < 10800) // 2 to less than 3 hours
+            else if (sessionDurationSeconds < 10800) 
             {
                 return SessionColor.Yellow;
             }
             else
             {
-                return SessionColor.Green; // 3 hours and more
+                return SessionColor.Green; 
             }
         }
 
@@ -169,6 +160,28 @@ namespace CodingTracker.Business.PanelColorControls
             {
                 stopwatch.Stop();
                 activity.Stop();
+            }
+        }
+
+        public List<DateTime> GetDatesPrevious28days() // Potential mismatch with sql lite db dates?
+        {
+            using (var activity = new Activity(nameof(GetDatesPrevious28days)).Start())
+            {
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Getting dates for the previous 28 days. TraceID: {activity.TraceId}");
+
+                List<DateTime> dates = new List<DateTime>();
+                DateTime today = DateTime.Today;
+
+                for (int i = 1; i <= 29; i++)
+                {
+                    dates.Add(today.AddDays(-i));
+                }
+
+                stopwatch.Stop();
+                _appLogger.Info($"Retrieved dates for the previous 28 days. Count: {dates.Count}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+                return dates;
             }
         }
     }

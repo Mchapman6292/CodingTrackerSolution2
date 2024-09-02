@@ -212,7 +212,7 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         public void SetCurrentCodingSession(CodingSession codingSession, Activity activity)
         {
             if (activity == null) 
-                throw new ArgumentNullException(nameof(activity), $"Activity cannot be null for {nameof(SetCurrentCodingSession)}");
+                _appLogger.Error($"Activity parameter not provided for {nameof(SetCurrentCodingSession)}");
             if (codingSession == null) 
                 throw new ArgumentNullException(nameof(activity), $"codingSession cannot be null for {nameof(SetCurrentCodingSession)}");
 
@@ -272,6 +272,23 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
             _appLogger.Info($"durationSeconds calculated: {durationSeconds} TraceId: {activity.TraceId}.");
 
             return durationSeconds;
+        }
+
+
+        public bool CheckIfCodingSessionActive()
+        {
+            using (var activity = new Activity(nameof(CheckIfCodingSessionActive)).Start())
+            {
+                var stopwatch = Stopwatch.StartNew();
+                _appLogger.Debug($"Checking if session is active. TraceID: {activity.TraceId}");
+
+                bool isActive = IsCodingSessionActive;
+
+                stopwatch.Stop();
+                _appLogger.Info($"Coding session active status: {isActive}, Execution Time: {stopwatch.ElapsedMilliseconds}ms, Trace ID: {activity.TraceId}");
+
+                return isActive;
+            }
         }
 
 

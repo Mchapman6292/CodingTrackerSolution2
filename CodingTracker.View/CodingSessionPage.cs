@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormSwitchers;
-using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.ICodingSessionManagers;
 using System.Diagnostics;
 using CodingTracker.Common.CodingSessionDTOs;
 
@@ -24,31 +24,31 @@ namespace CodingTracker.View
     {
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
-        private readonly ISessionLogic _codingSession;
         private readonly ISessionGoalCountDownTimer _goalCountDownTimer;
         private readonly IInputValidator _inputValidator;
         private readonly IErrorHandler _errorHandler;
         private readonly IApplicationLogger _appLogger;
+        private readonly ICodingSessionManager _codingSessionManager;
 
 
         private int _goalHours;
         private int _goalMinutes;
-        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController, ISessionLogic codingSession, ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger)
+        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController,ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger, ICodingSessionManager codingSessionManager)
         {
             InitializeComponent();
             _formSwitcher = formSwitcher;
             _formController = formController;
-            _codingSession = codingSession;
             _goalCountDownTimer = goalCountDownTimer;
             _inputValidator = inputValidator;
             _appLogger = appLogger;
+            _codingSessionManager = codingSessionManager;
         }
 
         private void CodingSessionPageStartSessionButton_Click(object sender, EventArgs e)
         {
             this.Hide();
             _formSwitcher.SwitchToCodingSessionTimer();
-            _codingSession.StartSession();
+            _codingSessionManager.StartSession();
 
         }
 

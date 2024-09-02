@@ -1,5 +1,4 @@
-﻿using CodingTracker.Business.CodingSessions;
-using CodingTracker.Common.IDatabaseManagers;
+﻿
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.ICodingSessionManagers;
@@ -8,10 +7,8 @@ namespace CodingTracker.View
 {
     partial class LoginPage
     {
-        private readonly IDatabaseManager _dbManager;
         private readonly IInputValidator _inputValidator;
         private readonly IUtilityService _utilityService;
-        private readonly SessionLogic _codingSession;
         private Button startSessionButton;
         private Button endSessionButton;
         private Button viewSessionsButton;

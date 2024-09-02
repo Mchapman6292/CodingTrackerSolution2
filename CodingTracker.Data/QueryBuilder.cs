@@ -1,5 +1,4 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IQueryBuilders;
 using System.Data.SQLite;
 using System.Diagnostics;

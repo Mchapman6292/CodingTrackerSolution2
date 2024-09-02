@@ -2,7 +2,6 @@
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.ICodingSessions;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
@@ -21,21 +20,19 @@ namespace CodingTracker.View
         private readonly IFormController _formController;
         private readonly IPanelColorControl _panelColorControl;
         private readonly IErrorHandler _errorHandler;
-        private readonly ISessionLogic _codingSession;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
 
 
 
-        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler, ISessionLogic codingSession, IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler,IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator)
         {
             InitializeComponent();
             _appLogger = appLogger;
             _formController = formController;
             _panelColorControl = panelControl;
             _errorHandler = errorHandler;
-            _codingSession = codingSession;
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
             _sessionCalculator = sessionCalculator;
@@ -85,7 +82,7 @@ namespace CodingTracker.View
             _appLogger.Debug("UpdateLabels method started.");
             try
             {
-                List<DateTime> last28Days = _codingSession.GetDatesPrevious28days();
+                List<DateTime> last28Days = _panelColorControl.GetDatesPrevious28days();
                 var GunaLabels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2HtmlLabel>().ToList();
                 for (int i = 0; i < last28Days.Count && i < GunaLabels.Count; i++)
                 {
@@ -99,7 +96,7 @@ namespace CodingTracker.View
             }
         }
 
-        private void UpDateLast28Days(Panel parentPanel)
+        private async Task UpDateLast28Days(Panel parentPanel)
         {
             using (var activity = new Activity(nameof(UpDateLast28Days)))
             {
@@ -107,7 +104,7 @@ namespace CodingTracker.View
                 try
                 {
                     var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
-                    List<Color> panelColors = _panelColorControl.AssignColorsToSessionsInLast28Days();
+                    List<Color> panelColors = await _panelColorControl.AssignColorsToSessionsInLast28Days();
 
                     for (int i = 0; i < panelColors.Count && i < gradientPanels.Count; i++)
                     {

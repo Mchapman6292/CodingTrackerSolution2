@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Security.Cryptography;
-using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.ICredentialManagers;
-using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
@@ -20,15 +18,13 @@ namespace CodingTracker.Data.CredentialManagers
     public class CredentialManager : ICredentialManager
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly IDatabaseManager _databaseManager;
         private readonly IUserCredentialRepository _userCredentialRepository;
         private readonly IUtilityService _utilityService;
 
 
-        public CredentialManager(IApplicationLogger applogger,  IDatabaseManager databaseManager, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService)
+        public CredentialManager(IApplicationLogger applogger, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService)
         {
             _appLogger = applogger;
-            _databaseManager = databaseManager;
             _userCredentialRepository = userCredentialRepository;
             _utilityService = utilityService;
         }
@@ -77,40 +73,6 @@ namespace CodingTracker.Data.CredentialManagers
             throw new NotImplementedException();
         }
 
-
-        public bool IsAccountCreatedSuccessfully(string username)
-        {
-            using (var activity = new Activity(nameof(IsAccountCreatedSuccessfully)).Start())
-            {
-                _appLogger.Debug($"Starting {nameof(IsAccountCreatedSuccessfully)}. TraceID: {activity.TraceId}, Username: {username}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-
-                bool isCreated = false;
-                _databaseManager.ExecuteCRUD(connection =>
-                {
-                    using var command = new SQLiteCommand(@"
-                SELECT EXISTS(SELECT 1 FROM UserCredentials WHERE Username = @Username)",
-                        connection);
-
-                    command.Parameters.AddWithValue("@Username", username);
-
-                    try
-                    {
-                        isCreated = Convert.ToBoolean(command.ExecuteScalar());
-                        stopwatch.Stop();
-                        _appLogger.Info($"{nameof(IsAccountCreatedSuccessfully)} completed for {username}. Account exists: {isCreated}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    }
-                    catch (SQLiteException ex)
-                    {
-                        stopwatch.Stop();
-                        _appLogger.Error($"Failed to check if account was created for {username}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                    }
-                });
-
-                return isCreated;
-            }
-        }
 
 
        
@@ -163,11 +125,6 @@ namespace CodingTracker.Data.CredentialManagers
 
 
 
-
-        public UserCredentialDTO GetCredentialById(int userId)//needed?
-        {
-            throw new NotImplementedException(" not implemented.");
-        }
     }
 }
 

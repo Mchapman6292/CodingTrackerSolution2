@@ -45,7 +45,7 @@ namespace CodingTracker.View
         }
 
 
-        private void CreateAccountPageCreateAccountButton_Click(object sender, EventArgs e)
+        private async void CreateAccountPageCreateAccountButton_Click(object sender, EventArgs e)
         {
             Stopwatch overallStopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(CreateAccountPageCreateAccountButton)).Start())
@@ -62,10 +62,9 @@ namespace CodingTracker.View
                 {
                     try
                     {
-                        _credentialManager.CreateAccount(username, password);
+                       bool isAccountCreated = await _credentialManager.CreateAccount(activity, username, password);
 
-                        // Checks if credentials have been added to the database. 
-                        if (_credentialManager.IsAccountCreatedSuccessfully(username))
+                        if (isAccountCreated)
                         {
                             _appLogger.Info($"Account creation successful for user: {username}. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
 

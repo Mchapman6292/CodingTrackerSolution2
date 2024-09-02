@@ -1,16 +1,16 @@
-﻿using CodingTracker.Common.UserCredentialDTOs;
+﻿
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace CodingTracker.Common.ICredentialManagers
 {
     public interface ICredentialManager
     {
-        Task CreateAccount(string username, string password);
+        Task<bool> CreateAccount(Activity activity, string username, string password);
 
-        UserCredentialDTO GetCredentialById(int userId);
 
         string HashPassword(string password);
 
-        bool IsAccountCreatedSuccessfully(string username);
 
 
     }

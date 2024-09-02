@@ -15,7 +15,7 @@ namespace CodingTracker.Common.DataInterfaces.IUserCredentialRepository
 
         Task<bool> AddUserCredential(Activity activity, UserCredential newUser);
 
-        Task UpdateUserCredentialPassword(string username, string password, Activity activity);
+        Task<bool> UpdateUserCredentialPassword(string username, string password, Activity activity);
 
         Task<bool> UpdateLastLogin(string username, DateTime lastLogin, Activity activity);
 

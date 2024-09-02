@@ -84,31 +84,42 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
         }
 
 
-        public async Task UpdateUserCredentialPassword(string username, string password, Activity activity)
+        public async Task<bool> UpdateUserCredentialPassword(string username, string password, Activity activity)
         {
-            _appLogger.Info($"Starting {nameof(UpdateUserCredentialPassword)} TraceId: {activity.TraceId} , ParentId:   {activity.ParentId}.");
-
+            _appLogger.Info($"Starting {nameof(UpdateUserCredentialPassword)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
             try
             {
                 UserCredential user = await GetCredentialByUsername(username, activity);
+                if (user == null)
+                {
+                    _appLogger.Warning($"User not found: {username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                    return false;
+                }
 
-                string hashedNewPassword = _utilityService.HashPassword( activity, password);
-
+                string hashedNewPassword = _utilityService.HashPassword(activity, password);
                 user.PasswordHash = hashedNewPassword;
 
-                await _context.SaveChangesAsync();
-
-                _appLogger.Info($"Password updated successfully for User: {username},TraceId: {activity.TraceId}  , ParentId:{activity.ParentId}.");
+                int rowsAffected = await _context.SaveChangesAsync();
+                if (rowsAffected > 0)
+                {
+                    _appLogger.Info($"Password updated successfully for User: {username}, TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                    return true;
+                }
+                else
+                {
+                    _appLogger.Warning($"No changes were saved when updating password for User: {username}, TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                    return false;
+                }
             }
             catch (DbUpdateException dbEx)
             {
-                _appLogger.Error($"Database error while updating password for user: {username}. TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}", dbEx);
-                throw;
+                _appLogger.Error($"Database error while updating password for user: {username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", dbEx);
+                return false;
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error updating password for user: {username}. TraceId: {activity.TraceId}  , ParentId:   {activity.ParentId}", ex);
-                throw;
+                _appLogger.Error($"Error updating password for user: {username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
+                return false;
             }
         }
 

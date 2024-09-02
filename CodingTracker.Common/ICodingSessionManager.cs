@@ -18,6 +18,7 @@ namespace CodingTracker.Common.ICodingSessionManagers
         void UpdateCodingSessionEndTimes(Activity activity);
         void SetCurrentCodingSession(CodingSession codingSession, Activity activity);
         int CalculateDurationSeconds(Activity activity, DateTime? startDate, DateTime? endDate);
+        bool CheckIfCodingSessionActive();
 
 
     }

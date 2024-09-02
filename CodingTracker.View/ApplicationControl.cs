@@ -1,31 +1,33 @@
 ﻿using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ICodingSessions;
-using CodingTracker.Common.IDatabaseManagers;
+using CodingTracker.Common.DataInterfaces.IEntityContexts;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.ICodingSessionManagers;
 
 namespace CodingTracker.Business.ApplicationControls
 {
     public class ApplicationControl : IApplicationControl
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ISessionLogic _codingSession;
-        private readonly IDatabaseManager _databaseManager;
+        private readonly IEntityContext _context;
+        private readonly ICodingSessionManager _codingSessionManager;
         public bool ApplicationIsRunning { get; private set; }
 
 
 
-        public ApplicationControl(IApplicationLogger appLogger, ISessionLogic codingSession, IDatabaseManager databaseManager)
+        public ApplicationControl(IApplicationLogger appLogger, IEntityContext entityContext, ICodingSessionManager codingSessionManager)
         {
             ApplicationIsRunning = false; // Set to false instead of true to ensure that processes don't run or exit prematurely or unintentionally.
             _appLogger = appLogger;
-            _codingSession = codingSession;
-            _databaseManager = databaseManager;
+            _context = entityContext;
+            _codingSessionManager = codingSessionManager;
         }
 
         public void StartApplication()
@@ -33,34 +35,32 @@ namespace CodingTracker.Business.ApplicationControls
             ApplicationIsRunning = true;
         }
 
-        public void ExitApplication()
+        public async Task ExitApplication()
         {
-            using (var activity = new Activity(nameof(ExitApplication)).Start())
+            using var activity = new Activity(nameof(ExitApplication)).Start();
+            _appLogger.Info($"Starting {nameof(ExitApplication)}. TraceID: {activity.TraceId}");
+
+            var stopwatch = Stopwatch.StartNew();
+
+            try
             {
-                _appLogger.Info($"Starting {nameof(ExitApplication)}. TraceID: {activity.TraceId}");
-
-                try
+                if (_codingSessionManager.CheckIfCodingSessionActive())
                 {
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-
-                    if (_codingSession.CheckIfCodingSessionActive())
-                    {
-                        _codingSession.EndSession();
-                        _appLogger.Info($"Active coding session saved. TraceID: {activity.TraceId}");
-                    }
-
-                    _databaseManager.CloseDatabaseConnection();
-                    _appLogger.Info($"Database connections closed. TraceID: {activity.TraceId}");
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{nameof(ExitApplication)} completed. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-
-                    Application.Exit();
+                    _codingSessionManager.EndCodingSession(activity);
+                    _appLogger.Info($"Active coding session saved. TraceID: {activity.TraceId}");
                 }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"An error occurred during {nameof(ExitApplication)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
+
+                await _context.SaveChangesAsync();
+
+                stopwatch.Stop();
+                _appLogger.Info($"{nameof(ExitApplication)} completed. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _appLogger.Error($"An error occurred during {nameof(ExitApplication)}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
             }
         }
     }

@@ -13,8 +13,6 @@ using System.Diagnostics;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Data.CredentialManagers;
 using System.Drawing.Drawing2D;
-using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.UserCredentialDTOs;
 
 namespace CodingTracker.View
 {
@@ -26,11 +24,10 @@ namespace CodingTracker.View
         private readonly ICredentialManager _credentialManager;
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
-        private readonly IDatabaseManager _databaseManager;
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager)
+        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher)
         {
             _authenticationService = authenticationService;
             _appControl = appControl;
@@ -38,7 +35,6 @@ namespace CodingTracker.View
             _credentialManager = credentialManager;
             _formController = formController;
             _formSwitcher = formSwitcher;
-            _databaseManager = databaseManager;
             this.FormBorderStyle = FormBorderStyle.None;
             InitializeComponent();
             InitializeVLCPlayer();
@@ -215,7 +211,7 @@ namespace CodingTracker.View
 
         private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
         {
-            _databaseManager.UpdateCodingSessionsTable();
+          
         }
 
         private void LoginPageRememberMeToggle_CheckedChanged(object sender, EventArgs e)

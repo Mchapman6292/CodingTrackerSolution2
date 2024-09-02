@@ -1,4 +1,4 @@
-﻿using CodingTracker.Common.UserCredentialDTOs;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,9 +11,8 @@ namespace CodingTracker.Common.IAuthtenticationServices
     public interface IAuthenticationService
     {
         Task<bool> AuthenticateLogin(string username, string password, Activity activity);
-        UserCredentialDTO GetUserDetails(string username);
 
-        void ResetPassword(string username, string newPassword);
+        Task<bool> ResetPassword(string username, string newPassword);
 
     }
 }

@@ -2,13 +2,11 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using CodingTracker.Business.ApplicationControls;
-using CodingTracker.Business.CodingSessions;
+using CodingTracker.Common.CodingSessions;
 using CodingTracker.Common.InputValidators;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ICredentialManagers;
-using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IAuthtenticationServices;
 using CodingTracker.Common.IStartConfigurations;
@@ -16,7 +14,6 @@ using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Data.CredentialManagers;
-using CodingTracker.Data.DatabaseManagers;
 using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
@@ -35,11 +32,8 @@ using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Business.SessionCalculators;
-using CodingTracker.Common.UserCredentialDTOManagers;
 using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;
-using CodingTracker.Data.NewDatabaseReads;
-using CodingTracker.Common.INewDatabaseReads;
 using CodingTracker.Data.EntityContexts;
 using Microsoft.EntityFrameworkCore;
 using CodingTracker.Common.DataInterfaces.CodingSessionRepository;
@@ -78,7 +72,6 @@ namespace CodingTracker.View.Program
 
             var formFactory = serviceProvider.GetRequiredService<IFormFactory>();
             var loginPage = formFactory.CreateLoginPage();
-            var dbManager = serviceProvider.GetRequiredService<IDatabaseManager>();
             Application.Run(loginPage);
         }
 
@@ -93,17 +86,13 @@ namespace CodingTracker.View.Program
             services.AddSingleton<IConfiguration>(configuration)
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
-                    .AddSingleton<IDatabaseManager, DatabaseManager>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
-                    .AddSingleton<IUserCredentialDTOManager, UserCredentialDTOManager>()
                     .AddSingleton<ICredentialManager, CredentialManager>()
-                    .AddSingleton<INewDatabaseRead, NewDatabaseRead>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<IAuthenticationService, AuthenticationService>()
                     .AddSingleton<ISessionCalculator, SessionCalculator>()
                     .AddSingleton<IFormFactory, FormFactory>()
-                    .AddSingleton<ISessionLogic, SessionLogic>()
                     .AddSingleton<IFormController, FormController>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()

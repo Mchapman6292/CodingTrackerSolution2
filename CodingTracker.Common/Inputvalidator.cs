@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.Common.IDatabaseManagers;
 using System.Text.RegularExpressions;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IInputValidationResults;
