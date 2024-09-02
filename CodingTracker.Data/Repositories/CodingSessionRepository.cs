@@ -186,7 +186,7 @@ namespace CodingTracker.Common.DataInterfaces.CodingSessionRepository
             try
             {
                 await _context.SaveChangesAsync();
-                _appLogger.Info($" SaveCodingSessionChanges successful TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                _appLogger.Info($" SaveUserCredentialChanges successful TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
                 return true;
             }
             catch (DbUpdateException ex)

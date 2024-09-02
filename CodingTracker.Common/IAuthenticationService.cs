@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.ILoginManagers
+namespace CodingTracker.Common.IAuthtenticationServices
 {
     public interface IAuthenticationService
     {
@@ -14,8 +14,6 @@ namespace CodingTracker.Common.ILoginManagers
         UserCredentialDTO GetUserDetails(string username);
 
         void ResetPassword(string username, string newPassword);
-
-        string HashPassword(string password, Activity activity);
 
     }
 }

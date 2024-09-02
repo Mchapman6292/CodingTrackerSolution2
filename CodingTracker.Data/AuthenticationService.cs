@@ -2,14 +2,14 @@
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.ILoginManagers;
+using CodingTracker.Common.IAuthtenticationServices;
 using CodingTracker.Common.INewDatabaseReads;
 using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.UserCredentials;
-using CodingTracker.Data.Interfaces.IUserCredentialRepository;
-using CodingTracker.Data.Repositories.UserCredentialRepository;
+using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
+using CodingTracker.Common.IUtilityServices;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -29,9 +29,10 @@ namespace CodingTracker.Common.IAuthenticationServices
         private readonly IQueryBuilder _queryBuilder;
         private readonly INewDatabaseRead _newDatabaseRead;
         private readonly IUserCredentialRepository _userCredentialRepository;
+        private readonly IUtilityService _utilityService;
 
         private int _currentUserId;
-        public AuthenticationService(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager, IUserCredentialDTOManager userCredentialDTOManager, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead, IUserCredentialRepository userCredentialRepository)
+        public AuthenticationService(IApplicationLogger appLogger, IDatabaseManager databaseManager, ICredentialManager credentialManager, IUserCredentialDTOManager userCredentialDTOManager, IQueryBuilder queryBuilder, INewDatabaseRead newDatabaseRead, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService)
         {
             _databaseManager = databaseManager;
             _credentialManager = credentialManager;
@@ -40,6 +41,7 @@ namespace CodingTracker.Common.IAuthenticationServices
             _queryBuilder = queryBuilder;
             _newDatabaseRead = newDatabaseRead;
             _userCredentialRepository = userCredentialRepository;
+            _utilityService = utilityService;
         }
 
 
@@ -52,7 +54,7 @@ namespace CodingTracker.Common.IAuthenticationServices
 
  
 
-                var inputHash = HashPassword(password, activity);
+                var inputHash = _utilityService.HashPassword(password, activity);
                 var storedHash = loginCredential.PasswordHash;
 
                 bool isValid = inputHash.Equals(storedHash, StringComparison.Ordinal);
@@ -162,47 +164,6 @@ namespace CodingTracker.Common.IAuthenticationServices
 
 
 
-        public string HashPassword(string password, Activity activity)
-        {
-            _appLogger.Debug($"Starting {nameof(HashPassword)}, TraceId: {activity.TraceId}.");
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            try
-            {
-                using (SHA256 sha256Hash = SHA256.Create())
-                {
-                    byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                    StringBuilder builder = new StringBuilder();
-                    for (int i = 0; i < bytes.Length; i++)
-                    {
-                        builder.Append(bytes[i].ToString("x2"));
-                    }
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{nameof(HashPassword)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-                    return builder.ToString();
-                }
-            }
-            catch (ArgumentNullException ex)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"Password cannot be null. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                throw;
-            }
-            catch (EncoderFallbackException ex)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"Encoding error while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"An unexpected error occurred while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                throw;
-            }
-        }
     }
 }
 

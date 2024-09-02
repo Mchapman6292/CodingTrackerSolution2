@@ -4,7 +4,7 @@ namespace CodingTracker.Common.ICredentialManagers
 {
     public interface ICredentialManager
     {
-        void CreateAccount(string username, string password);
+        Task CreateAccount(string username, string password);
 
         UserCredentialDTO GetCredentialById(int userId);
 

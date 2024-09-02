@@ -1,13 +1,13 @@
-﻿using CodingTracker.Data.Interfaces;
+﻿using CodingTracker.Common.DataInterfaces;
 using Microsoft.EntityFrameworkCore;
-using CodingTracker.Data.Interfaces.IUserCredentialRepository;
+using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
 using CodingTracker.Data.EntityContexts;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.UserCredentials;
-using CodingTracker.Data.Repositories.GenericRepository;
 using CodingTracker.Common.IAuthenticationServices;
-using CodingTracker.Common.ILoginManagers;
-using CodingTracker.Common.DataInterfaces.IEntityContexts; 
+using CodingTracker.Common.IAuthtenticationServices;
+using CodingTracker.Common.DataInterfaces.IEntityContexts;
+using CodingTracker.Common.IUtilityServices;
 using System.Diagnostics;
 
 namespace CodingTracker.Data.Repositories.UserCredentialRepository
@@ -15,15 +15,15 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
     public class UserCredentialRepository : IUserCredentialRepository
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly IAuthenticationService _authService;
         private readonly IEntityContext _context;
+        private readonly IUtilityService _utilityService;
 
-        public UserCredentialRepository(IApplicationLogger appLogger, IAuthenticationService authService, IEntityContext context)
+        public UserCredentialRepository(IApplicationLogger appLogger, IEntityContext context, IUtilityService utilityService)
 
         {
             _appLogger = appLogger;
-            _authService = authService;
             _context = context;
+            _utilityService = utilityService;
         }
 
         public async Task<UserCredential> GetCredentialByUsername(string username, Activity activity)
@@ -52,27 +52,39 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
         }
 
 
-        public async Task<bool> CreateUserCredential(UserCredential newUser, Activity activity)
+        public async Task<bool> AddUserCredential(Activity activity, UserCredential newUser)
         {
-            _appLogger.Info($"Starting {nameof(CreateUserCredential)} TraceId: {activity.TraceId}, ParentId");
-
+            _appLogger.Info($"Starting {nameof(AddUserCredential)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
             try
             {
                 await _context.UserCredentials.AddAsync(newUser);
+                int rowsAffected = await _context.SaveChangesAsync();
 
-                await _context.SaveChangesAsync();
-                _appLogger.Info($"Successfully created new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
-                return true;
+                if (rowsAffected > 0) 
+                {
+                    _appLogger.Info($"Successfully created new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
+                    return true;
+                }
+                else 
+                {
+                    _appLogger.Warning($"User credential for username: {newUser.Username} was not added to the database. No rows affected. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
+                    return false;
+                }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _appLogger.Error($"Database error creating new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", dbEx);
+                return false;
             }
             catch (Exception ex)
             {
-                _appLogger.Error($"Error creating new user credential for username: {newUser.Username}. TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}", ex);
+                _appLogger.Error($"Unexpected error creating new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
                 return false;
             }
         }
 
 
-        public async Task UpdateUserCredentialPassword(string username, string newPassword, Activity activity)
+        public async Task UpdateUserCredentialPassword(string username, string password, Activity activity)
         {
             _appLogger.Info($"Starting {nameof(UpdateUserCredentialPassword)} TraceId: {activity.TraceId} , ParentId:   {activity.ParentId}.");
 
@@ -80,7 +92,7 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
             {
                 UserCredential user = await GetCredentialByUsername(username, activity);
 
-                string hashedNewPassword = _authService.HashPassword(newPassword, activity);
+                string hashedNewPassword = _utilityService.HashPassword( activity, password);
 
                 user.PasswordHash = hashedNewPassword;
 
@@ -127,5 +139,27 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
                 throw;
             }
         }
+
+        public async Task<bool> SaveUserCredentialChanges(Activity activity)
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+                _appLogger.Info($" SaveUserCredentialChanges successful TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                _appLogger.Error($"Database error during {nameof(SaveUserCredentialChanges)}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _appLogger.Error($"Unexpected error during {nameof(SaveUserCredentialChanges)}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
+                throw;
+
+            }
+        }
+
     }
 }

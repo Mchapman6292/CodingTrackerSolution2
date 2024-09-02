@@ -10,10 +10,9 @@ using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.Common.ILoginManagers;
+using CodingTracker.Common.IAuthtenticationServices;
 using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Common.IUtilityServices;
-using CodingTracker.Common.UserCredentialDTOs;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Data.CredentialManagers;
@@ -35,7 +34,6 @@ using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.CodingSessionTimers;
 using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
-using CodingTracker.Common.CodingSessionDTOManagers;
 using CodingTracker.Business.SessionCalculators;
 using CodingTracker.Common.UserCredentialDTOManagers;
 using CodingTracker.Data.QueryBuilders;
@@ -47,7 +45,7 @@ using Microsoft.EntityFrameworkCore;
 using CodingTracker.Common.DataInterfaces.CodingSessionRepository;
 using CodingTracker.Common.DataInterfaces.IEntityContexts;
 using CodingTracker.Common.IdGenerators;
-using CodingTracker.Data.Interfaces.IUserCredentialRepository;
+using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
 using CodingTracker.Data.Repositories.UserCredentialRepository;
 using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 /// To do
@@ -81,8 +79,6 @@ namespace CodingTracker.View.Program
             var formFactory = serviceProvider.GetRequiredService<IFormFactory>();
             var loginPage = formFactory.CreateLoginPage();
             var dbManager = serviceProvider.GetRequiredService<IDatabaseManager>();
-            dbManager.EnsureDatabaseForUser();
-            dbManager.CreateTableIfNotExists();
             Application.Run(loginPage);
         }
 

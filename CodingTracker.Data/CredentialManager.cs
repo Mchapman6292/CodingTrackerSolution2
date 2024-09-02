@@ -6,9 +6,12 @@ using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IDatabaseManagers;
 using System.Data.SQLite;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
+using CodingTracker.Common.IUtilityServices;
 using System.Diagnostics;
 
 using System.Net;
+using CodingTracker.Common.UserCredentials;
 
 
 // Pass DTO as parameter to methods that act on multiple properties
@@ -18,62 +21,56 @@ namespace CodingTracker.Data.CredentialManagers
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IDatabaseManager _databaseManager;
+        private readonly IUserCredentialRepository _userCredentialRepository;
+        private readonly IUtilityService _utilityService;
 
 
-        public CredentialManager(IApplicationLogger applogger,  IDatabaseManager databaseManager)
+        public CredentialManager(IApplicationLogger applogger,  IDatabaseManager databaseManager, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService)
         {
             _appLogger = applogger;
             _databaseManager = databaseManager;
+            _userCredentialRepository = userCredentialRepository;
+            _utilityService = utilityService;
         }
 
-        public void CreateAccount(string username, string password)
+        public async Task<bool> CreateAccount(Activity activity, string username, string password)
         {
-            using (var activity = new Activity(nameof(CreateAccount)).Start())
+            try
             {
-                _appLogger.Debug($"Starting {nameof(CreateAccount)}. TraceID: {activity.TraceId}, Username: {username}");
+                _appLogger.Info($"Starting {nameof(CreateAccount)}. TraceID: {activity.TraceId}, Username: {username}");
 
-                string hashedPassword = HashPassword(password);
-                DateTime accountCreationDate = DateTime.UtcNow;
-                _appLogger.Debug($"PasswordHash hashed for {username}. TraceID: {activity.TraceId}, AccountCreationDate: {accountCreationDate}");
+                string paswordHash = _utilityService.HashPassword(activity, password);
 
-                _databaseManager.ExecuteCRUD(connection =>
+                UserCredential newCredential = new UserCredential
                 {
-                    using var command = new SQLiteCommand(@"
-                            INSERT INTO UserCredentials
-                            (
-                                Username,
-                                PasswordHash
-                            )
-                            VALUES
-                            (
-                                @Username,
-                                @PasswordHash
-                            )", connection);
+                    Username = username,
+                    PasswordHash = paswordHash
+                };
 
-                    command.Parameters.AddWithValue("@Username", username);
-                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
-                    try
-                    {
-                        Stopwatch stopwatch = Stopwatch.StartNew();
-                        _appLogger.Debug($"Executing INSERT command for {username}. TraceID: {activity.TraceId}");
+               bool isAdded = await _userCredentialRepository.AddUserCredential(activity, newCredential);
 
-                        int affectedRows = command.ExecuteNonQuery();
-
-                        stopwatch.Stop();
-                        _appLogger.Info($"Credentials added successfully for {username}. Rows affected: {affectedRows}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                    }
-                    catch (SQLiteException ex)
-                    {
-                        _appLogger.Error($"Failed to add credentials for {username}. SQLite error code: {ex.ErrorCode}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                    }
-                    catch (Exception ex)
-                    {
-                        _appLogger.Error($"An unexpected error occurred while adding credentials for {username}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                    }
-                });
+                if (isAdded) 
+                {
+                    _appLogger.Info($"Account created successfully. TraceID: {activity.TraceId}, Username: {username}");
+                    return true;
+                }
+                else
+                {
+                    _appLogger.Warning($"Failed to create account. TraceID: {activity.TraceId}, Username: {username}");
+                    return false;
+                }
+            }
+            catch (Exception ex) 
+            {
+                _appLogger.Error($"Unexpected error during {nameof(CreateAccount)}. TraceID: {activity.TraceId}, Username: {username}", ex);
+                return false;
             }
         }
+
+
+
+
 
         private bool checkifCredentialsExist()
         {
