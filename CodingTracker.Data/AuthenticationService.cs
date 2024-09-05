@@ -1,4 +1,4 @@
-﻿using CodingTracker.Common.CodingSessionDTOs;
+﻿
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IAuthtenticationServices;
@@ -19,12 +19,11 @@ namespace CodingTracker.Common.IAuthenticationServices
     {
         private readonly IApplicationLogger _appLogger;
         private readonly ICredentialManager _credentialManager;
-        private readonly CodingSessionDTO _codingSessionDTO;
         private readonly IQueryBuilder _queryBuilder;
         private readonly IUserCredentialRepository _userCredentialRepository;
         private readonly IUtilityService _utilityService;
 
-        private int _currentUserId;
+        private int _currentUserId{ get; set; }
         public AuthenticationService(IApplicationLogger appLogger,ICredentialManager credentialManager,  IQueryBuilder queryBuilder, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService)
         {
             _credentialManager = credentialManager;
@@ -56,6 +55,7 @@ namespace CodingTracker.Common.IAuthenticationServices
                 }
 
                     _appLogger.Info($"{nameof(AuthenticateLogin)} successful. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.");
+                    _currentUserId = loginCredential.UserId;
                     return true;
                    
             }
@@ -65,6 +65,23 @@ namespace CodingTracker.Common.IAuthenticationServices
                 return false;
             }
         }
+
+        public async Task<int> GetCurrentUserId(Activity activity)
+        {
+            _appLogger.Info($"Starting {nameof(GetCurrentUserId)} TraceId: {activity.TraceId}.");
+
+
+            if (_currentUserId == 0)
+            {
+                _appLogger.Error($"CurrentUserId is not set currentUserId: {_currentUserId}, TraceId: {activity.TraceId}.");
+                return _currentUserId;
+            }
+            _appLogger.Info($"CurrentUserId returned :{_currentUserId}, TraceId: {activity.TraceId}.");
+            return _currentUserId;
+        }
+
+
+   
 
 
 

@@ -37,23 +37,26 @@ namespace CodingTracker.Logging.ApplicationLoggers
             }
         }
 
-
-        public async Task LogActivityAsync(string methodName, Func<Activity, Task> logAction, Func<Task> action)            // Func<Task> allows the method passed to be Async
+        public async Task LogActivityAsync(string methodName, Func<Activity, Task> logAction, Func<Activity, Task> action)
         {
-            using (var activity = new Activity(methodName).Start())
+            Activity activity = Activity.Current ?? new Activity(methodName).Start();
+
+            try
             {
-                try
-                {
-                    if (logAction != null)
-                        await logAction(activity);
-                    if (action != null)
-                        await action();
-                }
-                catch (Exception ex)
-                {
-                    Error($"Exception in {methodName}. TraceID: {activity.TraceId}", ex);
-                    throw;
-                }
+                if (logAction != null)
+                    await logAction(activity);
+                if (action != null)
+                    await action(activity);
+            }
+            catch (Exception ex)
+            {
+                Error($"Exception in {methodName}. TraceID: {activity.TraceId}", ex);
+                throw;
+            }
+            finally
+            {
+                if (Activity.Current == null)
+                    activity.Stop();
             }
         }
 

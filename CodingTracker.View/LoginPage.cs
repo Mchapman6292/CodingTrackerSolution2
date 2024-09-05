@@ -133,37 +133,44 @@ namespace CodingTracker.View
 
 
 
-        private void loginPageLoginButton_Click(object sender, EventArgs e)
+        private async void loginPageLoginButton_Click(object sender, EventArgs e)
         {
-            _appLogger.LogActivity(nameof(loginPageLoginButton_Click),
-            activity => _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}"),
-           async activity =>
-            {
-                string username = loginPageUsernameTextbox.Text;
-                string password = LoginPagePasswordTextbox.Text;
-
-
-                bool isValidLogin = await _authenticationService.AuthenticateLogin(username, password, activity);
-
-                if (isValidLogin)
+            await _appLogger.LogActivityAsync(nameof(loginPageLoginButton_Click),
+                async activity =>
                 {
-                    if (LoginPageRememberMeToggle.Checked)
+                    _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}");
+                },
+                async activity =>  // Note the added 'activity' parameter here
+                {
+                    try
                     {
-                        Properties.Settings.Default.LastUsername = username;
-                        Properties.Settings.Default.Save();
-                    }
+                        string username = loginPageUsernameTextbox.Text;
+                        string password = LoginPagePasswordTextbox.Text;
+                        bool isValidLogin = await _authenticationService.AuthenticateLogin(username, password, activity);
 
-                    this.Hide();
-                    _formSwitcher.SwitchToMainPage();
-                    _appLogger.Info("User logged in successfully.");
+                        if (isValidLogin)
+                        {
+                            if (LoginPageRememberMeToggle.Checked)
+                            {
+                                Properties.Settings.Default.LastUsername = username;
+                                Properties.Settings.Default.Save();
+                            }
+                            this.Hide();
+                            _formSwitcher.SwitchToMainPage();
+                            _appLogger.Info($"User logged in successfully. TraceId:{activity.TraceId}");
+                        }
+                        else
+                        {
+                            LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
+                            _appLogger.Warning($"Login failed for user '{username}'. TraceId:{activity.TraceId}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _appLogger.Error($"Error during login process. TraceId:{activity.TraceId}", ex);
+                    }
                 }
-                else
-                {
-                    LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
-                    _appLogger.Warning($"Login failed for user '{username}'. TraceID: {Activity.Current?.TraceId}");
-                }
-            }
-    );
+            );
         }
 
 

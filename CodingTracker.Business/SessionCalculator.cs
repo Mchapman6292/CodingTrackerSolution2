@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.CodingSessionDTOManagers;
+using CodingTracker.Common.CodingSessionManagers;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.Interfaces.ICodingSessionRepository;
 

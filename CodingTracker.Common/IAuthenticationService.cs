@@ -14,5 +14,7 @@ namespace CodingTracker.Common.IAuthtenticationServices
 
         Task<bool> ResetPassword(string username, string newPassword);
 
+        Task<int> GetCurrentUserId(Activity activity);
+
     }
 }

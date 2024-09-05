@@ -6,7 +6,7 @@ using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Business.SessionCalculators;
-using CodingTracker.Common.CodingSessionDTOManagers;
+using CodingTracker.Common.CodingSessionManagers;
 using Guna.UI2.WinForms;
 using System.Diagnostics;
 

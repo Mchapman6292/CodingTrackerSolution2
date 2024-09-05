@@ -54,33 +54,42 @@ namespace CodingTracker.Data.Repositories.UserCredentialRepository
 
         public async Task<bool> AddUserCredential(Activity activity, UserCredential newUser)
         {
-            _appLogger.Info($"Starting {nameof(AddUserCredential)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
-            try
-            {
-                await _context.UserCredentials.AddAsync(newUser);
-                int rowsAffected = await _context.SaveChangesAsync();
+            bool result = false;
+            await _appLogger.LogActivityAsync(nameof(AddUserCredential),
+                async (activity) =>
+                {
+                    _appLogger.Info($"Starting {nameof(AddUserCredential)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
+                },
+                async (act) =>
+                {
+                    try
+                    {
+                        await _context.UserCredentials.AddAsync(newUser);
+                        int rowsAffected = await _context.SaveChangesAsync();
+                        if (rowsAffected > 0)
+                        {
+                            _appLogger.Info($"Successfully created new user credential for username: {newUser.Username}. TraceId: {act.TraceId}, ParentId: {act.ParentId}");
+                            result = true;
+                        }
+                        else
+                        {
+                            _appLogger.Warning($"User credential for username: {newUser.Username} was not added to the database. No rows affected. TraceId: {act.TraceId}, ParentId: {act.ParentId}");
+                            result = false;
+                        }
+                    }
+                    catch (DbUpdateException dbEx)
+                    {
+                        _appLogger.Error($"Database error creating new user credential for username: {newUser.Username}. TraceId: {act.TraceId}, ParentId: {act.ParentId}", dbEx);
+                        result = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        _appLogger.Error($"Unexpected error creating new user credential for username: {newUser.Username}. TraceId: {act.TraceId}, ParentId: {act.ParentId}", ex);
+                        result = false;
+                    }
+                });
 
-                if (rowsAffected > 0) 
-                {
-                    _appLogger.Info($"Successfully created new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
-                    return true;
-                }
-                else 
-                {
-                    _appLogger.Warning($"User credential for username: {newUser.Username} was not added to the database. No rows affected. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
-                    return false;
-                }
-            }
-            catch (DbUpdateException dbEx)
-            {
-                _appLogger.Error($"Database error creating new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", dbEx);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"Unexpected error creating new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}", ex);
-                return false;
-            }
+            return result;
         }
 
 

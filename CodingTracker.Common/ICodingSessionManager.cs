@@ -12,7 +12,7 @@ namespace CodingTracker.Common.ICodingSessionManagers
     public interface ICodingSessionManager
     {
         CodingSession CreateNewCodingSession(int userId, Activity activity);
-        void StartCodingSession(CodingSession codingSession, Activity activity, int userId);
+        void StartCodingSession(Activity activity, int userId);
         void EndCodingSession(Activity activity);
         string ConvertDurationSecondsToStringHHMM(Activity activity, int durationSeconds);
         void UpdateCodingSessionEndTimes(Activity activity);

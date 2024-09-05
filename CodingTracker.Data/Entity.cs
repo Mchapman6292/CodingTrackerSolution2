@@ -1,4 +1,4 @@
-﻿using CodingTracker.Common.CodingSessionDTOManagers;
+﻿using CodingTracker.Common.CodingSessionManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

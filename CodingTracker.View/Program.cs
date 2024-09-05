@@ -42,6 +42,8 @@ using CodingTracker.Common.IdGenerators;
 using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
 using CodingTracker.Data.Repositories.UserCredentialRepository;
 using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.ICodingSessionManagers;
+using CodingTracker.Common.CodingSessionManagers;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -107,6 +109,7 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IUserCredentialRepository, UserCredentialRepository>()
                     .AddSingleton<ICodingSessionRepository, CodingSessionRepository>()
                     .AddSingleton<IEntityContext, EntityContext>()
+                    .AddSingleton<ICodingSessionManager, CodingSessionManager>()
 
 
                     // Transient services.

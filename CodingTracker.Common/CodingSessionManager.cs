@@ -11,7 +11,7 @@ using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Common.ICodingSessionManagers;
 using System.Linq.Expressions;
 
-namespace CodingTracker.Common.CodingSessionDTOManagers
+namespace CodingTracker.Common.CodingSessionManagers
 {
 
 
@@ -98,10 +98,9 @@ namespace CodingTracker.Common.CodingSessionDTOManagers
         }
 
 
-        public void StartCodingSession(CodingSession codingSession, Activity activity, int userId)
+        public void StartCodingSession(Activity activity, int userId)
         {
             if (activity == null) throw new ArgumentNullException(nameof(activity), $"Activity cannot be null for {nameof(StartCodingSession)}");
-            if (codingSession == null) throw new ArgumentNullException(nameof(codingSession), $"codingSession cannot be null for {nameof(StartCodingSession)}");
 
             try
             {
