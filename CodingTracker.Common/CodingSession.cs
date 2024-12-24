@@ -30,12 +30,6 @@ namespace CodingTracker.Common.CodingSessions
 
 
 
-        public UserCredential User { get; set; }
-
-        public CodingSession()
-        {
-
-        }
 
 
 

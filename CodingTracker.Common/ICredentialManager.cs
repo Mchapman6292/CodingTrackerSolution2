@@ -9,9 +9,5 @@ namespace CodingTracker.Common.ICredentialManagers
         Task<bool> CreateAccount(Activity activity, string username, string password);
 
 
-        string HashPassword(string password);
-
-
-
     }
 }

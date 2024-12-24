@@ -39,7 +39,7 @@ namespace CodingTracker.Common.IAuthenticationServices
             _appLogger.Info($"Starting {nameof(AuthenticateLogin)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}. ");
             try
             {
-                UserCredential loginCredential = await _userCredentialRepository.GetCredentialByUsername(username, activity);
+                UserCredentialDTO loginCredential = await _userCredentialRepository.GetCredentialByUsername(username, activity);
 
  
 
@@ -94,7 +94,7 @@ namespace CodingTracker.Common.IAuthenticationServices
                 _appLogger.Info($"Starting {nameof(ResetPassword)}. TraceID: {activity.TraceId}, Username: {username}");
                 try
                 {
-                    UserCredential user = await _userCredentialRepository.GetCredentialByUsername(username, activity);
+                    UserCredentialDTO user = await _userCredentialRepository.GetCredentialByUsername(username, activity);
                     if (user == null)
                     {
                         _appLogger.Warning($"User not found for password reset: {username}. TraceID: {activity.TraceId}");

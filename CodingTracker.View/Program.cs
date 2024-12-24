@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using CodingTracker.Business.ApplicationControls;
-using CodingTracker.Common.CodingSessions;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers;
 using CodingTracker.Common.InputValidators;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
@@ -29,21 +29,24 @@ using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ErrorHandlers;
 using CodingTracker.View.FormSwitchers;
 using CodingTracker.Business.CodingSessionTimers;
-using CodingTracker.Common.ICodingSessionTimers;
 using CodingTracker.Business.CodingSessionCountDownTimers;
 using CodingTracker.Business.SessionCalculators;
 using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.IQueryBuilders;
-using CodingTracker.Data.EntityContexts;
+using CodingTracker.Data.DbContextService.CodingTrackerDbContexts;
 using Microsoft.EntityFrameworkCore;
-using CodingTracker.Common.DataInterfaces.CodingSessionRepository;
-using CodingTracker.Common.DataInterfaces.IEntityContexts;
+using CodingTracker.Data.Repositories.CodingSessionRepositories;
+using CodingTracker.Common.DataInterfaces.ICodingTrackerDbContexts;
 using CodingTracker.Common.IdGenerators;
-using CodingTracker.Common.DataInterfaces.IUserCredentialRepository;
-using CodingTracker.Data.Repositories.UserCredentialRepository;
-using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.DataInterfaces.IUserCredentialRepositories;
+using CodingTracker.Data.Repositories.UserCredentialRepositories;
+using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 using CodingTracker.Common.ICodingSessionManagers;
 using CodingTracker.Common.CodingSessionManagers;
+using CodingTracker.Common.BusinessInterfaces;
+using CodingTracker.Data.DbContextService.CodingTrackerDbContexts;
+using CodingTracker.Common.DataInterfaces.ICodingTrackerDbContexts;
+using CodingTracker.Data.Repositories.UserCredentialRepositories;
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -105,10 +108,10 @@ namespace CodingTracker.View.Program
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
                     .AddSingleton<IIdGenerators, IdGenerators>()
-                    .AddSingleton<IEntityContext, EntityContext>()
+                    .AddSingleton<ICodingTrackerDbContext, CodingTrackerDbContext>()
                     .AddSingleton<IUserCredentialRepository, UserCredentialRepository>()
                     .AddSingleton<ICodingSessionRepository, CodingSessionRepository>()
-                    .AddSingleton<IEntityContext, EntityContext>()
+                    .AddSingleton<ICodingTrackerDbContext, CodingTrackerDbContext>()
                     .AddSingleton<ICodingSessionManager, CodingSessionManager>()
 
 
@@ -121,8 +124,8 @@ namespace CodingTracker.View.Program
                     .AddTransient<CodingSessionTimerForm>()
                     .AddTransient<CreateAccountPage>()
 
-                    .AddDbContext<EntityContext>(options =>
-                        options.UseSqlite("Data Source=path_to_your_database.db"));
+                    .AddDbContext<CodingTrackerDbContext>(options =>
+                        options.UseNpgsql("Data Source=path_to_your_database.db"));
 
 
 

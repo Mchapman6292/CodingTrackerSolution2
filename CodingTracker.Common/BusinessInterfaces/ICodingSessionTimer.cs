@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.ICodingSessionTimers
+namespace CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers
 {
     public interface ICodingSessionTimer
     {

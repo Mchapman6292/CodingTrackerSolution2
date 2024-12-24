@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
-using CodingTracker.Common.ICodingSessionTimers;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers;
 
 namespace CodingTracker.Business.CodingSessionTimers
 {

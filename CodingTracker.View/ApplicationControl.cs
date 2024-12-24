@@ -1,6 +1,6 @@
 ﻿using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.DataInterfaces.IEntityContexts;
+using CodingTracker.Common.DataInterfaces.ICodingTrackerDbContexts;
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 using CodingTracker.Common.ICodingSessionManagers;
 
 namespace CodingTracker.Business.ApplicationControls
@@ -16,13 +16,13 @@ namespace CodingTracker.Business.ApplicationControls
     public class ApplicationControl : IApplicationControl
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly IEntityContext _context;
+        private readonly ICodingTrackerDbContext _context;
         private readonly ICodingSessionManager _codingSessionManager;
         public bool ApplicationIsRunning { get; private set; }
 
 
 
-        public ApplicationControl(IApplicationLogger appLogger, IEntityContext entityContext, ICodingSessionManager codingSessionManager)
+        public ApplicationControl(IApplicationLogger appLogger, ICodingTrackerDbContext entityContext, ICodingSessionManager codingSessionManager)
         {
             ApplicationIsRunning = false; // Set to false instead of true to ensure that processes don't run or exit prematurely or unintentionally.
             _appLogger = appLogger;
