@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.Common.DataInterfaces.CodingSessionRepository;
+using CodingTracker.Data.Repositories.CodingSessionRepositories;
 using System.Drawing;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Data.QueryBuilders;
-using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 
 namespace CodingTracker.Business.PanelColorControls
 {
@@ -62,7 +62,7 @@ namespace CodingTracker.Business.PanelColorControls
                 _appLogger.Info($"Starting {nameof(AssignColorsToSessionsInLast28Days)}, TraceID: {activity.TraceId}.");
 
 
-                var recentSessions = await _codingSessionRepository.GetRecentSessions(activity, 28);
+                var recentSessions = await _codingSessionRepository.GetRecentSessionsAsync(28);
 
   
                 _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {recentSessions}.");
@@ -70,8 +70,11 @@ namespace CodingTracker.Business.PanelColorControls
                 List<Color> sessionColors = new List<Color>();
                 foreach (var session in recentSessions)
                 {
-                    double totalDurationSeconds = session.DurationSeconds ?? 0; 
-                    DateOnly? sessionDate = session.StartDate;  
+                    double totalDurationSeconds = session.DurationSeconds ?? 0;
+
+                    DateOnly? sessionDate = session.StartDate.HasValue
+                            ? DateOnly.FromDateTime(session.StartDate.Value)
+                            : null;
 
                     SessionColor colorEnum = DetermineSessionColor(totalDurationSeconds);
                     Color color = ConvertSessionColorEnumToColor(colorEnum);

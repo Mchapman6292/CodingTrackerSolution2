@@ -40,6 +40,7 @@ namespace CodingTracker.Common.UtilityServices
             return DateTime.TryParseExact(input, "yy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
         }
 
+
         public double CalculatePercentage(double part, double total)
         {
             if (total == 0) return 0;
@@ -47,45 +48,19 @@ namespace CodingTracker.Common.UtilityServices
         }
 
 
-        public string HashPassword( Activity activity, string password)
+        public string HashPassword(string password)
         {
-            _appLogger.Debug($"Starting {nameof(HashPassword)}, TraceId: {activity.TraceId}.");
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            try
+            using (SHA256 sha256Hash = SHA256.Create())
             {
-                using (SHA256 sha256Hash = SHA256.Create())
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+
+                for (int i = 0; i < bytes.Length; i++)
                 {
-                    byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                    StringBuilder builder = new StringBuilder();
-                    for (int i = 0; i < bytes.Length; i++)
-                    {
-                        builder.Append(bytes[i].ToString("x2"));
-                    }
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"{nameof(HashPassword)} completed successfully. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}.");
-                    return builder.ToString();
+                    builder.Append(bytes[i].ToString("x2"));
                 }
-            }
-            catch (ArgumentNullException ex)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"Password cannot be null. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                throw;
-            }
-            catch (EncoderFallbackException ex)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"Encoding error while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"An unexpected error occurred while hashing the password. Error: {ex.Message}. Elapsed time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}", ex);
-                throw;
+
+                return builder.ToString();
             }
         }
     }

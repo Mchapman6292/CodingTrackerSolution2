@@ -13,7 +13,7 @@ namespace CodingTracker.Common.IUtilityServices
         int TryParseInt(string input);
         bool TryParseDate(string input, out DateTime result);
 
-        string HashPassword(Activity activity, string password);
+        string HashPassword(string password);
 
 
     }

@@ -17,9 +17,7 @@ using CodingTracker.Common.ICodingSessionManagers;
 using CodingTracker.Common.CodingSessions;
 using CodingTracker.Common.IAuthenticationServices;
 using System.Diagnostics;
-using CodingTracker.Common.CodingSessionDTOs;
-using System.Net;
-using CodingTracker.Common.IAuthtenticationServices;
+using CodingTracker.Business.CodingSessionService.UserIdServices;
 
 
 namespace CodingTracker.View
@@ -35,10 +33,12 @@ namespace CodingTracker.View
         private readonly ICodingSessionManager _codingSessionManager;
         private readonly IAuthenticationService _authenticationService;
 
+        private readonly UserIdService _userIdService;
+
 
         private int _goalHours;
         private int _goalMinutes;
-        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController,ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger, ICodingSessionManager codingSessionManager, IAuthenticationService authenticationService)
+        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController,ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger, ICodingSessionManager codingSessionManager, IAuthenticationService authenticationService, UserIdService idService)
         {
             InitializeComponent();
             _formSwitcher = formSwitcher;
@@ -48,6 +48,7 @@ namespace CodingTracker.View
             _appLogger = appLogger;
             _codingSessionManager = codingSessionManager;
             _authenticationService = authenticationService;
+            _userIdService = idService;
         }
 
         private async void CodingSessionPageStartSessionButton_Click(object sender, EventArgs e)
@@ -67,7 +68,7 @@ namespace CodingTracker.View
                         _formSwitcher.SwitchToCodingSessionTimer();
                         _appLogger.Info($"Switched to Coding Session Timer. TraceId: {activity.TraceId}");
 
-                        int currentUserId = await _authenticationService.GetCurrentUserId(activity);
+                        int currentUserId =  _userIdService.GetCurrentUserId();
                         _appLogger.Info($"Retrieved current user ID: {currentUserId}. TraceId: {activity.TraceId}");
 
                         _codingSessionManager.StartCodingSession(activity, currentUserId);

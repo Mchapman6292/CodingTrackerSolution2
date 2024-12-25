@@ -6,15 +6,12 @@ using CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers;
 using CodingTracker.Common.InputValidators;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.Common.IAuthtenticationServices;
+using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
-using CodingTracker.Data.CredentialManagers;
-using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Logging.ApplicationLoggers;
 using CodingTracker.View.FormFactories;
 using CodingTracker.View.FormControllers;
@@ -43,10 +40,11 @@ using CodingTracker.Data.Repositories.UserCredentialRepositories;
 using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 using CodingTracker.Common.ICodingSessionManagers;
 using CodingTracker.Common.CodingSessionManagers;
-using CodingTracker.Common.BusinessInterfaces;
-using CodingTracker.Data.DbContextService.CodingTrackerDbContexts;
-using CodingTracker.Common.DataInterfaces.ICodingTrackerDbContexts;
-using CodingTracker.Data.Repositories.UserCredentialRepositories;
+using CodingTracker.Business.Authentication.AuthenticationServices;
+using CodingTracker.Business.CodingSessionService.EditSessionPageContextManagers;
+
+
+
 /// To do
 /// Change get validDate & Time inputvalidator
 /// Consistent appraoch to DTO
@@ -92,7 +90,6 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
                     .AddSingleton<IApplicationLogger, ApplicationLogger>()
-                    .AddSingleton<ICredentialManager, CredentialManager>()
                     .AddSingleton<IUtilityService, UtilityService>()
                     .AddSingleton<IApplicationControl, ApplicationControl>()
                     .AddSingleton<IAuthenticationService, AuthenticationService>()
@@ -109,10 +106,11 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IQueryBuilder, QueryBuilder>()
                     .AddSingleton<IIdGenerators, IdGenerators>()
                     .AddSingleton<ICodingTrackerDbContext, CodingTrackerDbContext>()
-                    .AddSingleton<IUserCredentialRepository, UserCredentialRepository>()
                     .AddSingleton<ICodingSessionRepository, CodingSessionRepository>()
                     .AddSingleton<ICodingTrackerDbContext, CodingTrackerDbContext>()
                     .AddSingleton<ICodingSessionManager, CodingSessionManager>()
+                    .AddSingleton<IUserCredentialRepository , UserCredentialRepository>()
+                    .AddSingleton<EditSessionPageContextManager>()
 
 
                     // Transient services.

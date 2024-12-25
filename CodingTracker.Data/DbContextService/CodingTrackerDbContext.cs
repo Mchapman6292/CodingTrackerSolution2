@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CodingTracker.Common.DataInterfaces.ICodingTrackerDbContexts;
 using CodingTracker.Common.Entities.UserCredentialEntities;
-using CodingTracker.Common.Entities;
+using CodingTracker.Common.Entities.CodingSessionEntities;
 
 
 namespace CodingTracker.Data.DbContextService.CodingTrackerDbContexts
@@ -27,8 +27,7 @@ namespace CodingTracker.Data.DbContextService.CodingTrackerDbContexts
 
             modelBuilder.Entity<CodingSessionEntity>()
                 .HasOne<UserCredentialEntity>()
-                .WithMany()
-                .HasForeignKey(e => e.UserId);
+                .WithMany();
 
 
             modelBuilder.Entity<UserCredentialEntity>()

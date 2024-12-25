@@ -1,5 +1,5 @@
 ﻿using CodingTracker.Common.IApplicationControls;
-using CodingTracker.Common.IAuthtenticationServices;
+using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.View.FormControllers;
 using CodingTracker.View.FormSwitchers;
@@ -10,8 +10,6 @@ using System.Windows.Forms;
 using LibVLCSharp.Shared;
 using LibVLCSharp.WinForms;
 using System.Diagnostics;
-using CodingTracker.Common.ICredentialManagers;
-using CodingTracker.Data.CredentialManagers;
 using System.Drawing.Drawing2D;
 
 namespace CodingTracker.View
@@ -21,18 +19,16 @@ namespace CodingTracker.View
         private readonly IAuthenticationService _authenticationService;
         private readonly IApplicationControl _appControl;
         private readonly IApplicationLogger _appLogger;
-        private readonly ICredentialManager _credentialManager;
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher)
+        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, IFormController formController, IFormSwitcher formSwitcher)
         {
             _authenticationService = authenticationService;
             _appControl = appControl;
             _appLogger = applogger;
-            _credentialManager = credentialManager;
             _formController = formController;
             _formSwitcher = formSwitcher;
             this.FormBorderStyle = FormBorderStyle.None;

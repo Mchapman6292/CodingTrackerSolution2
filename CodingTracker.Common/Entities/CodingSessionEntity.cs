@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.Entities
+namespace CodingTracker.Common.Entities.CodingSessionEntities
 {
     public class CodingSessionEntity
     {
-        public int SessionId { get; set; } = 0; // Default value indicating not set. 
-        public int UserId { get; set; } = 0;
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int SessionId { get; set; } // Default value indicating not set. 
         public DateTime? StartDate { get; set; }
-        public DateTime? StartTime { get; set; }
         public DateTime? EndDate { get; set; }
-        public DateTime? EndTime { get; set; }
         public double? DurationSeconds { get; set; }
 
         public string? DurationHHMM { get; set; }

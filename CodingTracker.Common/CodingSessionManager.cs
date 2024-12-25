@@ -1,7 +1,6 @@
 ﻿using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.CodingSessionDTOs;
-using CodingTracker.Common.ICredentialManagers;
 using System.Diagnostics;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.CodingSessions;
@@ -22,7 +21,6 @@ namespace CodingTracker.Common.CodingSessionManagers
 
         private readonly IErrorHandler _errorHandler;
         private readonly IApplicationLogger _appLogger;
-        private readonly ICredentialManager _credentialManager;
         private readonly IInputValidator _inputValidator;
         private readonly IIdGenerators _idGenerators;
         private readonly ICodingSessionRepository _codingSessionRepo;
@@ -30,11 +28,10 @@ namespace CodingTracker.Common.CodingSessionManagers
 
         private bool IsCodingSessionActive = false;
 
-        public CodingSessionManager(IErrorHandler errorHandler, IApplicationLogger appLogger, ICredentialManager credentialManager, IInputValidator inputValidator, IIdGenerators idGenerators, ICodingSessionRepository codingSessionRepo, ICodingSessionTimer sessionTimer)
+        public CodingSessionManager(IErrorHandler errorHandler, IApplicationLogger appLogger, IInputValidator inputValidator, IIdGenerators idGenerators, ICodingSessionRepository codingSessionRepo, ICodingSessionTimer sessionTimer)
         {
             _errorHandler = errorHandler;
             _appLogger = appLogger;
-            _credentialManager = credentialManager;
             _inputValidator = inputValidator;
             _idGenerators = idGenerators;
             _codingSessionRepo = codingSessionRepo;
