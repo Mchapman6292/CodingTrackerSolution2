@@ -1,16 +1,15 @@
 ﻿
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.IAuthenticationServices;
-using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Common.UserCredentials;
+
 using CodingTracker.Data.Repositories.UserCredentialRepositories;
 using CodingTracker.Common.DataInterfaces.IUserCredentialRepositories;
 using CodingTracker.Common.UserCredentials.UserCredentialDTOs;
 using CodingTracker.Common.IUtilityServices;
-using System.Data.SQLite;
 using System.Diagnostics;
 using CodingTracker.Business.CodingSessionService.UserIdServices;
 using CodingTracker.Common.Entities.UserCredentialEntities;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
 
 
 // resetPassword, updatePassword, rememberUser 
@@ -18,16 +17,14 @@ namespace CodingTracker.Business.Authentication.AuthenticationServices
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IApplicationLogger _appLogger;
-        private readonly IQueryBuilder _queryBuilder;
         private readonly IUserCredentialRepository _userCredentialRepository;
+        private readonly IApplicationLogger _appLogger;
         private readonly IUtilityService _utilityService;
         private readonly UserIdService _userIdService;
 
-        public AuthenticationService(IApplicationLogger appLogger,IQueryBuilder queryBuilder, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService, UserIdService userIdService)
+        public AuthenticationService(IApplicationLogger appLogger, IUserCredentialRepository userCredentialRepository, IUtilityService utilityService, UserIdService userIdService)
         {
             _appLogger = appLogger;
-            _queryBuilder = queryBuilder;
             _userCredentialRepository = userCredentialRepository;
             _utilityService = utilityService;
             _userIdService = userIdService;
@@ -45,7 +42,7 @@ namespace CodingTracker.Business.Authentication.AuthenticationServices
             {
                 Username = username,
                 PasswordHash = _utilityService.HashPassword(password),
-                LastLogin = DateTime.Now
+                LastLogin = DateTime.UtcNow,
                 
             };
 

@@ -1,15 +1,14 @@
 ﻿using System.Data;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.FormControllers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.View.FormFactories;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.Business.PanelColorControls;
-using CodingTracker.Business.SessionCalculators;
-using CodingTracker.Common.CodingSessionManagers;
+using CodingTracker.Business.CodingSessionManagers;
 using Guna.UI2.WinForms;
 using System.Diagnostics;
-
+using CodingTracker.Common.BusinessInterfaces.IPanelColourControls;
+using CodingTracker.View.FormService;
+using CodingTracker.Business.CodingSessionService.SessionCalculators;
+using CodingTracker.Business.MainPageService.PanelColourAssigners;
+using CodingTracker.Business.MainPageService.LabelAssignments;
 
 
 namespace CodingTracker.View
@@ -18,25 +17,26 @@ namespace CodingTracker.View
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IFormController _formController;
-        private readonly IPanelColorControl _panelColorControl;
+        private readonly IPanelColourAssigner _panelAssigner;
         private readonly IErrorHandler _errorHandler;
         private readonly IFormFactory _formFactory;
         private readonly IFormSwitcher _formSwitcher;
         private readonly ISessionCalculator _sessionCalculator;
+        private readonly ILabelAssignment _labelAssignment;
 
 
 
-        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColorControl panelControl, IErrorHandler errorHandler,IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator)
+        public MainPage(IApplicationLogger appLogger, IFormController formController, IPanelColourAssigner panelAssigner, IErrorHandler errorHandler,IFormFactory formFactory, IFormSwitcher formSwitcher, ISessionCalculator sessionCalculator, ILabelAssignment labelAssignment)
         {
             InitializeComponent();
             _appLogger = appLogger;
             _formController = formController;
-            _panelColorControl = panelControl;
+            _panelAssigner = panelAssigner;
             _errorHandler = errorHandler;
             _formFactory = formFactory;
             _formSwitcher = formSwitcher;
             _sessionCalculator = sessionCalculator;
-
+            _labelAssignment = labelAssignment;
         }
 
         private void MainPage_Load(object sender, EventArgs e)
@@ -82,7 +82,7 @@ namespace CodingTracker.View
             _appLogger.Debug("UpdateLabels method started.");
             try
             {
-                List<DateTime> last28Days = _panelColorControl.GetDatesPrevious28days();
+                List<DateTime> last28Days = _panelAssigner.GetDatesPrevious28days();
                 var GunaLabels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2HtmlLabel>().ToList();
                 for (int i = 0; i < last28Days.Count && i < GunaLabels.Count; i++)
                 {
@@ -104,7 +104,7 @@ namespace CodingTracker.View
                 try
                 {
                     var gradientPanels = parentPanel.Controls.OfType<Guna.UI2.WinForms.Guna2GradientPanel>().ToList();
-                    List<Color> panelColors = await _panelColorControl.AssignColorsToSessionsInLast28Days();
+                    List<Color> panelColors = await _panelAssigner.AssignColorsToSessionsInLast28Days();
 
                     for (int i = 0; i < panelColors.Count && i < gradientPanels.Count; i++)
                     {
@@ -122,10 +122,10 @@ namespace CodingTracker.View
 
 
 
-        private void UpdatedateTodaySessionLabel() 
+        private async Task UpdatedateTodaySessionLabel() 
         {
-            throw new NotImplementedException();
-           
+           await  _labelAssignment.UpdateTodayLabel(TodaySessionLabel);
+
         }
 
         private void Day2Label_Click(object sender, EventArgs e)

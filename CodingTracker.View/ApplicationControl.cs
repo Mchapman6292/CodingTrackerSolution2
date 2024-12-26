@@ -8,8 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
-using CodingTracker.Common.ICodingSessionManagers;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers;
 
 namespace CodingTracker.Business.ApplicationControls
 {

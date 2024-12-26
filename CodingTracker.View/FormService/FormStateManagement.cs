@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.View.FormStateManagements
+namespace CodingTracker.View.FormService
 {
     public class FormStateManagement
     {

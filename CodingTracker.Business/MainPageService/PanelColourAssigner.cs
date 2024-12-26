@@ -9,10 +9,9 @@ using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Data.Repositories.CodingSessionRepositories;
 using System.Drawing;
 using CodingTracker.Common.CodingSessionDTOs;
-using CodingTracker.Data.QueryBuilders;
 using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 
-namespace CodingTracker.Business.PanelColorControls
+namespace CodingTracker.Business.MainPageService.PanelColourAssigners
 {
     public enum SessionColor
     {
@@ -23,7 +22,7 @@ namespace CodingTracker.Business.PanelColorControls
         Green,       // For 3 hours and more
         Black        // For errors/null   
     }
-    public interface IPanelColorControl
+    public interface IPanelColourAssigner
     {
         Task<List<Color>> AssignColorsToSessionsInLast28Days();
         Color ConvertSessionColorEnumToColor(SessionColor color);
@@ -38,7 +37,7 @@ namespace CodingTracker.Business.PanelColorControls
 
 
 
-    public class PanelColorControl : IPanelColorControl
+    public class PanelColourAssigner : IPanelColourAssigner
     {
         private readonly IApplicationLogger _appLogger;
         private readonly IErrorHandler _errorHandler;
@@ -48,7 +47,7 @@ namespace CodingTracker.Business.PanelColorControls
 
 
 
-        public PanelColorControl(IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionRepository codingSessionRepository)
+        public PanelColourAssigner(IApplicationLogger appLogger, IErrorHandler errorHandler, ICodingSessionRepository codingSessionRepository)
         {
             _appLogger = appLogger;
             _errorHandler = errorHandler;
@@ -64,7 +63,7 @@ namespace CodingTracker.Business.PanelColorControls
 
                 var recentSessions = await _codingSessionRepository.GetRecentSessionsAsync(28);
 
-  
+
                 _appLogger.Debug($"Sessions returned by ReadFromCodingSessionsTable for {nameof(AssignColorsToSessionsInLast28Days)}: {recentSessions}.");
 
                 List<Color> sessionColors = new List<Color>();
@@ -100,21 +99,21 @@ namespace CodingTracker.Business.PanelColorControls
             {
                 return SessionColor.Green;
             }
-            else if (sessionDurationSeconds < 3600) 
+            else if (sessionDurationSeconds < 3600)
             {
                 return SessionColor.RedGrey;
             }
-            else if (sessionDurationSeconds < 7200) 
+            else if (sessionDurationSeconds < 7200)
             {
                 return SessionColor.Red;
             }
-            else if (sessionDurationSeconds < 10800) 
+            else if (sessionDurationSeconds < 10800)
             {
                 return SessionColor.Yellow;
             }
             else
             {
-                return SessionColor.Green; 
+                return SessionColor.Green;
             }
         }
 

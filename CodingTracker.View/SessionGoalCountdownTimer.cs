@@ -1,9 +1,9 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ISessionGoalCountDownTimers;
 using System.Windows.Forms;
 using System;
 using System.Diagnostics;
-using CodingTracker.Business.CodingSessionCountDownTimers;
+using CodingTracker.Business.CodingSessionService;
+using CodingTracker.Common.BusinessInterfaces;
 
 
 namespace CodingTracker.View.SessionGoalCountDownTimers

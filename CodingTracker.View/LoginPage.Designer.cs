@@ -1,7 +1,7 @@
 ﻿
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IUtilityServices;
-using CodingTracker.Common.ICodingSessionManagers;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers;
 
 namespace CodingTracker.View
 {

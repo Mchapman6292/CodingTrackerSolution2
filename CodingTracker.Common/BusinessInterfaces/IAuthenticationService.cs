@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.IAuthenticationServices
+namespace CodingTracker.Common.BusinessInterfaces.IAuthenticationServices
 {
     public interface IAuthenticationService
     {

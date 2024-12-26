@@ -13,7 +13,7 @@ namespace CodingTracker.Common.Entities.CodingSessionEntities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SessionId { get; set; } // Default value indicating not set. 
-        public DateTime? StartDate { get; set; }
+        public DateTime? StartDate { get; set; } = DateTime.UtcNow;
         public DateTime? EndDate { get; set; }
         public double? DurationSeconds { get; set; }
 

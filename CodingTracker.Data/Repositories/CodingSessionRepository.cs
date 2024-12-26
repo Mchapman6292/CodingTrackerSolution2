@@ -76,5 +76,13 @@ namespace CodingTracker.Data.Repositories.CodingSessionRepositories
             return await _dbContext.CodingSessions
                 .ToListAsync();
         }
+
+        public async Task<bool> CheckTodayCodingSessions()
+        {
+            var today = DateTime.UtcNow.Date;
+            return await _dbContext.CodingSessions
+                .AnyAsync(s => s.StartDate.HasValue &&
+                               s.StartDate.Value.Date == today);
+        }
     }
 }

@@ -10,10 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.View.FormControllers;
-using CodingTracker.Common.ISessionGoalCountDownTimers;
-using CodingTracker.View.FormFactories;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces;
 namespace CodingTracker.View
 {
     public partial class CodingSessionTimerForm : Form

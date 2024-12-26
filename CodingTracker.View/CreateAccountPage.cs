@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.View.FormControllers;
 using System.Diagnostics;
 using CodingTracker.View;
 using System.Security.Principal;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.Common.IAuthenticationServices;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
 
 namespace CodingTracker.View
 {

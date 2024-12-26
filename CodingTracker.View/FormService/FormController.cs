@@ -1,9 +1,7 @@
 ﻿using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.View.FormControllers;
-using CodingTracker.View.FormFactories;
 
-namespace CodingTracker.View.FormControllers
+namespace CodingTracker.View.FormService
 {
 
     public interface IFormController
@@ -50,7 +48,7 @@ namespace CodingTracker.View.FormControllers
         {
             if (currentForm != null)
             {
-                currentForm.Hide(); 
+                currentForm.Hide();
             }
         }
 
@@ -71,7 +69,7 @@ namespace CodingTracker.View.FormControllers
 
         public void CloseTargetForm(Form targetForm) // Probably not needed but keep for now. 
         {
-            if (targetForm == null) return; 
+            if (targetForm == null) return;
 
             if (targetForm.Visible)
             {
@@ -79,7 +77,7 @@ namespace CodingTracker.View.FormControllers
                 targetForm.Invoke(new Action(() =>
                 {
                     targetForm.Hide();
-                    targetForm.Dispose(); 
+                    targetForm.Dispose();
                 }));
             }
         }

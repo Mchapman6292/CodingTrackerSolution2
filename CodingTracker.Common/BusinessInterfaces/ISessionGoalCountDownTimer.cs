@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.ISessionGoalCountDownTimers
+namespace CodingTracker.Common.BusinessInterfaces
 {
     public interface ISessionGoalCountDownTimer
     {

@@ -5,15 +5,15 @@ using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IInputValidationResults;
 using System.Diagnostics;
 using System.Text;
-using CodingTracker.Common.InputValidationResults;
 using System.ComponentModel.DataAnnotations;
 using CodingTracker.Common.IErrorHandlers;
+using CodingTracker.Common.BusinessInterfaces;
 
 
 
 // performs the actual validation of user inputs
 
-namespace CodingTracker.Common.InputValidators
+namespace CodingTracker.Business.InputValidators
 {
 
     public class InputValidator : IInputValidator

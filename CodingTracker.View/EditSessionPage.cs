@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.Common.IApplicationControls;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.View.FormControllers;
 using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
@@ -17,6 +15,7 @@ using CodingTracker.Business.CodingSessionService.EditSessionPageContextManagers
 using Guna.UI2.WinForms;
 using CodingTracker.Data.Repositories.CodingSessionRepositories;
 using CodingTracker.Common.Entities.CodingSessionEntities;
+using CodingTracker.View.FormService;
 
 namespace CodingTracker.View
 {

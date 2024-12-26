@@ -6,11 +6,11 @@ using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.CodingSessions;
 using CodingTracker.Common.IdGenerators;
 using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
-using CodingTracker.Common.ICodingSessionManagers;
 using System.Linq.Expressions;
 using CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers;
 
-namespace CodingTracker.Common.CodingSessionManagers
+namespace CodingTracker.Business.CodingSessionManagers
 {
 
 

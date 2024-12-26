@@ -8,7 +8,7 @@ using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
 using CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers;
 
-namespace CodingTracker.Business.CodingSessionTimers
+namespace CodingTracker.Business.CodingSessionService
 {
     public class CodingSessionTimer : ICodingSessionTimer
     {

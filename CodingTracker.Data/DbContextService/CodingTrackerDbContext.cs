@@ -19,21 +19,5 @@ namespace CodingTracker.Data.DbContextService.CodingTrackerDbContexts
 
 
 
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-
-            modelBuilder.Entity<CodingSessionEntity>()
-                .HasOne<UserCredentialEntity>()
-                .WithMany();
-
-
-            modelBuilder.Entity<UserCredentialEntity>()
-                .HasIndex(e => e.Username)
-                .IsUnique();
-
-        }
     }
 }

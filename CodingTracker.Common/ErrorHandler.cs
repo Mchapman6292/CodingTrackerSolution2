@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -42,12 +41,6 @@ namespace CodingTracker.Common.ErrorHandlers
                 throw;
             }
 
-            catch (SQLiteException ex) when (isDatabaseOperation)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"SQLite error in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-            }
-
             catch (Exception ex)
             {
                 stopwatch.Stop();
@@ -84,11 +77,7 @@ namespace CodingTracker.Common.ErrorHandlers
                 _appLogger.Error($"Invalid operation in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
                 throw;
             }
-            catch (SQLiteException ex) when (isDatabaseOperation)
-            {
-                stopwatch.Stop();
-                _appLogger.Error($"SQLite error in {methodName}: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-            }
+
             catch (Exception ex)
             {
                 stopwatch.Stop();
@@ -129,23 +118,7 @@ namespace CodingTracker.Common.ErrorHandlers
         }
 
 
-        public void HandleErrorsWithSql(Action action, string methodName)
-        {
-            try
-            {
-                action();
-            }
-            catch (SQLiteException ex)
-            {
-
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in {methodName} (DB Operation): {ex.Message}");
-                throw;
-            }
-        }
+  
     }
 }
    

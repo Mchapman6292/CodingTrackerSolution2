@@ -15,5 +15,7 @@ namespace CodingTracker.Common.DataInterfaces.ICodingSessionRepositories
         Task<List<CodingSessionEntity>> GetTodayCodingSessionsAsync();
 
         Task<List<CodingSessionEntity>> GetAllCodingSessionAsync();
+
+        Task<bool> CheckTodayCodingSessions();
     }
 }

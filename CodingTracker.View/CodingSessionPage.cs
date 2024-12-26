@@ -7,17 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CodingTracker.View.FormControllers;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.ICodingSessionManagers;
 using CodingTracker.Common.CodingSessions;
-using CodingTracker.Common.IAuthenticationServices;
 using System.Diagnostics;
 using CodingTracker.Business.CodingSessionService.UserIdServices;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
+using CodingTracker.Common.BusinessInterfaces;
 
 
 namespace CodingTracker.View

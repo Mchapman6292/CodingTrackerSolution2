@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
 
-namespace CodingTracker.Business.CodingSessionCountDownTimers
+namespace CodingTracker.Business.CodingSessionService
 {
 
     public interface ICodingSessionCountDownTimer

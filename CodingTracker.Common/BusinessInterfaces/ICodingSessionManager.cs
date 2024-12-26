@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodingTracker.Common.ICodingSessionManagers
+namespace CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers
 {
     public interface ICodingSessionManager
     {

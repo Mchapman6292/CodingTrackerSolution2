@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using CodingTracker.View;
-using CodingTracker.Common.IAuthenticationServices;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
-using CodingTracker.View.FormFactories;
 
-namespace CodingTracker.View.FormFactories
+namespace CodingTracker.View.FormService
 {
     public interface IFormFactory
     {
@@ -26,7 +24,7 @@ namespace CodingTracker.View.FormFactories
         private IApplicationLogger _appLogger;
         private MainPage _mainPageInstance;
 
-        public  FormFactory(IServiceProvider serviceProvider,IApplicationLogger appLogger)
+        public FormFactory(IServiceProvider serviceProvider, IApplicationLogger appLogger)
         {
             _serviceProvider = serviceProvider;
             _appLogger = appLogger;
@@ -74,9 +72,9 @@ namespace CodingTracker.View.FormFactories
         {
             return CreateForm<EditSessionPage>(nameof(CreateEditSessionPage));
         }
-        public CreateAccountPage CreateAccountPage() 
+        public CreateAccountPage CreateAccountPage()
         {
-            return CreateForm<CreateAccountPage>(nameof(CreateAccountPage));    
+            return CreateForm<CreateAccountPage>(nameof(CreateAccountPage));
         }
 
         public CodingSessionTimerForm CreateCodingSessionTimer()

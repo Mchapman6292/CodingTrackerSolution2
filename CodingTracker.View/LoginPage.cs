@@ -1,8 +1,5 @@
 ﻿using CodingTracker.Common.IApplicationControls;
-using CodingTracker.Common.IAuthenticationServices;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.FormControllers;
-using CodingTracker.View.FormSwitchers;
 
 using System;
 using System.IO;
@@ -11,6 +8,8 @@ using LibVLCSharp.Shared;
 using LibVLCSharp.WinForms;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
 
 namespace CodingTracker.View
 {

@@ -5,22 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.CodingSessionManagers;
+using CodingTracker.Business.CodingSessionManagers;
 using CodingTracker.Common.CodingSessionDTOs;
 using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 using CodingTracker.Common.Entities.CodingSessionEntities;
 
 
-namespace CodingTracker.Business.SessionCalculators
+namespace CodingTracker.Business.CodingSessionService.SessionCalculators
 {
     public interface ISessionCalculator
     {
         Task<double> CalculateLastSevenDaysAvgInSeconds();
-        Task<double> CalculateTodayTotal();
+        Task<double> GetTodayTotalSession();
         Task<double> CalculateTotalAvg();
         double CalculateDurationSeconds();
     }
-    
+
 
     public class SessionCalculator : ISessionCalculator
     {
@@ -54,14 +54,14 @@ namespace CodingTracker.Business.SessionCalculators
 
             double averageSeconds = totalSeconds / 7; // Still divide by 7 for a true 7-day average
 
-                  
+
             return averageSeconds;
         }
 
 
 
 
-        public async Task<double> CalculateTodayTotal()
+        public async Task<double> GetTodayTotalSession()
         {
             var sessions = await _codingSessionRepository.GetTodayCodingSessionsAsync();
 

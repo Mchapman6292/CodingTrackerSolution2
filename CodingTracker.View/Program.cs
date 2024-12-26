@@ -3,33 +3,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using CodingTracker.Business.ApplicationControls;
 using CodingTracker.Common.BusinessInterfaces.ICodingSessionTimers;
-using CodingTracker.Common.InputValidators;
+using CodingTracker.Business.InputValidators;
 using CodingTracker.Common.IApplicationControls;
 using CodingTracker.Common.IApplicationLoggers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.Common.IAuthenticationServices;
-using CodingTracker.Common.IStartConfigurations;
 using CodingTracker.Common.IUtilityServices;
 using CodingTracker.Common.UtilityServices;
 using CodingTracker.Data.Configurations;
 using CodingTracker.Logging.ApplicationLoggers;
-using CodingTracker.View.FormFactories;
-using CodingTracker.View.FormControllers;
 using CodingTracker.View.SessionGoalCountDownTimers;
-using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidationResults;
 using CodingTracker.View.IMessageBoxManagers;
 using CodingTracker.View.MessageBoxManagers;
-using CodingTracker.Common.InputValidationResults;
-using CodingTracker.Business.PanelColorControls;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.ErrorHandlers;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.Business.CodingSessionTimers;
-using CodingTracker.Business.CodingSessionCountDownTimers;
-using CodingTracker.Business.SessionCalculators;
-using CodingTracker.Data.QueryBuilders;
-using CodingTracker.Common.IQueryBuilders;
 using CodingTracker.Data.DbContextService.CodingTrackerDbContexts;
 using Microsoft.EntityFrameworkCore;
 using CodingTracker.Data.Repositories.CodingSessionRepositories;
@@ -38,11 +25,20 @@ using CodingTracker.Common.IdGenerators;
 using CodingTracker.Common.DataInterfaces.IUserCredentialRepositories;
 using CodingTracker.Data.Repositories.UserCredentialRepositories;
 using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
-using CodingTracker.Common.ICodingSessionManagers;
-using CodingTracker.Common.CodingSessionManagers;
+using CodingTracker.Business.CodingSessionManagers;
 using CodingTracker.Business.Authentication.AuthenticationServices;
 using CodingTracker.Business.CodingSessionService.EditSessionPageContextManagers;
-
+using CodingTracker.Business.CodingSessionService.UserIdServices;
+using CodingTracker.Business.MainPageService;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers;
+using CodingTracker.Business.CodingSessionService;
+using CodingTracker.Common.BusinessInterfaces;
+using CodingTracker.Common.DataInterfaces;
+using CodingTracker.Business.MainPageService.PanelColorControls;
+using CodingTracker.Common.BusinessInterfaces.IPanelColourControls;
+using CodingTracker.Business.MainPageService.PanelColourAssigners;
 
 
 /// To do
@@ -86,6 +82,8 @@ namespace CodingTracker.View.Program
 
             IConfiguration configuration = configurationBuilder.Build();
 
+            var connectionString = configuration.GetSection("DatabaseConfig:ConnectionString").Value;
+
             services.AddSingleton<IConfiguration>(configuration)
                     .AddSingleton<IStartConfiguration, StartConfiguration>()  
                     .AddSingleton<IInputValidator, InputValidator>()
@@ -98,19 +96,21 @@ namespace CodingTracker.View.Program
                     .AddSingleton<IFormController, FormController>()
                     .AddSingleton<IInputValidationResult, InputValidationResult>()
                     .AddSingleton<IMessageBoxManager, MessageBoxManager>()
-                    .AddSingleton<IPanelColorControl, PanelColorControl>()
+                    .AddSingleton<IPanelColourControl, PanelColourControl>()
                     .AddSingleton<IErrorHandler, ErrorHandler>()
                     .AddSingleton<IFormSwitcher, FormSwitcher>()
                     .AddSingleton<ICodingSessionTimer, CodingSessionTimer>()
                     .AddSingleton<ICodingSessionCountDownTimer, CodingSessionCountDownTimer>()
-                    .AddSingleton<IQueryBuilder, QueryBuilder>()
                     .AddSingleton<IIdGenerators, IdGenerators>()
-                    .AddSingleton<ICodingTrackerDbContext, CodingTrackerDbContext>()
                     .AddSingleton<ICodingSessionRepository, CodingSessionRepository>()
                     .AddSingleton<ICodingTrackerDbContext, CodingTrackerDbContext>()
                     .AddSingleton<ICodingSessionManager, CodingSessionManager>()
                     .AddSingleton<IUserCredentialRepository , UserCredentialRepository>()
+                    .AddSingleton<IPanelColourAssigner, PanelColourAssigner>()
+
+
                     .AddSingleton<EditSessionPageContextManager>()
+                    .AddSingleton<UserIdService , UserIdService>()
 
 
                     // Transient services.
@@ -123,7 +123,7 @@ namespace CodingTracker.View.Program
                     .AddTransient<CreateAccountPage>()
 
                     .AddDbContext<CodingTrackerDbContext>(options =>
-                        options.UseNpgsql("Data Source=path_to_your_database.db"));
+                    options.UseNpgsql(connectionString), ServiceLifetime.Scoped).AddScoped<ICodingTrackerDbContext, CodingTrackerDbContext>();
 
 
 
