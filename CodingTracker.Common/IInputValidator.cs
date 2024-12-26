@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodingTracker.Common.InputValidationResults;
+using CodingTracker.Common.BusinessInterfaces;
 
 namespace CodingTracker.Common.IInputValidators
 {

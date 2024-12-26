@@ -1,131 +1,101 @@
-﻿using CodingTracker.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using CodingTracker.Data.Interfaces.IUserCredentialRepository;
-using CodingTracker.Data.EntityContexts;
+﻿using CodingTracker.Common.DataInterfaces.ICodingTrackerDbContexts;
+using CodingTracker.Common.DataInterfaces.IUserCredentialRepositories;
+using CodingTracker.Common.Entities.UserCredentialEntities;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Common.UserCredentials;
-using CodingTracker.Data.Repositories.GenericRepository;
-using CodingTracker.Common.IAuthenticationServices;
-using CodingTracker.Common.ILoginManagers;
-using CodingTracker.Common.DataInterfaces.IEntityContexts; 
+using CodingTracker.Common.UserCredentials.UserCredentialDTOs;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CodingTracker.Data.Repositories.UserCredentialRepository
+namespace CodingTracker.Data.Repositories.UserCredentialRepositories
 {
     public class UserCredentialRepository : IUserCredentialRepository
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly IAuthenticationService _authService;
-        private readonly IEntityContext _context;
+        private readonly ICodingTrackerDbContext _dbContext;
 
-        public UserCredentialRepository(IApplicationLogger appLogger, IAuthenticationService authService, IEntityContext context)
-
+        public UserCredentialRepository(IApplicationLogger appLogger, ICodingTrackerDbContext context)
         {
             _appLogger = appLogger;
-            _authService = authService;
-            _context = context;
+            _dbContext = context;
         }
 
-        public async Task<UserCredential> GetCredentialByUsername(string username, Activity activity)
+        public async Task<bool> UserIdExistsAsync(int userId)
         {
-            _appLogger.Info($"Starting {nameof(GetCredentialByUsername)} TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}.");
-            try
-            {
-                var user = await _context.UserCredentials.FirstOrDefaultAsync(uc => uc.Username == username);
-
-                if (user == null)
-                {
-                    _appLogger.Info($"User not found for username: {username}. TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}.");
-                }
-                else
-                {
-                    _appLogger.Info($"User found for username: {username}. TraceId: {activity.TraceId}  , ParentId:   {activity.ParentId}.");
-                }
-                return user;
-
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"Error in {nameof(GetCredentialByUsername)} for username: {username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}.", ex);
-                return null;
-            }
+            return await _dbContext.UserCredentials
+                .AnyAsync(u => u.UserId == userId);
         }
 
-
-        public async Task<bool> CreateUserCredential(UserCredential newUser, Activity activity)
+        public async Task<UserCredentialEntity?> GetUserCredentialByIdAsync(int userId)
         {
-            _appLogger.Info($"Starting {nameof(CreateUserCredential)} TraceId: {activity.TraceId}, ParentId");
-
-            try
-            {
-                await _context.UserCredentials.AddAsync(newUser);
-
-                await _context.SaveChangesAsync();
-                _appLogger.Info($"Successfully created new user credential for username: {newUser.Username}. TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"Error creating new user credential for username: {newUser.Username}. TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}", ex);
-                return false;
-            }
+            return await _dbContext.UserCredentials
+                .FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
-
-        public async Task UpdateUserCredentialPassword(string username, string newPassword, Activity activity)
+        public async Task<bool> UsernameExistsAsync(string username)
         {
-            _appLogger.Info($"Starting {nameof(UpdateUserCredentialPassword)} TraceId: {activity.TraceId} , ParentId:   {activity.ParentId}.");
-
-            try
-            {
-                UserCredential user = await GetCredentialByUsername(username, activity);
-
-                string hashedNewPassword = _authService.HashPassword(newPassword, activity);
-
-                user.PasswordHash = hashedNewPassword;
-
-                await _context.SaveChangesAsync();
-
-                _appLogger.Info($"Password updated successfully for User: {username},TraceId: {activity.TraceId}  , ParentId:{activity.ParentId}.");
-            }
-            catch (DbUpdateException dbEx)
-            {
-                _appLogger.Error($"Database error while updating password for user: {username}. TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}", dbEx);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"Error updating password for user: {username}. TraceId: {activity.TraceId}  , ParentId:   {activity.ParentId}", ex);
-                throw;
-            }
+            return await _dbContext.UserCredentials
+                .AnyAsync(u => u.Username == username);
         }
 
-
-        public async Task<bool> UpdateLastLogin(string username, DateTime lastLogin, Activity activity)
+        public async Task<UserCredentialEntity?> GetUserCredentialByUsernameAsync(string username)
         {
-            _appLogger.Info($"Starting {nameof(UpdateLastLogin)} TraceId: {activity.TraceId}, ParentId: {activity.ParentId}");
-
-            try
-            {
-                UserCredential user = await GetCredentialByUsername(username, activity);
-
-                user.LastLogin = lastLogin;
-
-                await _context.SaveChangesAsync();
-
-                _appLogger.Info($"LastLogin updated successfully for User: {username},TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}.");
-                return true;
-            }
-            catch (DbUpdateException dbEx)
-            {
-                _appLogger.Error($"Database error while updating LastLogin for user: {username}. TraceId: {activity.TraceId} , ParentId:  {activity.ParentId}", dbEx);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _appLogger.Error($"Error updating LastLogin for user: {username}. TraceId: {activity.TraceId}  , ParentId:   {activity.ParentId}", ex);
-                throw;
-            }
+            return await _dbContext.UserCredentials
+                .FirstOrDefaultAsync(u => u.Username == username);
         }
+
+        public async Task<bool> AddUserCredentialAsync(UserCredentialEntity userCredential)
+        {
+            await _dbContext.UserCredentials.AddAsync(userCredential);
+            int result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<bool> ValidateUserCredentialsAsync(string username, string hashedPassword)
+        {
+            return await _dbContext.UserCredentials
+                .AnyAsync(u => u.Username == username && u.PasswordHash == hashedPassword);
+        }
+
+        public async Task<bool> UpdateUserCredentialsAsync(string username, string passwordHash, int userId)
+        {
+            UserCredentialEntity? user = await GetUserCredentialByIdAsync(userId);
+
+            if (user == null) return false;
+
+            user.Username = username;
+            user.PasswordHash = passwordHash;
+
+  
+            int result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
+
+
+        public async Task<bool> UpdatePassWord(string username, string hashedPassword)
+        {
+            UserCredentialEntity? user = await _dbContext.UserCredentials
+                    .FirstOrDefaultAsync(u => u.Username == username);
+
+            if (user == null) return false;
+
+            user.PasswordHash = hashedPassword;
+
+            int result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<bool> DeleteUserAsync(int userId)
+        {
+            return await _dbContext.UserCredentials
+                .Where(u => u.UserId == userId)
+                .ExecuteDeleteAsync() > 0;
+        }
+
+
     }
 }

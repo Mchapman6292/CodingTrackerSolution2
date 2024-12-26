@@ -1,34 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CodingTracker.Common.CodingSessions;
+﻿using CodingTracker.Common.Entities.CodingSessionEntities;
 
-namespace CodingTracker.Common.Interfaces.ICodingSessionRepository
+namespace CodingTracker.Common.DataInterfaces.ICodingSessionRepositories
 {
     public interface ICodingSessionRepository
-
     {
-        Task<bool> AddCodingSession(Activity activity, CodingSession session);
+        Task<List<CodingSessionEntity>> GetSessionsbyIDAsync(List<int> sessionIds);
 
-        Task<IEnumerable<CodingSession>> GetAllCodingSessions(Activity activity);
+        Task<int> DeleteSessionsByIdAsync(IReadOnlyCollection<int> sessionIds);
 
+        Task<List<CodingSessionEntity>> GetRecentSessionsAsync(int numberOfSessions);
 
-        Task<(bool success, List<int> failedIds)> DeleteSessionsById(Activity activity, List<int> sessionIds);
+        Task<List<CodingSessionEntity>> GetSessionsForLastDaysAsync(int numberOfDays);
 
-        Task<IEnumerable<CodingSession>> GetCodingSessionByDateOnly(Activity activity, DateOnly startDate, DateOnly endDate);
+        Task<List<CodingSessionEntity>> GetTodayCodingSessionsAsync();
 
-        Task<bool> SaveCodingSessionChanges(Activity activity);
+        Task<List<CodingSessionEntity>> GetAllCodingSessionAsync();
 
-        Task<IEnumerable<CodingSession>> GetRecentSessions(Activity activity, int numberOfSessions);
-
-
-
-
-
-
-
+        Task<bool> CheckTodayCodingSessions();
     }
 }

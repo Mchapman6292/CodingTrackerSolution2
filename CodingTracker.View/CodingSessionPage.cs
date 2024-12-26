@@ -7,15 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CodingTracker.View.FormControllers;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.Common.ICodingSessions;
-using CodingTracker.Common.ISessionGoalCountDownTimers;
 using CodingTracker.Common.IInputValidators;
 using CodingTracker.Common.IErrorHandlers;
 using CodingTracker.Common.IApplicationLoggers;
+using CodingTracker.Common.CodingSessions;
 using System.Diagnostics;
-using CodingTracker.Common.CodingSessionDTOs;
+using CodingTracker.Business.CodingSessionService.UserIdServices;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.ICodingSessionManagers;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
+using CodingTracker.Common.BusinessInterfaces;
 
 
 namespace CodingTracker.View
@@ -24,35 +25,88 @@ namespace CodingTracker.View
     {
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
-        private readonly ISessionLogic _codingSession;
         private readonly ISessionGoalCountDownTimer _goalCountDownTimer;
         private readonly IInputValidator _inputValidator;
         private readonly IErrorHandler _errorHandler;
         private readonly IApplicationLogger _appLogger;
+        private readonly ICodingSessionManager _codingSessionManager;
+        private readonly IAuthenticationService _authenticationService;
+
+        private readonly UserIdService _userIdService;
 
 
         private int _goalHours;
         private int _goalMinutes;
-        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController, ISessionLogic codingSession, ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger)
+        public CodingSessionPage(IFormSwitcher formSwitcher, IFormController formController,ISessionGoalCountDownTimer goalCountDownTimer, IInputValidator inputValidator, IApplicationLogger appLogger, ICodingSessionManager codingSessionManager, IAuthenticationService authenticationService, UserIdService idService)
         {
             InitializeComponent();
             _formSwitcher = formSwitcher;
             _formController = formController;
-            _codingSession = codingSession;
             _goalCountDownTimer = goalCountDownTimer;
             _inputValidator = inputValidator;
             _appLogger = appLogger;
+            _codingSessionManager = codingSessionManager;
+            _authenticationService = authenticationService;
+            _userIdService = idService;
         }
 
-        private void CodingSessionPageStartSessionButton_Click(object sender, EventArgs e)
+        private async void CodingSessionPageStartSessionButton_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            _formSwitcher.SwitchToCodingSessionTimer();
-            _codingSession.StartSession();
+            await _appLogger.LogActivityAsync(nameof(CodingSessionPageStartSessionButton_Click),
+                async activity =>
+                {
+                    _appLogger.Info($"Starting {nameof(CodingSessionPageStartSessionButton_Click)} TraceId: {activity.TraceId}.");
+                },
+                async activity =>
+                {
+                    try
+                    {
+                        this.Hide();
+                        _appLogger.Info($"Form hidden. TraceId: {activity.TraceId}");
 
+                        _formSwitcher.SwitchToCodingSessionTimer();
+                        _appLogger.Info($"Switched to Coding Session Timer. TraceId: {activity.TraceId}");
+
+                        int currentUserId =  _userIdService.GetCurrentUserId();
+                        _appLogger.Info($"Retrieved current user ID: {currentUserId}. TraceId: {activity.TraceId}");
+
+                        _codingSessionManager.StartCodingSession(activity, currentUserId);
+                        _appLogger.Info($"Coding session started for user ID: {currentUserId}. TraceId: {activity.TraceId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _appLogger.Error($"Error starting coding session. TraceId: {activity.TraceId}", ex);
+                    }
+                });
         }
 
 
+        private async void CodingSesionPageEndSessionButton_Click(object sender, EventArgs e)
+        {
+            await _appLogger.LogActivityAsync(nameof(CodingSesionPageEndSessionButton_Click),
+                async activity =>
+                {
+                    _appLogger.Info($"Starting {nameof(CodingSesionPageEndSessionButton_Click)} TraceId: {activity.TraceId}.");
+                },
+                async activity =>
+                {
+                    try
+                    {
+                        _codingSessionManager.EndCodingSession(activity);
+                        _appLogger.Info($"Coding session ended. TraceId: {activity.TraceId}");
+
+                        this.Hide();
+                        _appLogger.Info($"Form hidden. TraceId: {activity.TraceId}");
+
+                        _formSwitcher.SwitchToMainPage();
+                        _appLogger.Info($"Switched to main page. TraceId: {activity.TraceId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _appLogger.Error($"Error ending coding session. TraceId: {activity.TraceId}", ex);
+                    }
+                });
+        }
 
 
 
@@ -115,12 +169,6 @@ namespace CodingTracker.View
             };
         }
 
-        private void CodingSesionPageEndSessionButton_Click(object sender, EventArgs e)
-        {
-            _codingSession.EndSession();
-            this.Hide();
-            _formSwitcher.SwitchToMainPage();
-        }
 
         private void CodingSessionPageHomeButton_Click(object sender, EventArgs e)
         {

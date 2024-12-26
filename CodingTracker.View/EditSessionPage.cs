@@ -8,27 +8,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CodingTracker.Common.IApplicationControls;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.View.FormControllers;
-using CodingTracker.Common.Interfaces.ICodingSessionRepository;
+using CodingTracker.Common.DataInterfaces.ICodingSessionRepositories;
 using CodingTracker.Common.IApplicationLoggers;
 using System.Diagnostics;
+using CodingTracker.Business.CodingSessionService.EditSessionPageContextManagers;
 using Guna.UI2.WinForms;
+using CodingTracker.Data.Repositories.CodingSessionRepositories;
+using CodingTracker.Common.Entities.CodingSessionEntities;
+using CodingTracker.View.FormService;
 
 namespace CodingTracker.View
 {
     public partial class EditSessionPage : Form
     {
+        private readonly EditSessionPageContextManager EditPageContextManager;
+
+
         private readonly IApplicationControl _appControl;
         private readonly IFormSwitcher _formSwitcher;
         private readonly IFormController _formController;
         private readonly IApplicationLogger _appLogger;
-        private readonly ICodingSessionRepository _codingSessionRepository;
-        private List<int> deletionSessionIds = new List<int>();
+        private readonly CodingSessionRepository _codingSessionRepository;
         private bool isEditSessionOn = false;
 
-        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IApplicationLogger appLogger, ICodingSessionRepository codingSessionRepository)
+        public EditSessionPage(IApplicationControl appControl, IFormSwitcher formSwitcher, IApplicationLogger appLogger, CodingSessionRepository codingSessionRepository, EditSessionPageContextManager editContextManager)
         {
+            EditPageContextManager = editContextManager;
             _appLogger = appLogger;
             _appControl = appControl;
             _formSwitcher = formSwitcher;
@@ -45,77 +50,53 @@ namespace CodingTracker.View
 
         private async Task LoadSessionsIntoDataGridView()
         {
-            using (var activity = new Activity(nameof(LoadSessionsIntoDataGridView)).Start())
+            int numberOfSessions = 20;
+
+            List<CodingSessionEntity> sessions = await _codingSessionRepository.GetRecentSessionsAsync(numberOfSessions);
+
+            EditSessionPageDataGridView.Rows.Clear();
+
+            foreach (var session in sessions)
             {
-                _appLogger.Debug($"Starting {nameof(LoadSessionsIntoDataGridView)}. TraceID: {activity.TraceId}");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                try
+                int rowIndex = EditSessionPageDataGridView.Rows.Add();
+                if(rowIndex < 0)
                 {
-                    int numberOfSessions = 20;
-                    var sessions = await _codingSessionRepository.GetRecentSessions(activity, numberOfSessions);
-
-                    EditSessionPageDataGridView.Rows.Clear();
-
-                    foreach (var session in sessions)
-                    {
-                        int rowIndex = EditSessionPageDataGridView.Rows.Add();
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.SessionId;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.SessionId;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.DurationHHMM;
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartTime?.ToString("g");
-                        EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndTime?.ToString("g");
-
-                        _appLogger.Debug($"Added session to DataGridView: SessionID={session.SessionId}, StartTime={session.StartTime}, EndTime={session.EndTime}, DurationSeconds={session.DurationSeconds}. RowIndex={rowIndex}. TraceID={activity.TraceId}");
-                    }
-
-                    stopwatch.Stop();
-                    _appLogger.Info($"Loaded sessions into DataGridView successfully. Total sessions loaded: {sessions.Count()}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
+                    _appLogger.Error($"Failed to add row for SessionID {session.SessionId}. Invalid row index returned.");
+                    continue;
                 }
-                catch (Exception ex)
-                {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed to load sessions into DataGridView. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
-                }
+
+                EditSessionPageDataGridView.Rows[rowIndex].Cells[0].Value = session.SessionId;
+                EditSessionPageDataGridView.Rows[rowIndex].Cells[1].Value = session.SessionId;
+                EditSessionPageDataGridView.Rows[rowIndex].Cells[2].Value = session.DurationHHMM;
+                EditSessionPageDataGridView.Rows[rowIndex].Cells[3].Value = session.StartDate?.ToString("g");
+                EditSessionPageDataGridView.Rows[rowIndex].Cells[4].Value = session.EndDate?.ToString("g");
+
             }
         }
+         
+        
 
         private void EditModeDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            using (var activity = new Activity(nameof(EditModeDataGridView_CellClick)).Start())
+            if (isEditSessionOn && e.RowIndex >= 0)
             {
-                _appLogger.Debug($"Starting {nameof(EditModeDataGridView_CellClick)}: TraceID: {activity.TraceId}");
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                DataGridViewRow row = EditSessionPageDataGridView.Rows[e.RowIndex];
+                int sessionId = Convert.ToInt32(row.Cells["SessionId"].Value);
 
-                try
+                bool highlight = EditPageContextManager.CheckForSessionId(sessionId);
+                if (highlight)
                 {
-                    if (isEditSessionOn && e.RowIndex >= 0)
-                    {
-                        DataGridViewRow row = EditSessionPageDataGridView.Rows[e.RowIndex];
-                        int sessionId = Convert.ToInt32(row.Cells["SessionId"].Value);
-
-                        bool highlight = !deletionSessionIds.Contains(sessionId);
-                        if (highlight)
-                        {
-                            deletionSessionIds.Add(sessionId);
-                        }
-                        else
-                        {
-                            deletionSessionIds.Remove(sessionId);
-                        }
-                        HighlightRow(row, highlight);
-                        _appLogger.Info($"Row clicked: SessionID={sessionId}, Highlighted={highlight}, TraceID={activity.TraceId}");
-                    }
-                    stopwatch.Stop();
-                    _appLogger.Info($"{nameof(EditModeDataGridView_CellClick)} completed successfully. Execution Time: {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
+                    EditPageContextManager.AddSessionIdForDeletion(sessionId);
                 }
-                catch (Exception ex)
+                else
                 {
-                    stopwatch.Stop();
-                    _appLogger.Error($"Failed during {nameof(EditModeDataGridView_CellClick)}. Error: {ex.Message}. Execution Time: {stopwatch.ElapsedMilliseconds}ms, TraceID: {activity.TraceId}");
+                    EditPageContextManager.RemoveSessionIdForDeletion(sessionId);
                 }
+                HighlightRow(row, highlight);
             }
         }
+            
+        
 
 
         private void HighlightRow(DataGridViewRow row, bool highlight)
@@ -155,19 +136,7 @@ namespace CodingTracker.View
             DeleteSessionButton.Visible = true;
         }
 
-        private void ClearDeletionSessionIdsList()
-        {
-            using(var activity = new Activity(nameof(ClearDeletionSessionIdsList)).Start())
-            {
-                _appLogger.Info($"Starting {nameof(ClearDeletionSessionIdsList)}. TraceID: {activity.TraceId}.");
-                Stopwatch stopwatch = Stopwatch.StartNew();
 
-                deletionSessionIds.Clear();
-                stopwatch.Stop();
-
-                _appLogger.Info($"{nameof(ClearDeletionSessionIdsList)} complete, elapsed time : {stopwatch.ElapsedMilliseconds}, TraceID: {activity.TraceId}");
-            }
-        }
 
         private void ToggleEditMode()
         {
@@ -193,21 +162,13 @@ namespace CodingTracker.View
 
         private void ChangeButtonColorIfEditSession()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            using (var activity = new Activity(nameof(ChangeButtonColorIfEditSession)).Start())
+            if (!isEditSessionOn) 
             {
-                _appLogger.Debug($"Starting {nameof(ChangeButtonColorIfEditSession)}, TraceID: {activity.TraceId}.");
-
-                if (!isEditSessionOn) 
-                {
-                    EditSessionButton.ForeColor = Color.White;
-                }
-                else
-                {
-                    EditSessionButton.ForeColor = Color.FromArgb(193, 20, 137); // Default dark pink
-                }
-                stopwatch.Stop();
-                _appLogger.Info($"{nameof(EditSessionButton_Click)}: completed TraceID: {activity.TraceId}. Elapsed time: {stopwatch.ElapsedMilliseconds}.");
+                EditSessionButton.ForeColor = Color.White;
+            }
+            else
+            {
+                EditSessionButton.ForeColor = Color.FromArgb(193, 20, 137); // Default dark pink
             }
         }
 
@@ -238,48 +199,16 @@ namespace CodingTracker.View
 
         private async void DeleteSessionButton_Click(object sender, EventArgs e)
         {
-            using (var activity = new Activity(nameof(DeleteSessionButton_Click)).Start())
+            if(!isEditSessionOn)
             {
-                if (!isEditSessionOn)
-                {
-                    _appLogger.Error($"Error for {nameof(DeleteSessionButton_Click)}. isEditSessionOn is set to false, session editing must be enabled to delete sessions. TraceID: {activity.TraceId}");
-                    return;
-                }
-
-                if (deletionSessionIds.Count == 0)
-                {
-                    _appLogger.Error($"Error for {nameof(DeleteSessionButton_Click)}. deletionSessionIds list is empty. TraceID: {activity.TraceId}");
-                    return;
-                }
-
-                try
-                {
-                    DeleteSessionButton.Enabled = false;
-
-                    _appLogger.Info($"Starting deletion of {deletionSessionIds.Count} sessions. TraceID: {activity.TraceId}");
-
-                    var (success, failedIds) = await _codingSessionRepository.DeleteSessionsById(activity, deletionSessionIds);
-
-                    if (success)
-                    {
-                        _appLogger.Info($"Successfully deleted {deletionSessionIds.Count - failedIds.Count} out of {deletionSessionIds.Count} sessions. TraceID: {activity.TraceId}");
-                    }
-                    else
-                    {
-                        _appLogger.Warning($"Failed to delete some sessions. {failedIds.Count} deletions failed. TraceID: {activity.TraceId}");
-                    }
-                    await LoadSessionsIntoDataGridView();
-                    deletionSessionIds.Clear();
-                }
-                catch (Exception ex)
-                {
-                    _appLogger.Error($"Error in {nameof(DeleteSessionButton_Click)}. Error: {ex.Message}. TraceID: {activity.TraceId}", ex);
-                }
-                finally
-                {
-                    DeleteSessionButton.Enabled = true;
-                }
+                _appLogger.Error($"Error for {nameof(DeleteSessionButton_Click)}. isEditSessionOn is set to false, session editing must be enabled to delete sessions.");
             }
+
+            DeleteSessionButton.Enabled = false; // Disabled during deletion to prevent multiple clicks etc.
+
+            IReadOnlyCollection<int> deletedSessionIds = EditPageContextManager.GetSessionIdsForDeletion();
+
+
         }
 
 

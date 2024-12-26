@@ -7,36 +7,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CodingTracker.Common.ICredentialManagers;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.Data.CredentialManagers;
 using CodingTracker.Common.IInputValidators;
-using CodingTracker.View.FormControllers;
 using System.Diagnostics;
 using CodingTracker.View;
 using System.Security.Principal;
-using CodingTracker.View.FormSwitchers;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
 
 namespace CodingTracker.View
 {
 
     public partial class CreateAccountPage : Form
     {
-        private readonly ICredentialManager _credentialManager;
         private readonly IInputValidator _inputValidator;
         private readonly IApplicationLogger _appLogger;
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
+        private readonly IAuthenticationService _authenticationService;
         public Action<string> AccountCreatedCallback { get; set; }
 
-        public CreateAccountPage(ICredentialManager credentialManager, IInputValidator inputValidator, IApplicationLogger appLogger, IFormController formController, IFormSwitcher formSwitcher)
+        public CreateAccountPage( IInputValidator inputValidator, IApplicationLogger appLogger, IFormController formController, IFormSwitcher formSwitcher, IAuthenticationService authentication)
         {
             InitializeComponent();
-            _credentialManager = credentialManager;
             _inputValidator = inputValidator;
             _appLogger = appLogger;
             _formController = formController;
             _formSwitcher = formSwitcher;
+            _authenticationService = authentication;
+            
         }
 
         private void DisplayErrorMessage(string message)
@@ -45,7 +44,7 @@ namespace CodingTracker.View
         }
 
 
-        private void CreateAccountPageCreateAccountButton_Click(object sender, EventArgs e)
+        private async void CreateAccountPageCreateAccountButton_Click(object sender, EventArgs e)
         {
             Stopwatch overallStopwatch = Stopwatch.StartNew();
             using (var activity = new Activity(nameof(CreateAccountPageCreateAccountButton)).Start())
@@ -62,10 +61,9 @@ namespace CodingTracker.View
                 {
                     try
                     {
-                        _credentialManager.CreateAccount(username, password);
+                       bool isAccountCreated = await _authenticationService.CreateAccount(username, password);
 
-                        // Checks if credentials have been added to the database. 
-                        if (_credentialManager.IsAccountCreatedSuccessfully(username))
+                        if (isAccountCreated)
                         {
                             _appLogger.Info($"Account creation successful for user: {username}. Total Duration: {overallStopwatch.ElapsedMilliseconds}ms. TraceID: {activity.TraceId}");
 

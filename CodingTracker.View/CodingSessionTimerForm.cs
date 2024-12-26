@@ -9,18 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CodingTracker.Common.ICodingSessions;
 using CodingTracker.Common.IErrorHandlers;
-using CodingTracker.View.FormSwitchers;
-using CodingTracker.View.FormControllers;
-using CodingTracker.Common.ISessionGoalCountDownTimers;
-using CodingTracker.View.FormFactories;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces;
 namespace CodingTracker.View
 {
     public partial class CodingSessionTimerForm : Form
     {
         private readonly IApplicationLogger _appLogger;
-        private readonly ISessionLogic _codingSesison;
         private readonly IErrorHandler _errorHandler;
         private readonly IFormSwitcher _formSwitcher;
         private readonly IFormController _formController;
@@ -32,10 +28,9 @@ namespace CodingTracker.View
 
 
 
-        public CodingSessionTimerForm(IApplicationLogger appLogger, ISessionLogic codingSession, ISessionGoalCountDownTimer countdownTimer, IFormSwitcher formSwitcher, IFormController formController, IFormFactory formFactory)
+        public CodingSessionTimerForm(IApplicationLogger appLogger, ISessionGoalCountDownTimer countdownTimer, IFormSwitcher formSwitcher, IFormController formController, IFormFactory formFactory)
         {
             _appLogger = appLogger;
-            _codingSesison = codingSession;
             _sessionCountDownTimer = countdownTimer;
             _formSwitcher = formSwitcher;
             _formController = formController;
@@ -106,7 +101,6 @@ namespace CodingTracker.View
         private void CodingTimerPageEndSessionButton_Click(object sender, EventArgs e)
         {
             _sessionCountDownTimer.StopCountDownTimer();
-            _codingSesison.EndSession();
             _formFactory.CreateMainPage();
             _formSwitcher.SwitchToMainPage();
   

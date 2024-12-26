@@ -1,8 +1,5 @@
 ﻿using CodingTracker.Common.IApplicationControls;
-using CodingTracker.Common.ILoginManagers;
 using CodingTracker.Common.IApplicationLoggers;
-using CodingTracker.View.FormControllers;
-using CodingTracker.View.FormSwitchers;
 
 using System;
 using System.IO;
@@ -10,11 +7,9 @@ using System.Windows.Forms;
 using LibVLCSharp.Shared;
 using LibVLCSharp.WinForms;
 using System.Diagnostics;
-using CodingTracker.Common.ICredentialManagers;
-using CodingTracker.Data.CredentialManagers;
 using System.Drawing.Drawing2D;
-using CodingTracker.Common.IDatabaseManagers;
-using CodingTracker.Common.UserCredentialDTOs;
+using CodingTracker.View.FormService;
+using CodingTracker.Common.BusinessInterfaces.IAuthenticationServices;
 
 namespace CodingTracker.View
 {
@@ -23,22 +18,18 @@ namespace CodingTracker.View
         private readonly IAuthenticationService _authenticationService;
         private readonly IApplicationControl _appControl;
         private readonly IApplicationLogger _appLogger;
-        private readonly ICredentialManager _credentialManager;
         private readonly IFormController _formController;
         private readonly IFormSwitcher _formSwitcher;
-        private readonly IDatabaseManager _databaseManager;
         private LibVLC _libVLC;
         private VideoView _videoView;
 
-        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, ICredentialManager credentialManager, IFormController formController, IFormSwitcher formSwitcher, IDatabaseManager databaseManager)
+        public LoginPage(IAuthenticationService authenticationService, IApplicationControl appControl, IApplicationLogger applogger, IFormController formController, IFormSwitcher formSwitcher)
         {
             _authenticationService = authenticationService;
             _appControl = appControl;
             _appLogger = applogger;
-            _credentialManager = credentialManager;
             _formController = formController;
             _formSwitcher = formSwitcher;
-            _databaseManager = databaseManager;
             this.FormBorderStyle = FormBorderStyle.None;
             InitializeComponent();
             InitializeVLCPlayer();
@@ -137,37 +128,44 @@ namespace CodingTracker.View
 
 
 
-        private void loginPageLoginButton_Click(object sender, EventArgs e)
+        private async void loginPageLoginButton_Click(object sender, EventArgs e)
         {
-            _appLogger.LogActivity(nameof(loginPageLoginButton_Click),
-            activity => _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}"),
-           async activity =>
-            {
-                string username = loginPageUsernameTextbox.Text;
-                string password = LoginPagePasswordTextbox.Text;
-
-
-                bool isValidLogin = await _authenticationService.AuthenticateLogin(username, password, activity);
-
-                if (isValidLogin)
+            await _appLogger.LogActivityAsync(nameof(loginPageLoginButton_Click),
+                async activity =>
                 {
-                    if (LoginPageRememberMeToggle.Checked)
+                    _appLogger.Info($"Login activity started. TraceId:{activity.TraceId}");
+                },
+                async activity =>  // Note the added 'activity' parameter here
+                {
+                    try
                     {
-                        Properties.Settings.Default.LastUsername = username;
-                        Properties.Settings.Default.Save();
-                    }
+                        string username = loginPageUsernameTextbox.Text;
+                        string password = LoginPagePasswordTextbox.Text;
+                        bool isValidLogin = await _authenticationService.AuthenticateLogin(username, password, activity);
 
-                    this.Hide();
-                    _formSwitcher.SwitchToMainPage();
-                    _appLogger.Info("User logged in successfully.");
+                        if (isValidLogin)
+                        {
+                            if (LoginPageRememberMeToggle.Checked)
+                            {
+                                Properties.Settings.Default.LastUsername = username;
+                                Properties.Settings.Default.Save();
+                            }
+                            this.Hide();
+                            _formSwitcher.SwitchToMainPage();
+                            _appLogger.Info($"User logged in successfully. TraceId:{activity.TraceId}");
+                        }
+                        else
+                        {
+                            LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
+                            _appLogger.Warning($"Login failed for user '{username}'. TraceId:{activity.TraceId}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _appLogger.Error($"Error during login process. TraceId:{activity.TraceId}", ex);
+                    }
                 }
-                else
-                {
-                    LoginPageDisplaySuccessMessage("Login failed. Please check your username and password.");
-                    _appLogger.Warning($"Login failed for user '{username}'. TraceID: {Activity.Current?.TraceId}");
-                }
-            }
-    );
+            );
         }
 
 
@@ -215,7 +213,7 @@ namespace CodingTracker.View
 
         private void LoginPageForgotPasswordButton_Click(object sender, EventArgs e)
         {
-            _databaseManager.UpdateCodingSessionsTable();
+          
         }
 
         private void LoginPageRememberMeToggle_CheckedChanged(object sender, EventArgs e)
