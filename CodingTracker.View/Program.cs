@@ -39,6 +39,7 @@ using CodingTracker.Common.DataInterfaces;
 using CodingTracker.Business.MainPageService.PanelColorControls;
 using CodingTracker.Common.BusinessInterfaces.IPanelColourControls;
 using CodingTracker.Business.MainPageService.PanelColourAssigners;
+using CodingTracker.Business.CodingSessionService.SessionCalculators;
 
 
 /// To do
